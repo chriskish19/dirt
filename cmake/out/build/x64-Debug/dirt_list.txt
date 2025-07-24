@@ -1,0 +1,13 @@
+// dirt_lists.txt example code
+
+
+
+args : -copy -watch -mirror -recursive
+{
+	src C:\dirt_test_src
+	dst C:\dirt_test_dst
+}
+
+
+
+// cmd line example

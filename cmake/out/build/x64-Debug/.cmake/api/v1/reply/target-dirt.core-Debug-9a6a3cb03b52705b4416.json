@@ -1,0 +1,294 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "dirt.core.exe"
+		},
+		{
+			"path" : "dirt.core.pdb"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"_add_executable",
+			"add_executable",
+			"target_compile_definitions"
+		],
+		"files" : 
+		[
+			"C:/Users/chris/scoop/apps/vcpkg/current/scripts/buildsystems/vcpkg.cmake",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 40,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 598,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 54,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 3,
+					"define" : "CORE_NAMES_INCLUDE=CORE_names_hpp"
+				},
+				{
+					"backtrace" : 4,
+					"define" : "CORE_args_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/codes/args.hpp\""
+				},
+				{
+					"backtrace" : 5,
+					"define" : "CORE_cmdline_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/classes/cmdline.hpp\""
+				},
+				{
+					"backtrace" : 6,
+					"define" : "CORE_codes_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/codes/codes.hpp\""
+				},
+				{
+					"backtrace" : 7,
+					"define" : "CORE_dirt_api_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/api/dirt_api.hpp\""
+				},
+				{
+					"backtrace" : 8,
+					"define" : "CORE_names_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/depends/macro/names.hpp\""
+				},
+				{
+					"backtrace" : 9,
+					"define" : "CORE_processor_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/classes/processor.hpp\""
+				},
+				{
+					"backtrace" : 10,
+					"define" : "CORE_stl_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/depends/stl/stl.hpp\""
+				},
+				{
+					"backtrace" : 11,
+					"define" : "CORE_stl_includes_hpp=\"C:/Users/chris/source/repos/utilities/dirt/cmake/../projects/dirt.core/depends/stl/stl_includes.hpp\""
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					2
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4
+			]
+		}
+	],
+	"id" : "dirt.core::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -MDd",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "/machine:x64 /debug /INCREMENTAL /subsystem:console",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "dirt.core",
+	"nameOnDisk" : "dirt.core.exe",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/api/dirt_api.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/cmdline.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/processor.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/depends/stl/stl_includes.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/entry/main.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/api/dirt_api.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/cmdline.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/processor.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/codes/args.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/codes/codes.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/depends/macro/names.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/depends/stl/stl.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "C:/Users/chris/source/repos/utilities/dirt/projects/dirt.core/depends/stl/stl_includes.hpp",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "EXECUTABLE"
+}

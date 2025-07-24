@@ -1,0 +1,14 @@
+# ninja log v6
+3	17	7732533977025892	clean	8c45b54705a541e8
+37	359	7732534098079765	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/depends/stl/stl_includes.cpp.obj	b5b17b1ccb738406
+43	2317	7732776865789505	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/cmdline.cpp.obj	59321187176ac73
+60	2556	7733442943308036	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/entry/main.cpp.obj	2988e1b98f26bd48
+38	2649	7732776865744299	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/api/dirt_api.cpp.obj	cffb6ee18bc7a39c
+54	2792	7733442943244984	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/processor.cpp.obj	e7865defd00438d6
+2792	3397	7733442970619066	dirt.core.exe	8e3fdfd90e7a8aa0
+68	630	7750114529751220	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/depends/stl/stl_includes.cpp.obj	a37cc195a29e4d54
+72	2845	7750114529787044	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/entry/main.cpp.obj	bf0bc04b0a0364a4
+60	2859	7750114529672552	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/cmdline.cpp.obj	998796d82a04a5a2
+64	3109	7750114529700168	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/classes/processor.cpp.obj	29bca4c120acc39
+55	3200	7750114529611155	CMakeFiles/dirt.core.dir/C_/Users/chris/source/repos/utilities/dirt/projects/dirt.core/api/dirt_api.cpp.obj	a379faf1c0dd79a5
+3200	4143	7750114561066177	dirt.core.exe	3494c78bd38d3b1e
