@@ -217,13 +217,13 @@ std::vector<core::arg_entry> core::parse_file(const std::filesystem::path& p, co
 
 			if (last_word == "{" and word == "src") {
 				// the next should be the src path
-				iss >> word;
+				iss >> std::quoted(word);
 				entry.src_p = word;
 			}
 
 			if (word == "dst") {
 				// the next should be the dst path
-				iss >> word;
+				iss >> std::quoted(word);
 				entry.dst_p = word;
 			}
 		}
@@ -571,3 +571,4 @@ void core::output_entry_data(const file_entry& entry, const std::string& name)
 		<< "Action: " << action_to_string(entry.action) << '\n'
 		<< "File type: " << file_type_to_string(entry.src_s.type()) << '\n';
 }
+

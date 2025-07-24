@@ -21,7 +21,7 @@ args : -copy -watch -mirror
 Its a simple syntax parser that looks for right token and in the right place. If there is a syntax error the terminal will 
 output a syntax error. But only a general error it doesnt tell what token is missing or where. There is no limit to the amount of directories
 to be monitored/synced but each will use a 4MB buffer so keep that in mind. The file can be named anything but the extension type must support UTF text.
-if there is spaces in the path wrap it in double quotes "./hello world folder".
+Currently v1.0 doesnt support spaces in the directory name. But Ive added code to support spaces and will add it to the next release.
 </p>
 
 ## Arguments:
@@ -82,3 +82,11 @@ Copies directories recursively. Everything inside a directory and inside other d
 In the valid combinations table, at most arguments are shown but arguments on each line can be less and will 
 be valid as long as copy or watch is specified. Src, dst must always be specified.
 </p>
+
+## How to run
+<p>In your terminal:</p>
+
+```powershell
+PS C:\Users\chris>.\dirt.core -dirt_list_path ./dirt_list.txt
+
+```
