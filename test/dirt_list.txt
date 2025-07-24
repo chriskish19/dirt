@@ -1,0 +1,7 @@
+// dirt_lists.txt example code
+
+args : -copy -watch -mirror
+{
+	src "C:/dirt test src"
+	dst C:/dirt_test_dst
+}

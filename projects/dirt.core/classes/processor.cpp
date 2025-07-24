@@ -727,7 +727,7 @@ void core::queue_system::filesystem_ec(const std::filesystem::filesystem_error& 
         // do
         break;
     case static_cast<int>(std::errc::permission_denied):
-        // do
+        add_delayed_entry(entry);
         break;
     case static_cast<int>(std::errc::not_a_directory):
         // do
@@ -839,12 +839,15 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
 bool core::queue_system::skip_entry(file_entry& entry)
 {
     auto set = entry.p_di_set;
+    std::filesystem::path partial_path;
     for (const auto& part : entry.src_p) {
-        if (std::filesystem::is_directory(part)) {
+        partial_path /= part;
+        if (std::filesystem::is_directory(partial_path) == true 
+            and partial_path != partial_path.root_path()) {
             {
                 std::unique_lock<std::mutex> local_lock(m_set_mtx);
                 directory_info di;
-                di.p = part;
+                di.p = partial_path;
                 auto found = set->find(di);
                 if (found != set->end()) {
                     return true;
