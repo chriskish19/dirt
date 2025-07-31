@@ -27,6 +27,7 @@ namespace core {
         unknown_exception_caught,
         invalid_directory_path,
         exception_thrown_and_handled,
+        pointer_is_null,
     };
 
     class code_pkg {
@@ -53,4 +54,5 @@ namespace core {
     inline const code_pkg unknown_exception_caught_pkg(codes::unknown_exception_caught, "core::codes::unknown_exception_caught | message: unknown exception caught and handled.");
     inline const code_pkg invalid_directory_path_pkg(codes::invalid_directory_path, "core::codes::invalid_directory_path | message: directory path given either is not a directory or it doesnt exist on the system.");
     inline const code_pkg exception_thrown_and_handled_pkg(codes::exception_thrown_and_handled, "core::codes::exception_thrown_and_handled | message: an exception was thrown and handled in a try catch block.");
+    inline const code_pkg pointer_is_null_pkg(codes::pointer_is_null, "core::codes::pointer_is_null | message: the pointer has no memory and is equal to nullptr");
 }

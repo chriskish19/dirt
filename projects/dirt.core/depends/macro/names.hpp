@@ -24,6 +24,8 @@
 // classes
 #define CORE_PROCESSOR_INCLUDE_PATH				CORE_processor_hpp					// processes files
 #define CORE_CMDLINE_INCLUDE_PATH				CORE_cmdline_hpp					// processes cmd line args
+#define CORE_LOGGER_INCLUDE_PATH				CORE_logger_hpp						// logger queue
 
 // libs
 #define CORE_FTXUI_INCLUDE_PATH					CORE_ftx_includes_hpp				// ftxui library all includes
+

@@ -15,9 +15,13 @@
 #include CORE_API_INCLUDE_PATH
 #include CORE_CMDLINE_INCLUDE_PATH
 #include CORE_PROCESSOR_INCLUDE_PATH
+#include CORE_LOGGER_INCLUDE_PATH
+
 
 
 int main(int argc, char* argv[]) {
+
+    core::glb_sl = std::make_unique<core::system_log>();
 
     std::jthread ui_thread([] {
         float progress = 0.0f;
@@ -25,6 +29,8 @@ int main(int argc, char* argv[]) {
         auto screen = ftxui::ScreenInteractive::TerminalOutput();
 
         auto renderer = ftxui::Renderer([&] {
+            
+            
             return ftxui::vbox({
                 // Simple header
                 ftxui::text("DIRT API") | ftxui::bold | ftxui::center,
@@ -35,10 +41,12 @@ int main(int argc, char* argv[]) {
                 // Placeholder content
                 ftxui::text("Working...") | ftxui::center,
                 }) | ftxui::border;
+
+                
             });
 
         screen.Loop(renderer);
-        });
+    });
 
 
 

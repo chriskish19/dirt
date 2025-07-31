@@ -13,6 +13,8 @@
 #include CORE_STL_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
 #include CORE_ARGS_INCLUDE_PATH
+#include CORE_LOGGER_INCLUDE_PATH
+
 
 #include <Windows.h>
 

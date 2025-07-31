@@ -104,6 +104,8 @@ core::code_pkg core::match_code(codes code)
 		return unknown_exception_caught_pkg;
 	case codes::exception_thrown_and_handled:
 		return exception_thrown_and_handled_pkg;
+	case codes::pointer_is_null:
+		return pointer_is_null_pkg;
 	default:
 		return c_unknown_pkg;
 	}
@@ -122,8 +124,8 @@ std::string core::get_location(std::source_location sl)
 
 void core::output_em(const code_pkg cp, const std::string location)
 {
-	std::osyncstream synced_cout(std::cout);
-	synced_cout << cp.m_s_code << '\n' << location << '\n';
+	std::string message = cp.m_s_code + '\n' 
+		+ location + '\n';
 }
 
 std::vector<core::args> core::validate_args(const std::vector<arg_pkg>& args)
@@ -311,23 +313,26 @@ void core::output_entry(const arg_entry& e)
 		s_v.push_back(pkg.m_s_arg);
 	}
 
-	std::osyncstream synced_cout(std::cout);
-
 	// outputing to the console:
-	synced_cout << "Entry number: " << e.entry_number << '\n';
+	std::string message;
+
+	message = "Entry number: " + std::to_string(e.entry_number) + '\n';
 	for (const auto& s : s_v) {
-		synced_cout << "arg: " << s << '\n';
+		message += "arg: " + s + '\n';
 	}
-	synced_cout << "Destination Path: " << e.dst_p << '\n';
-	synced_cout << "Source Path: " << e.src_p << '\n';
+	message += "Destination Path: " + e.dst_p.string() + '\n'
+	+ "Source Path: " + e.src_p.string() + '\n';
+
+	glb_sl->log_message(message);
 	
 }
 
 void core::output_fse(const std::filesystem::filesystem_error& e)
 {
-	std::osyncstream synced_cout(std::cout);
-	synced_cout << "Message: " << e.what() << '\n' << "Path 1: " 
-		<< e.path1() << '\n' << "Path 2: " << e.path2() << '\n';
+	std::string message = "Message: " + std::string(e.what()) + '\n' 
+		+ "Path 1: " + e.path1().string() + '\n'
+		+ "Path 2: " + e.path2().string() + '\n';
+	glb_sl->log_message(message);
 }
 
 std::uintmax_t core::file_numbers(const std::filesystem::path& p)
@@ -476,8 +481,8 @@ std::string core::file_type_to_string(std::filesystem::file_type type) {
 
 void core::output_filesystem_ec(std::error_code ec)
 {
-	std::osyncstream synced_cout(std::cout);
-	synced_cout << "filesystem error (" << ec.value() << "): " << ec.message() << '\n';
+	std::string message = "filesystem error (" + std::to_string(ec.value()) + "): " + ec.message() + '\n';
+	glb_sl->log_message(message);
 }
 
 std::vector<core::arg_entry> core::get_specific_entries(const std::vector<arg_entry>& v, args specific_arg)
@@ -511,19 +516,6 @@ std::uintmax_t core::total_size(const std::filesystem::path& p)
 		output_em(unknown_exception_caught_pkg);
 	}
 	return 0;
-}
-
-void core::progress_dots_in_terminal(int count, int delay_ms, int repeat)
-{
-	for (int r = 0; r < repeat; ++r) {
-		for (int i = 1; i <= count; ++i) {
-			std::cout << "\rProcessing";
-			for (int j = 0; j < i; ++j) std::cout << '.';
-			std::cout << std::flush;
-			std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
-		}
-	}
-	std::cout << "\rProcessing   \r"; // Clear line after animation
 }
 
 std::vector<std::queue<core::file_entry>> core::split_queue(std::queue<file_entry> buffer_q, std::size_t number_of_qs)
@@ -565,12 +557,14 @@ bool core::find_directory(const std::filesystem::path& p, const std::filesystem:
 
 void core::output_entry_data(const file_entry& entry, const std::string& name)
 {
-	std::osyncstream synced_cout(std::cout);
-	synced_cout << '\n'
-		<< name << '\n'
-		<< "Source Path: " << entry.src_p << '\n'
-		<< "Destination Path: " << entry.dst_p << '\n'
-		<< "Action: " << action_to_string(entry.action) << '\n'
-		<< "File type: " << file_type_to_string(entry.src_s.type()) << '\n';
+	std::string message = '\n' +
+		name + '\n'
+		+ "Source Path: " + entry.src_p.string() + '\n'
+		+ "Destination Path: " + entry.dst_p.string() + '\n'
+		+ "Action: " + action_to_string(entry.action) + '\n'
+		+ "File type: " + file_type_to_string(entry.src_s.type()) + '\n';
+	
+	glb_sl->log_message(message);
+	 
 }
 
