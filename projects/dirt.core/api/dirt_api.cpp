@@ -1,4 +1,4 @@
-#include "dirt_api.hpp"
+
 /**********************************************************/
 //
 // File: dirt_api.cpp
@@ -566,8 +566,10 @@ bool core::find_directory(const std::filesystem::path& p, const std::filesystem:
 void core::output_entry_data(const file_entry& entry, const std::string& name)
 {
 	std::osyncstream synced_cout(std::cout);
-	synced_cout << '\n' << name << '\n' << "Source Path: " << entry.src_p
-		<< '\n' << "Destination Path: " << entry.dst_p << '\n'
+	synced_cout << '\n'
+		<< name << '\n'
+		<< "Source Path: " << entry.src_p << '\n'
+		<< "Destination Path: " << entry.dst_p << '\n'
 		<< "Action: " << action_to_string(entry.action) << '\n'
 		<< "File type: " << file_type_to_string(entry.src_s.type()) << '\n';
 }
