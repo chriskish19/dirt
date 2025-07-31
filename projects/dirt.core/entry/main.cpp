@@ -21,29 +21,33 @@
 
 int main(int argc, char* argv[]) {
 
+    // global logging
     core::glb_sl = std::make_unique<core::system_log>();
+    core::glb_el = std::make_unique<core::system_log>();
 
-    std::jthread ui_thread([] {
+
+    std::vector<ftxui::Element> log_elements;
+    auto logs = core::glb_sl->latest();
+
+    for (const auto& lg : logs) {
+        log_elements.push_back(ftxui::text(lg));
+    }
+
+    std::jthread ui_thread([&] {
         float progress = 0.0f;
-
         auto screen = ftxui::ScreenInteractive::TerminalOutput();
 
         auto renderer = ftxui::Renderer([&] {
             
-            
             return ftxui::vbox({
-                // Simple header
-                ftxui::text("DIRT API") | ftxui::bold | ftxui::center,
-
-                // Progress bar
+                ftxui::text("DIRT") | ftxui::bold | ftxui::center,
                 ftxui::gauge(progress) | ftxui::border,
-
-                // Placeholder content
                 ftxui::text("Working...") | ftxui::center,
-                }) | ftxui::border;
-
-                
-            });
+                ftxui::separator(),
+                ftxui::text("Logs:") | ftxui::bold,
+                ftxui::vbox(log_elements) | ftxui::frame | ftxui::border
+            }) | ftxui::border;
+        });
 
         screen.Loop(renderer);
     });

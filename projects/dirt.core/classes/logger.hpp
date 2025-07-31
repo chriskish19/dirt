@@ -74,8 +74,13 @@ namespace core {
 		~system_log();
 
 		void log_message(const std::string& message);
+
+		std::vector<std::string> latest();
 	};
 
-	// global system logger object
+	// global system logger object, info logs
 	extern std::unique_ptr<system_log> glb_sl;
+
+	// global system logger object, error logs
+	extern std::unique_ptr<system_log> glb_el;
 }

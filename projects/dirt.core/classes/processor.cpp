@@ -26,7 +26,7 @@ core::process::~process()
 core::codes core::process::process_entry()
 {
     {
-        std::cout << "Processing copy entries...\n";
+        glb_sl->log_message( "Processing copy entries...\n");
         codes code = process_copy_entries();
         if (code != codes::success) {
             return code;
@@ -35,7 +35,7 @@ core::codes core::process::process_entry()
     
     
     {
-        std::cout << "Processing watch entries...\n";
+        glb_sl->log_message("Processing watch entries...\n");
         codes code = process_watch_entries();
         if (code != codes::success) {
             return code;
@@ -203,8 +203,10 @@ core::codes core::process::process_copy_entries()
             double speed = size / seconds; // bytes per second
 
             output_entry(entry);
-            std::cout << "Copied " << size << " bytes in " << seconds << " seconds.\n";
-            std::cout << "Speed: " << (speed / (1024 * 1024)) << " MB/s\n";
+            std::string message = "Copied " + std::to_string( size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
+                 + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
+
+            glb_sl->log_message(message);
         }
         else {
             auto start = std::chrono::high_resolution_clock::now();
@@ -224,8 +226,10 @@ core::codes core::process::process_copy_entries()
             double speed = size / seconds; // bytes per second
 
             output_entry(entry);
-            std::cout << "Copied " << size << " bytes in " << seconds << " seconds.\n";
-            std::cout << "Speed: " << (speed / (1024 * 1024)) << " MB/s\n";
+            std::string message = "Copied " + std::to_string(size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
+                + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
+
+            glb_sl->log_message(message);
         }
 
     }
@@ -366,9 +370,9 @@ void core::queue_system::regular_file(file_entry& entry)
             copied = std::filesystem::copy_file(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing);
 
-            if (copied == false) {
-                std::osyncstream synced_cout(std::cout);
-                synced_cout << "File not copied: " << entry.src_p << '\n';
+            if (copied == false and std::filesystem::exists(entry.dst_p) == false) {
+                std::string error = "File not copied: " + entry.src_p.string() + '\n';
+                glb_el->log_message(error);
             }
         }
         catch (const std::filesystem::filesystem_error& e) {
@@ -400,9 +404,9 @@ void core::queue_system::regular_file(file_entry& entry)
 
             removed = std::filesystem::remove(entry.dst_p);
 
-            if (removed == false) {
-                std::osyncstream synced_cout(std::cout);
-                synced_cout << "Failed to delete: " << entry.dst_p << '\n';
+            if (removed == false and std::filesystem::exists(entry.dst_p) == true) {
+                std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
+                glb_el->log_message(error);
             }
         }
         catch (const std::filesystem::filesystem_error& e) {
@@ -511,13 +515,14 @@ void core::queue_system::directory(file_entry& entry)
             removed = std::filesystem::remove_all(entry.dst_p);
 
 
-            std::osyncstream synced_cout(std::cout);
             if (removed == 0) {
-                synced_cout << "Failed to delete: " << entry.dst_p << '\n';
+                std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
+                glb_el->log_message(error);
             }
             else {
-                synced_cout << "Removed files from: " << entry.dst_p << '\n'
-                    << "Total files removed: " << removed << '\n';
+                std::string message = "Removed files from: " + entry.dst_p.string() + '\n'
+                    + "Total files removed: " + std::to_string(removed) + '\n';
+                glb_sl->log_message(message);
 
                 entry.completed_action = directory_completed_action::delete_all;
             }
@@ -874,7 +879,8 @@ void core::background_queue_system::regular_file(file_entry& entry)
                 std::filesystem::copy_options::update_existing);
 
             if (copied == false and std::filesystem::exists(entry.dst_p) == false) {
-                std::cout << "File not copied: " << entry.src_p << '\n';
+                std::string error = "File not copied: " + entry.src_p.string() + '\n';
+                glb_el->log_message(error);
             }
             else {
                 m_delayed_q.pop();
@@ -910,7 +916,8 @@ void core::background_queue_system::regular_file(file_entry& entry)
             removed = std::filesystem::remove(entry.dst_p);
 
             if (removed == false) {
-                std::cout << "Failed to delete: " << entry.dst_p << '\n';
+                std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
+                glb_el->log_message(error);
             }
             else {
                 m_delayed_q.pop();
@@ -1035,11 +1042,13 @@ void core::background_queue_system::directory(file_entry& entry)
         }
 
         if (removed == 0) {
-            std::cout << "Failed to delete: " << entry.dst_p << '\n';
+            std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
+            glb_el->log_message(error);
         }
         else {
-            std::cout << "Removed files from: " << entry.dst_p << '\n'
-                << "Total files removed: " << removed << '\n';
+            std::string message = "Removed files from: " + entry.dst_p.string() + '\n'
+                + "Total files removed: " + std::to_string(removed) + '\n';
+            glb_sl->log_message(message);
 
             entry.completed_action = directory_completed_action::delete_all;
 

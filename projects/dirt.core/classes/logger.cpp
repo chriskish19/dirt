@@ -14,8 +14,11 @@
 
 
 namespace core {
-	// automatic system logger
+	// automatic system logger, info logs
 	std::unique_ptr<system_log> glb_sl = nullptr;
+
+	// automatic system logger, error logs
+	std::unique_ptr<system_log> glb_el = nullptr;
 }
 
 core::base::base(std::size_t nol) {
@@ -64,10 +67,10 @@ std::string core::base::time_stamped(const std::string& message)
 		return time + message;
 	}
 	catch (const std::exception& e) {
-		std::cerr << "exception: " << e.what() << std::endl;
+		std::cout << "exception: " << e.what() << std::endl;
 	}
 	catch (...) {
-		std::cerr << "unknown exception caught..." << std::endl;
+		std::cout << "unknown exception caught..." << std::endl;
 	}
 	// exception thrown we return nothing
 	return {};
@@ -86,7 +89,7 @@ core::system_log::~system_log()
 
 void core::system_log::log_message(const std::string& message)
 {
-	std::unique_lock<std::mutex> local_lock(m_v_mtx);
+	std::lock_guard<std::mutex> local_lock(m_v_mtx);
 	
 	// get current log
 	log* log_p = nullptr;
@@ -97,4 +100,19 @@ void core::system_log::log_message(const std::string& message)
 	*log_p->message = message;
 
 	base::set_log(log_p);
+}
+
+std::vector<std::string> core::system_log::latest()
+{
+	std::lock_guard<std::mutex> local_lock(m_v_mtx);
+
+	auto buffer = get_buffer();
+
+	std::vector<std::string> current;
+
+	for (auto lg : *buffer) {
+		current.push_back(*lg->message);
+	}
+
+	return current;
 }
