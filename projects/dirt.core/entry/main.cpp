@@ -17,7 +17,7 @@
 #include CORE_PROCESSOR_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
 
-
+using namespace ftxui;
 
 int main(int argc, char* argv[]) {
 
@@ -25,33 +25,50 @@ int main(int argc, char* argv[]) {
     core::glb_sl = std::make_unique<core::system_log>();
     core::glb_el = std::make_unique<core::system_log>();
 
-
-    std::vector<ftxui::Element> log_elements;
-    auto logs = core::glb_sl->latest();
-
-    for (const auto& lg : logs) {
-        log_elements.push_back(ftxui::text(lg));
-    }
+    std::vector<std::string> info_logs,
+        error_logs;
 
     std::jthread ui_thread([&] {
-        float progress = 0.0f;
-        auto screen = ftxui::ScreenInteractive::TerminalOutput();
+        auto screen = ScreenInteractive::TerminalOutput();
 
-        auto renderer = ftxui::Renderer([&] {
-            
-            return ftxui::vbox({
-                ftxui::text("DIRT") | ftxui::bold | ftxui::center,
-                ftxui::gauge(progress) | ftxui::border,
-                ftxui::text("Working...") | ftxui::center,
-                ftxui::separator(),
-                ftxui::text("Logs:") | ftxui::bold,
-                ftxui::vbox(log_elements) | ftxui::frame | ftxui::border
-            }) | ftxui::border;
-        });
+        int info_selected = 0; // index of selected item
+        int error_selected = 0;
+        auto info_list = Menu(&info_logs, &info_selected);
+        auto error_list = Menu(&error_logs, &error_selected);
 
+        auto renderer = Renderer(Container::Vertical({ info_list, error_list }), [&] {
+            core::glb_sl->latest(info_logs);
+            core::glb_el->latest(error_logs);
+
+            std::string details;
+            if (info_list->Focused()) {
+                if (!info_logs.empty() && info_selected >= 0 && info_selected < info_logs.size())
+                    details = info_logs[info_selected];
+            }
+            else if (error_list->Focused()) {
+                if (!error_logs.empty() && error_selected >= 0 && error_selected < error_logs.size())
+                    details = error_logs[error_selected];
+            }
+
+            return vbox({
+                text("Select a log") | bold,
+                window(
+                    text("Info Logs"),
+                    info_list->Render() | frame | size(HEIGHT, LESS_THAN, 10)
+                ),
+                window(
+                    text("Error Logs"),
+                    error_list->Render() | frame | size(HEIGHT, LESS_THAN, 10)
+                ),
+                separator(),
+                window(
+                    text("Log Details"),
+                    paragraph(details) | frame | size(HEIGHT, LESS_THAN, 8)
+                ),
+                }); // vbox
+            }); // renderer
         screen.Loop(renderer);
-    });
-
+        }); // thread
 
 
 

@@ -102,17 +102,18 @@ void core::system_log::log_message(const std::string& message)
 	base::set_log(log_p);
 }
 
-std::vector<std::string> core::system_log::latest()
+void core::system_log::latest(std::vector<std::string>& log_v)
 {
 	std::lock_guard<std::mutex> local_lock(m_v_mtx);
 
 	auto buffer = get_buffer();
 
-	std::vector<std::string> current;
-
-	for (auto lg : *buffer) {
-		current.push_back(*lg->message);
+	for (;m_latest_index < this->get_v_index(); ++m_latest_index) {
+		log_v.push_back(*buffer->at(m_latest_index)->message);
 	}
 
-	return current;
+	// means the vector has looped once
+	if (m_latest_index > this->get_v_index()) {
+		m_latest_index = 0;
+	}
 }

@@ -11,7 +11,7 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
-
+#include CORE_FTXUI_INCLUDE_PATH
 
 #define LOGS 1000
 #define LOG_LENGTH 512
@@ -75,7 +75,10 @@ namespace core {
 
 		void log_message(const std::string& message);
 
-		std::vector<std::string> latest();
+		void latest(std::vector<std::string>& log_v);
+
+	protected:
+		std::size_t m_latest_index = 0;
 	};
 
 	// global system logger object, info logs
