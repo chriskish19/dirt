@@ -17,6 +17,7 @@
 #include CORE_PROCESSOR_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
 
+#undef DrawText
 using namespace ftxui;
 
 int main(int argc, char* argv[]) {
@@ -49,8 +50,9 @@ int main(int argc, char* argv[]) {
                 if (!error_logs.empty() && error_selected >= 0 && error_selected < error_logs.size())
                     details = error_logs[error_selected];
             }
-
+            
             return vbox({
+                text("DIRT (Directory Tool)") | center | bold,
                 text("Select a log") | bold,
                 window(
                     text("Info Logs"),
