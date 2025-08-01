@@ -818,12 +818,13 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
     
     while (buffer_q.empty() == false) {
         file_entry entry = buffer_q.front();
-        output_entry_data(entry, "Main Processor, Entry:");
 
         if (skip_entry(entry) == true) {
             buffer_q.pop();
             continue;
         }
+
+        output_entry_data(entry, "Main Processor, Entry:");
 
         switch_entry_type(entry);
 
