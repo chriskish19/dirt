@@ -17,7 +17,6 @@
 #include CORE_PROCESSOR_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
 
-#undef DrawText
 using namespace ftxui;
 
 int main(int argc, char* argv[]) {
