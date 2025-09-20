@@ -11,7 +11,6 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
-#include CORE_FTXUI_INCLUDE_PATH
 
 #define LOGS 1000
 #define LOG_LENGTH 512
@@ -63,7 +62,7 @@ namespace core {
 		// returns the message with a time on it ([2025-05-09-14:00:30...])
 		std::string time_stamped(const std::string& message);
 
-		// prevent concurrent access to logs vec
+		// prevent concurrent access to logs vec and m_message_queue
 		std::mutex m_v_mtx;
 	};
 
@@ -73,17 +72,12 @@ namespace core {
 		system_log();
 		~system_log();
 
+		void fill();
 		void log_message(const std::string& message);
-
-		void latest(std::vector<std::string>& log_v);
-
+		void display();
 	protected:
-		std::size_t m_latest_index = 0;
+		std::queue<log*> m_message_queue;
+
+		
 	};
-
-	// global system logger object, info logs
-	extern std::unique_ptr<system_log> glb_sl;
-
-	// global system logger object, error logs
-	extern std::unique_ptr<system_log> glb_el;
 }

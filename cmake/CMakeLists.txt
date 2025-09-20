@@ -36,14 +36,8 @@ endif()
 file(GLOB_RECURSE dt_core_sf "../projects/dirt.core/*.cpp") # dt_core_sf (core source files)
 file(GLOB_RECURSE dt_core_hf "../projects/dirt.core/*.hpp") # dt_core_sf (core header files)
 
-# ui package
-find_package(ftxui CONFIG REQUIRED)
-
 # core exe
 add_executable(${dirt_core} ${dt_core_sf} ${dt_core_hf})
-
-# link ui lib
-target_link_libraries(${dirt_core} PRIVATE ftxui::dom ftxui::screen ftxui::component)
 
 # core header file names
 # creates macros for each hpp file include path

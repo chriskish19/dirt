@@ -17,8 +17,6 @@
 #include CORE_API_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
 
-
-
 #include <Windows.h>
 
 // 4 MB Buffer

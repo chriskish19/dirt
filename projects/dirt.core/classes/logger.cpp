@@ -12,15 +12,6 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_LOGGER_INCLUDE_PATH
 
-
-namespace core {
-	// automatic system logger, info logs
-	std::unique_ptr<system_log> glb_sl = nullptr;
-
-	// automatic system logger, error logs
-	std::unique_ptr<system_log> glb_el = nullptr;
-}
-
 core::base::base(std::size_t nol) {
 	// allocate the logs vector and fill
 	m_logs_v = new std::vector<log*>;
@@ -93,27 +84,31 @@ void core::system_log::log_message(const std::string& message)
 	
 	// get current log
 	log* log_p = nullptr;
-	std::size_t index = 0;
+	std::size_t index = base::get_v_index(); 
 
-	index = base::get_v_index();
 	log_p = base::get_buffer()->at(index);
 	*log_p->message = message;
 
 	base::set_log(log_p);
 }
 
-void core::system_log::latest(std::vector<std::string>& log_v)
+void core::system_log::display()
 {
 	std::lock_guard<std::mutex> local_lock(m_v_mtx);
+	std::osyncstream mt_cout(std::cout);
 
-	auto buffer = get_buffer();
+	while (m_message_queue.empty() == false) {
+		auto log = m_message_queue.front();
+		mt_cout << *log->message << '\n';
 
-	for (;m_latest_index < this->get_v_index(); ++m_latest_index) {
-		log_v.push_back(*buffer->at(m_latest_index)->message);
+		m_message_queue.pop();
 	}
+}
 
-	// means the vector has looped once
-	if (m_latest_index > this->get_v_index()) {
-		m_latest_index = 0;
+void core::system_log::fill()
+{
+	std::lock_guard<std::mutex> local_lock(m_v_mtx);
+	for (auto log_p : *m_logs_v) {
+		m_message_queue.emplace(log_p);
 	}
 }

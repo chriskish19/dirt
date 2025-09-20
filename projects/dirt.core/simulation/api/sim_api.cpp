@@ -1,12 +1,13 @@
 /**********************************************************/
 //
-// File: ftx_includes.cpp
+// File: sim_api.cpp
 //
-// Purpose: compiled unit
+// Purpose: sim_api.hpp definitions
 //
 // Project: dirt.core
 //
 /**********************************************************/
 
 #include CORE_NAMES_INCLUDE
-#include CORE_FTXUI_INCLUDE_PATH
+#include CORE_SIM_API_INCLUDE_PATH
+

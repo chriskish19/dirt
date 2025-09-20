@@ -1,4 +1,4 @@
-/**********************************************************/
+﻿/**********************************************************/
 //
 // File: dirt_api.hpp
 //
@@ -15,9 +15,7 @@
 #include CORE_ARGS_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
 
-
 #include <Windows.h>
-
 
 namespace core {
 	arg_pkg match_arg_enum(args arg);
@@ -37,12 +35,32 @@ namespace core {
 	codes copy_directory_only(const std::filesystem::path& dst, const std::filesystem::path& src);
 	codes copy_directory_recursive(const std::filesystem::path& dst, const std::filesystem::path& src);
 	std::string action_to_string(file_action action);
-	void output_entry_data(const file_entry& entry,const std::string& name);
+	std::string output_entry_data(const file_entry& entry,const std::string& name);
 	std::string file_type_to_string(std::filesystem::file_type type);
 	void output_filesystem_ec(std::error_code ec);
 	std::vector<arg_entry> get_specific_entries(const std::vector<arg_entry>& v,args specific_arg);
 	std::uintmax_t total_size(const std::filesystem::path& p);
-	std::vector<std::queue<file_entry>> split_queue(std::queue<file_entry> buffer_q, std::size_t number_of_qs);
+	std::vector<std::queue<file_entry>> split_queue(std::queue<file_entry>& buffer_q, std::size_t number_of_qs);
 	bool find_directory(const std::filesystem::path& p, const std::filesystem::path& d);
+	
+	template<typename t>
+	void progress_bar(t current, t total = 100, t width = 50) {
+		auto thread_id = std::this_thread::get_id();
+		float percentage = static_cast<float>(current) / total * 100;
+		int filled = static_cast<int>(width * current / total);
 
+		// Use std::osyncstream for thread-safe output
+		std::osyncstream mt_cout(std::cout);
+
+		// Format the progress bar with thread ID
+		mt_cout << "\rThread# " << thread_id << " Progress: [";
+		for (int i = 0; i < width; ++i) {
+			mt_cout << (i < filled ? "=" : "-");
+		}
+		mt_cout << "] " << std::fixed << std::setprecision(1) << percentage << "%";
+
+		// Ensure the entire line is overwritten by padding with spaces
+		mt_cout << std::string(10, ' '); // Clear any leftover characters
+		mt_cout.flush();
+	}
 }
