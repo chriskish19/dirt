@@ -520,7 +520,7 @@ std::uintmax_t core::total_size(const std::filesystem::path& p)
 	return 0;
 }
 
-std::vector<std::queue<core::file_entry>> core::split_queue(std::queue<file_entry>& buffer_q, std::size_t number_of_qs)
+std::vector<std::queue<core::file_entry>> core::split_queue(std::queue<file_entry> buffer_q, std::size_t number_of_qs)
 {
 	std::vector<std::queue<core::file_entry>> file_entry_v_q;
 	auto buffer_q_size = buffer_q.size();

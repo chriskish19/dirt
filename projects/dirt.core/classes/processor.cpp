@@ -327,11 +327,12 @@ void core::queue_system::process_entry()
         if (m_entry_buffer.size() > MAX_QUEUE_SPLIT) {
             std::vector<std::queue<file_entry>> fe_qv = split_queue(m_entry_buffer, MAX_THREADS);
             std::vector<std::jthread> pq_tv;
+            std::size_t current_q_num = 0;
 
             // must make a copy!! this block goes out of scope by main thread
-            // process queue() must make a copy
-            for (auto& q : fe_qv) {
-                pq_tv.push_back(std::jthread(&core::queue_system::process_queue, this, q));
+            for (auto q : fe_qv) {
+                pq_tv.push_back(std::jthread(&core::queue_system::process_queue, this, q,current_q_num));
+                current_q_num++;
             }
         }
         else {
@@ -367,7 +368,7 @@ void core::queue_system::regular_file(file_entry& entry)
                 // the file has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             copied = std::filesystem::copy_file(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing);
 
@@ -376,6 +377,7 @@ void core::queue_system::regular_file(file_entry& entry)
                 std::osyncstream mt_cout(std::cout);
                 mt_cout << error;
             }
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -403,7 +405,7 @@ void core::queue_system::regular_file(file_entry& entry)
             if (found != entry.args_v.end()) {
                 break;
             }
-
+#if !DISABLE_DELETE
             removed = std::filesystem::remove(entry.dst_p);
 
             if (removed == false and std::filesystem::exists(entry.dst_p) == true) {
@@ -411,6 +413,7 @@ void core::queue_system::regular_file(file_entry& entry)
                 std::osyncstream mt_cout(std::cout);
                 mt_cout << error;
             }
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -431,9 +434,10 @@ void core::queue_system::regular_file(file_entry& entry)
                 // the file has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             std::filesystem::copy_file(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing);
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -481,12 +485,13 @@ void core::queue_system::directory(file_entry& entry)
                 // the directory has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             std::filesystem::copy(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing | 
                 std::filesystem::copy_options::recursive);
 
             entry.completed_action = directory_completed_action::recursive_copy;
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -514,7 +519,7 @@ void core::queue_system::directory(file_entry& entry)
             if (found != entry.args_v.end()) {
                 break;
             }
-
+#if !DISABLE_DELETE
             removed = std::filesystem::remove_all(entry.dst_p);
 
 
@@ -531,6 +536,7 @@ void core::queue_system::directory(file_entry& entry)
 
                 entry.completed_action = directory_completed_action::delete_all;
             }
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -551,9 +557,10 @@ void core::queue_system::directory(file_entry& entry)
                 // the directory has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             std::filesystem::copy(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing);
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -816,16 +823,18 @@ void core::queue_system::exit_process_entry()
     m_runner.store(false);
 }
 
-void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
+void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size_t queue_number)
 {
     system_log logger;
-    
+    t_out terminal;
+
     // background task thread vector
     std::vector<std::thread> bgtv;
     
     // total size
     auto before_buffer_size = buffer_q.size();
     std::size_t progress_size = 0;
+    
 
     while (buffer_q.empty() == false) {
         file_entry entry = buffer_q.front();
@@ -845,7 +854,10 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
 
         buffer_q.pop();
         
-        progress_bar(++progress_size,before_buffer_size);
+        {
+            std::lock_guard<std::mutex> local_lock(m_terminal_mtx);
+            terminal.progress_bar(++progress_size, before_buffer_size,50ull,queue_number);
+        }
     }
 
     //logger.fill();
@@ -857,7 +869,6 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
         }
     }
 
-    std::cout << '\n';
 }
 
 bool core::queue_system::skip_entry(file_entry& entry)
@@ -893,7 +904,7 @@ void core::background_queue_system::regular_file(file_entry& entry)
                 // the file has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             copied = std::filesystem::copy_file(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing);
 
@@ -905,6 +916,9 @@ void core::background_queue_system::regular_file(file_entry& entry)
             else {
                 m_delayed_q.pop();
             }
+#else
+            m_delayed_q.pop();
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -932,7 +946,7 @@ void core::background_queue_system::regular_file(file_entry& entry)
             if (found != entry.args_v.end()) {
                 break;
             }
-
+#if !DISABLE_DELETE
             removed = std::filesystem::remove(entry.dst_p);
 
             if (removed == false) {
@@ -943,6 +957,9 @@ void core::background_queue_system::regular_file(file_entry& entry)
             else {
                 m_delayed_q.pop();
             }
+#else
+            m_delayed_q.pop();
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -963,10 +980,10 @@ void core::background_queue_system::regular_file(file_entry& entry)
                 // the file has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             std::filesystem::copy_file(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing);
-
+#endif
             m_delayed_q.pop();
         }
         catch (const std::filesystem::filesystem_error& e) {
@@ -1015,13 +1032,13 @@ void core::background_queue_system::directory(file_entry& entry)
                 // the directory has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             std::filesystem::copy(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing |
                 std::filesystem::copy_options::recursive);
 
             entry.completed_action = directory_completed_action::recursive_copy;
-
+#endif
             m_delayed_q.pop();
         }
         catch (const std::filesystem::filesystem_error& e) {
@@ -1050,8 +1067,9 @@ void core::background_queue_system::directory(file_entry& entry)
             if (found != entry.args_v.end()) {
                 break;
             }
-
+#if !DISABLE_DELETE
             removed = std::filesystem::remove_all(entry.dst_p);
+#endif
         }
         catch (const std::filesystem::filesystem_error& e) {
             output_em(std_filesystem_exception_caught_pkg);
@@ -1062,6 +1080,7 @@ void core::background_queue_system::directory(file_entry& entry)
             output_em(unknown_exception_caught_pkg);
         }
 
+#if !DISABLE_DELETE
         if (removed == 0) {
             std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
             std::osyncstream mt_cout(std::cout);
@@ -1077,7 +1096,9 @@ void core::background_queue_system::directory(file_entry& entry)
 
             m_delayed_q.pop();
         }
-
+#else
+        m_delayed_q.pop();
+#endif
         break;
     }
 
@@ -1088,10 +1109,10 @@ void core::background_queue_system::directory(file_entry& entry)
                 // the directory has been deleted during the wait time
                 break;
             }
-
+#if !DISABLE_COPY
             std::filesystem::copy(entry.src_p, entry.dst_p,
                 std::filesystem::copy_options::update_existing);
-
+#endif
             m_delayed_q.pop();
         }
         catch (const std::filesystem::filesystem_error& e) {

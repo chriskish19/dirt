@@ -16,14 +16,11 @@
 #include CORE_ARGS_INCLUDE_PATH
 #include CORE_API_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
+#include CORE_DEFINES_INCLUDE_PATH
+#include CORE_TOUT_INCLUDE_PATH
+
 
 #include <Windows.h>
-
-// 4 MB Buffer
-#define BUFFER_SIZE 1024 * 1024 * 4
-#define BUFFER_TIME 10
-#define MAX_THREADS 8
-#define MAX_QUEUE_SPLIT 1000
 
 namespace core {
 	class background_queue_system {
@@ -112,9 +109,11 @@ namespace core {
 
 		void exit_process_entry();
 
-		void process_queue(std::queue<file_entry> buffer_q);
+		void process_queue(std::queue<file_entry> buffer_q, std::size_t queue_number=0);
 
 		bool skip_entry(file_entry& entry);
+
+		std::mutex m_terminal_mtx;
 	};
 
 

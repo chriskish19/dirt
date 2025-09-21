@@ -19,5 +19,6 @@
 #include CORE_LOGGER_INCLUDE_PATH
 
 namespace core {
+	
 
 }

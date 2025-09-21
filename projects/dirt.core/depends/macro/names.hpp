@@ -25,6 +25,11 @@
 #define CORE_PROCESSOR_INCLUDE_PATH				CORE_processor_hpp					// processes files
 #define CORE_CMDLINE_INCLUDE_PATH				CORE_cmdline_hpp					// processes cmd line args
 #define CORE_LOGGER_INCLUDE_PATH				CORE_logger_hpp						// logger queue
+#define CORE_TOUT_INCLUDE_PATH					CORE_t_out_hpp						// terminal outputing
 
 // simulation
 #define CORE_SIM_API_INCLUDE_PATH				CORE_sim_api_hpp					// simulation api
+#define CORE_SIM_INCLUDE_PATH					CORE_sim_hpp						// sim classes
+
+// macros
+#define CORE_DEFINES_INCLUDE_PATH				CORE_defines_hpp					// macros

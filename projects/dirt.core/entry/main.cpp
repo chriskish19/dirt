@@ -15,10 +15,16 @@
 #include CORE_CMDLINE_INCLUDE_PATH
 #include CORE_PROCESSOR_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
+#include CORE_SIM_INCLUDE_PATH
+#include CORE_SIM_API_INCLUDE_PATH
 
 
+#if !TEST_ENTRY
 int main(int argc, char* argv[]) {
-    
+    core::t_out::enable_vt_mode();
+
+
+
     std::unique_ptr<core::cmdline> p_args = std::make_unique<core::cmdline>(argc,argv);
     {
         core::codes code = p_args->parse();
@@ -59,3 +65,18 @@ int main(int argc, char* argv[]) {
 
     return static_cast<int>(core::codes::success);
 }
+#else
+// testing entry point
+
+int main(int argc, char* argv[]) {
+    core::t_out::enable_vt_mode();
+    
+    std::unique_ptr<core::sim> p_sim = std::make_unique<core::sim>("C:\\linux");
+
+    auto code = p_sim->work(1000);
+
+    return static_cast<int>(code);
+
+}
+
+#endif
