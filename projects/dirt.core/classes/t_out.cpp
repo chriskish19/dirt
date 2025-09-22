@@ -1,3 +1,4 @@
+#include "t_out.hpp"
 /**********************************************************/
 //
 // File: t_out.cpp
@@ -24,6 +25,12 @@ void core::t_out::enable_vt_mode() {
     SetConsoleMode(hOut, dwMode);
 }
 
+void core::t_out::log_out(const std::string& log)
+{
+	std::lock_guard<std::mutex> local_lock(m_log_mtx);
+	std::cout << log;
+}
+
 void core::t_out::clear_terminal()
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -35,4 +42,13 @@ void core::t_out::clear_terminal()
 	FillConsoleOutputCharacter(hConsole, ' ', dwConSize, coordScreen, &cCharsWritten);
 	FillConsoleOutputAttribute(hConsole, csbi.wAttributes, dwConSize, coordScreen, &cCharsWritten);
 	SetConsoleCursorPosition(hConsole, coordScreen);
+}
+
+std::size_t core::t_out::get_terminal_line()
+{
+	std::lock_guard<std::mutex> local_lock(m_line_mtx);
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(hConsole, &csbi);
+	return static_cast<std::size_t>(csbi.dwCursorPosition.Y+1);
 }

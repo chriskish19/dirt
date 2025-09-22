@@ -94,7 +94,7 @@ core::codes core::cmdline::validate()
         std::vector<std::size_t> invalid_entrys_v;
         for (const auto& entry : m_entrys_v) {
             if (validate_entry(entry) == false) {
-                std::cout << "error : invalid entry" << '\n';
+                global::terminal->log_out("error : invalid entry\n");
                 output_entry(entry);
                 invalid_entrys_v.push_back(entry.entry_number);
             }
@@ -110,7 +110,7 @@ core::codes core::cmdline::validate()
     }
     else {
         if (validate_entry(m_cmdline_entry) == false) {
-            std::cout << "error : invalid entry" << '\n';
+            global::terminal->log_out("error : invalid entry\n");
             output_entry(m_cmdline_entry);
             return codes::no_valid_entries;
         }

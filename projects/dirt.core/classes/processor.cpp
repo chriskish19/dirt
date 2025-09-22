@@ -25,7 +25,7 @@ core::process::~process()
 core::codes core::process::process_entry()
 {
     {
-        std::cout << "Processing copy entries...\n";
+        global::terminal->log_out("Processing copy entries...\n"); 
         codes code = process_copy_entries();
         if (code != codes::success) {
             return code;
@@ -34,7 +34,7 @@ core::codes core::process::process_entry()
     
     
     {
-        std::cout << "Processing watch entries...\n";
+        global::terminal->log_out("Processing watch entries...\n");
         codes code = process_watch_entries();
         if (code != codes::success) {
             return code;
@@ -205,7 +205,7 @@ core::codes core::process::process_copy_entries()
             std::string message = "Copied " + std::to_string( size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
                  + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
 
-            std::cout << message;
+            global::terminal->log_out(message);
         }
         else {
             auto start = std::chrono::high_resolution_clock::now();
@@ -228,7 +228,7 @@ core::codes core::process::process_copy_entries()
             std::string message = "Copied " + std::to_string(size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
                 + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
 
-            std::cout << message;
+            global::terminal->log_out(message);
         }
 
     }
@@ -306,7 +306,8 @@ void core::queue_system::process_entry()
     
     
     while (m_runner.load() == true) {
-        
+        global::terminal->log_out("waiting...");
+
         // trigger here
         {
             std::unique_lock<std::mutex> local_lock(m_launch_mtx);
@@ -330,7 +331,8 @@ void core::queue_system::process_entry()
             std::size_t current_q_num = 0;
 
             // must make a copy!! this block goes out of scope by main thread
-            for (auto q : fe_qv) {
+            // process_queue makes a copy...
+            for (const auto& q : fe_qv) {
                 pq_tv.push_back(std::jthread(&core::queue_system::process_queue, this, q,current_q_num));
                 current_q_num++;
             }
@@ -345,6 +347,8 @@ void core::queue_system::process_entry()
 
 
         m_launch_b.store(false);
+
+        global::terminal->clear_terminal();
     }
 
     // exit background queue system
@@ -374,8 +378,7 @@ void core::queue_system::regular_file(file_entry& entry)
 
             if (copied == false and std::filesystem::exists(entry.dst_p) == false) {
                 std::string error = "File not copied: " + entry.src_p.string() + '\n';
-                std::osyncstream mt_cout(std::cout);
-                mt_cout << error;
+                global::terminal->log_out(error);
             }
 #endif
         }
@@ -410,8 +413,7 @@ void core::queue_system::regular_file(file_entry& entry)
 
             if (removed == false and std::filesystem::exists(entry.dst_p) == true) {
                 std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-                std::osyncstream mt_cout(std::cout);
-                mt_cout << error;
+                global::terminal->log_out(error);
             }
 #endif
         }
@@ -525,14 +527,12 @@ void core::queue_system::directory(file_entry& entry)
 
             if (removed == 0) {
                 std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-                std::osyncstream mt_cout(std::cout);
-                mt_cout << error;
+                global::terminal->log_out(error);
             }
             else {
                 std::string message = "Removed files from: " + entry.dst_p.string() + '\n'
                     + "Total files removed: " + std::to_string(removed) + '\n';
-                std::osyncstream mt_cout(std::cout);
-                mt_cout << message;
+                global::terminal->log_out(message);
 
                 entry.completed_action = directory_completed_action::delete_all;
             }
@@ -834,7 +834,7 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size
     // total size
     auto before_buffer_size = buffer_q.size();
     std::size_t progress_size = 0;
-    
+    auto terminal_line = global::terminal->get_terminal_line();
 
     while (buffer_q.empty() == false) {
         file_entry entry = buffer_q.front();
@@ -844,7 +844,10 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size
             continue;
         }
 
-        logger.log_message(output_entry_data(entry, "Main Processor, Entry:"));
+#if LOGGER_VERBOSE
+        auto message = output_entry_data(entry, "Main Processor, Entry:");
+        logger.log_message(message);
+#endif
 
         switch_entry_type(entry);
 
@@ -856,12 +859,15 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size
         
         {
             std::lock_guard<std::mutex> local_lock(m_terminal_mtx);
-            terminal.progress_bar(++progress_size, before_buffer_size,50ull,queue_number);
+            terminal.progress_bar(++progress_size, before_buffer_size,50ull,terminal_line,queue_number);
         }
     }
 
-    //logger.fill();
-    //logger.display();
+#if LOGGER_VERBOSE
+    logger.fill();
+    logger.display();
+#endif
+
 
     for (auto& t : bgtv) {
         if (t.joinable()) {
@@ -910,8 +916,7 @@ void core::background_queue_system::regular_file(file_entry& entry)
 
             if (copied == false and std::filesystem::exists(entry.dst_p) == false) {
                 std::string error = "File not copied: " + entry.src_p.string() + '\n';
-                std::osyncstream mt_cout(std::cout);
-                mt_cout << error;
+                global::terminal->log_out(error);
             }
             else {
                 m_delayed_q.pop();
@@ -951,8 +956,7 @@ void core::background_queue_system::regular_file(file_entry& entry)
 
             if (removed == false) {
                 std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-                std::osyncstream mt_cout(std::cout);
-                mt_cout << error;
+                global::terminal->log_out(error);
             }
             else {
                 m_delayed_q.pop();
@@ -1083,14 +1087,12 @@ void core::background_queue_system::directory(file_entry& entry)
 #if !DISABLE_DELETE
         if (removed == 0) {
             std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-            std::osyncstream mt_cout(std::cout);
-            mt_cout << error;
+            global::terminal->log_out(error);
         }
         else {
             std::string message = "Removed files from: " + entry.dst_p.string() + '\n'
                 + "Total files removed: " + std::to_string(removed) + '\n';
-            std::osyncstream mt_cout(std::cout);
-            mt_cout << message;
+            global::terminal->log_out(message);
 
             entry.completed_action = directory_completed_action::delete_all;
 
@@ -1344,11 +1346,13 @@ void core::background_queue_system::delayed_process_entry()
                 });
         }
         
-        
+        system_log logger;
         while (m_delayed_q.empty() == false and m_run_dpe.load() == true) {
             file_entry entry = m_delayed_q.front();
-
-            output_entry_data(entry,"Background Processor, Entry:");
+#if LOGGER_VERBOSE
+            auto message = output_entry_data(entry,"Background Processor, Entry:");
+            logger.log_message(message);
+#endif
             switch_entry_type(entry);
             
             background_task(entry);
@@ -1358,6 +1362,11 @@ void core::background_queue_system::delayed_process_entry()
         }
 
         m_launch_dpe_b.store(false);
+
+#if LOGGER_VERBOSE
+        logger.fill();
+        logger.display();
+#endif
     }
 }
 

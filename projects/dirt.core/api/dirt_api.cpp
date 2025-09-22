@@ -127,6 +127,8 @@ void core::output_em(const code_pkg cp, const std::string location)
 {
 	std::string message = cp.m_s_code + '\n' 
 		+ location + '\n';
+
+	global::terminal->log_out(message);
 }
 
 std::vector<core::args> core::validate_args(const std::vector<arg_pkg>& args)
@@ -324,7 +326,7 @@ void core::output_entry(const arg_entry& e)
 	message += "Destination Path: " + e.dst_p.string() + '\n'
 	+ "Source Path: " + e.src_p.string() + '\n';
 
-	// TODO: figure out best way to send logs out
+	global::terminal->log_out(message);
 }
 
 void core::output_fse(const std::filesystem::filesystem_error& e)
@@ -333,7 +335,7 @@ void core::output_fse(const std::filesystem::filesystem_error& e)
 		+ "Path 1: " + e.path1().string() + '\n'
 		+ "Path 2: " + e.path2().string() + '\n';
 	
-	// TODO: figure out best way to send logs out
+	global::terminal->log_out(message);
 }
 
 std::uintmax_t core::file_numbers(const std::filesystem::path& p)
@@ -483,8 +485,7 @@ std::string core::file_type_to_string(std::filesystem::file_type type) {
 void core::output_filesystem_ec(std::error_code ec)
 {
 	std::string message = "filesystem error (" + std::to_string(ec.value()) + "): " + ec.message() + '\n';
-	std::osyncstream mt_cout(std::cout);
-	mt_cout << message;
+	global::terminal->log_out(message);
 }
 
 std::vector<core::arg_entry> core::get_specific_entries(const std::vector<arg_entry>& v, args specific_arg)
@@ -520,7 +521,7 @@ std::uintmax_t core::total_size(const std::filesystem::path& p)
 	return 0;
 }
 
-std::vector<std::queue<core::file_entry>> core::split_queue(std::queue<file_entry> buffer_q, std::size_t number_of_qs)
+std::vector<std::queue<core::file_entry>> core::split_queue(std::queue<file_entry>& buffer_q, std::size_t number_of_qs)
 {
 	std::vector<std::queue<core::file_entry>> file_entry_v_q;
 	auto buffer_q_size = buffer_q.size();

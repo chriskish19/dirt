@@ -9,11 +9,14 @@
 /**********************************************************/
 
 #pragma once
+
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
 #include CORE_ARGS_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
+#include CORE_TOUT_INCLUDE_PATH
+#include CORE_GLB_INCLUDE_PATH
 
 #include <Windows.h>
 
@@ -40,8 +43,6 @@ namespace core {
 	void output_filesystem_ec(std::error_code ec);
 	std::vector<arg_entry> get_specific_entries(const std::vector<arg_entry>& v,args specific_arg);
 	std::uintmax_t total_size(const std::filesystem::path& p);
-	std::vector<std::queue<file_entry>> split_queue(std::queue<file_entry> buffer_q, std::size_t number_of_qs);
+	std::vector<std::queue<file_entry>> split_queue(std::queue<file_entry>& buffer_q, std::size_t number_of_qs);
 	bool find_directory(const std::filesystem::path& p, const std::filesystem::path& d);
-	
-
 }

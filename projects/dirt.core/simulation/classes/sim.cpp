@@ -15,8 +15,6 @@ core::codes core::sim::work(std::size_t ms) {
 	std::thread queue_sys_t(&queue_system::process_entry, this);
 
 	while (m_s_runner.load() == true) {
-		std::this_thread::sleep_for(std::chrono::seconds(TEST_TIME_WAIT));
-
 		auto start = std::chrono::steady_clock::now();
 		auto duration = std::chrono::milliseconds(ms);
 		std::chrono::milliseconds elapsed = {};
@@ -32,6 +30,8 @@ core::codes core::sim::work(std::size_t ms) {
 		// signal queue system
 		m_launch_b.store(true);
 		m_launch_cv.notify_all();
+
+		std::this_thread::sleep_for(std::chrono::seconds(TEST_TIME_WAIT));
 	}
 
 	if (queue_sys_t.joinable()) {

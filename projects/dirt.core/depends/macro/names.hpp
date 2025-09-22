@@ -33,3 +33,6 @@
 
 // macros
 #define CORE_DEFINES_INCLUDE_PATH				CORE_defines_hpp					// macros
+
+// globals
+#define CORE_GLB_INCLUDE_PATH					CORE_glb_hpp						// global objects
