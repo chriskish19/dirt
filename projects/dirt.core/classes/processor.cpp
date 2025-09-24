@@ -304,9 +304,10 @@ void core::queue_system::process_entry()
     // background queue system thread
     std::jthread bqs_t(&core::queue_system::delayed_process_entry, this);
     
-    
+    auto t_line = global::terminal->get_terminal_line();
+
     while (m_runner.load() == true) {
-        global::terminal->log_out("waiting...");
+        global::terminal->log_out("\nwaiting...\n");
 
         // trigger here
         {
@@ -333,22 +334,18 @@ void core::queue_system::process_entry()
             // must make a copy!! this block goes out of scope by main thread
             // process_queue makes a copy...
             for (const auto& q : fe_qv) {
-                pq_tv.push_back(std::jthread(&core::queue_system::process_queue, this, q,current_q_num));
-                current_q_num++;
+                pq_tv.push_back(std::jthread(&core::queue_system::process_queue, this, q, current_q_num++,++t_line));
             }
         }
         else {
-            process_queue(m_entry_buffer);
+            process_queue(m_entry_buffer,0,++t_line);
         }
         
-
         std::queue<file_entry> empty_buffer;
         m_entry_buffer.swap(empty_buffer);
 
 
         m_launch_b.store(false);
-
-        global::terminal->clear_terminal();
     }
 
     // exit background queue system
@@ -823,7 +820,7 @@ void core::queue_system::exit_process_entry()
     m_runner.store(false);
 }
 
-void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size_t queue_number)
+void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size_t queue_number, std::size_t t_line)
 {
     system_log logger;
     t_out terminal;
@@ -834,7 +831,6 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size
     // total size
     auto before_buffer_size = buffer_q.size();
     std::size_t progress_size = 0;
-    auto terminal_line = global::terminal->get_terminal_line();
 
     while (buffer_q.empty() == false) {
         file_entry entry = buffer_q.front();
@@ -859,7 +855,7 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size
         
         {
             std::lock_guard<std::mutex> local_lock(m_terminal_mtx);
-            terminal.progress_bar(++progress_size, before_buffer_size,50ull,terminal_line,queue_number);
+            terminal.progress_bar(++progress_size, before_buffer_size,50ull,t_line,queue_number);
         }
     }
 

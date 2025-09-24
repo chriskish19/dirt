@@ -52,3 +52,11 @@ std::size_t core::t_out::get_terminal_line()
 	GetConsoleScreenBufferInfo(hConsole, &csbi);
 	return static_cast<std::size_t>(csbi.dwCursorPosition.Y+1);
 }
+
+void core::t_out::set_terminal_position(std::size_t x, std::size_t y)
+{
+	// Move cursor to top of progress bars
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos = { (SHORT)x, (SHORT)y};
+	SetConsoleCursorPosition(hConsole, pos);
+}

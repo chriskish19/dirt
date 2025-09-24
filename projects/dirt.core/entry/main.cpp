@@ -101,9 +101,9 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::unique_ptr<core::sim> p_sim = std::make_unique<core::sim>("C:\\linux\\Documentation");
+    std::unique_ptr<core::sim> p_sim = std::make_unique<core::sim>("C:\\linux\\Block");
 
-    auto code = p_sim->work(1000);
+    auto code = p_sim->work(10);
 
     return static_cast<int>(code);
 

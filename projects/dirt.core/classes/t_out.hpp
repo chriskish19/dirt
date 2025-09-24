@@ -30,6 +30,8 @@ namespace core {
 		void clear_terminal();
 
 		std::size_t get_terminal_line();
+
+		void set_terminal_position(std::size_t x,std::size_t y);
 	protected:
 		
 		std::mutex m_log_mtx;
@@ -55,7 +57,6 @@ namespace core {
 			std::cout << (i < filled ? "=" : "-");
 			std::cout << "\033[0m"; // Reset color
 		}
-		std::cout << "] " << std::fixed << std::setprecision(1) << percentage << "%";
-		std::cout << "\n";
+		std::cout << "] " << std::fixed << std::setprecision(1) << percentage << "% " << current << "/" << total;
 	}
 }
