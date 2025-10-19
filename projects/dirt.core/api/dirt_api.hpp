@@ -21,7 +21,15 @@
 #include <Windows.h>
 
 namespace core {
+	
+	/* 
+		returns the package (class arg_pkg which is an arg enum and the arg enum as a string)
+		given an argument from args enum. See header file CORE_ARGS_INCLUDE_PATH.
+	*/
 	arg_pkg match_arg_enum(args arg);
+	
+	
+	
 	arg_pkg match_s_arg(const std::string& arg);
 	code_pkg match_code(codes code);
 	std::string get_location(std::source_location sl = std::source_location::current());

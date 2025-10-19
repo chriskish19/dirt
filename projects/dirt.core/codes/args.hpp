@@ -14,13 +14,17 @@
 
 
 namespace core {
+	
+	/* 
+		these are the command line arguments as an enum type.
+	*/
 	enum class args {
-		copy,
-		uninit = 1,
-		watch,
-		dirt_list_path,
-		mirror,
-		new_files_only,
+		copy,				// copy all files from src to dst directory 
+		uninit = 1,			// default value if the args enum is declared but not initialized
+		watch,				// monitors the src directory for any changes
+		dirt_list_path,		// the file path to a txt file with listed entries
+		mirror,				// mirrors the src to the dst directory
+		new_files_only,		// 
 		no_deletes,
 		unknown,
 		src,
@@ -28,7 +32,11 @@ namespace core {
 		recursive,
 	};
 
-
+	
+	/* 
+		this class is a simple container for holding an args enum and the string value 
+		of that enum.
+	*/
 	class arg_pkg {
 	public:
 		arg_pkg(args arg, std::string s_arg) 
@@ -37,7 +45,13 @@ namespace core {
 		const args m_arg;
 		const std::string m_s_arg;
 	};
-
+	
+	
+	
+	/* 
+		these are instantiated objects of the arg_pkg class which just match 
+		an args enum to its string command line version.
+	*/
 	inline const arg_pkg copy_pkg(args::copy, "-copy");
 	inline const arg_pkg uninit_pkg(args::uninit, "-uninit");
 	inline const arg_pkg watch_pkg(args::watch, "-watch");
@@ -49,7 +63,12 @@ namespace core {
 	inline const arg_pkg src_pkg(args::src, "src");
 	inline const arg_pkg dst_pkg(args::dst, "dst");
 	inline const arg_pkg recursive_pkg(args::recursive, "-recursive");
-
+	
+	
+	/* 
+		this map is used to parse the command line arguments and match them
+		to the appropriate enum.
+	*/
 	inline const std::unordered_map<std::string, args> gbl_args_mp = {
 		{"-copy", args::copy},
 		{"-uninit" , args::uninit},
@@ -63,7 +82,13 @@ namespace core {
 		{"dst" , args::dst},
 		{"-recursive" , args::recursive}
 	};
-
+	
+	
+	/* 
+		these group classes are useful for parsing and checking for valid command line
+		combinations of arguments I used inheritance to simplify it. base_group checks for src 
+		and dst directories these are needed no matter what.
+	*/
 	class base_group {
 	public:
 		// src directory
@@ -71,7 +96,12 @@ namespace core {
 
 		// destination directory
 		args arg2 = args::dst;
-
+		
+		/* 
+			virtual for overiding in upper classes. Checks the arg_v for 
+			src and dst arguments. returns false if both are not present
+			and false if more than one is also present.
+		*/
 		virtual bool match_group(const std::vector<args>& arg_v) {
 			std::size_t src_count = 0;
 			std::size_t dst_count = 0;
@@ -83,11 +113,16 @@ namespace core {
 					dst_count++;
 				}
 			}
-
+			
+			// must be one of each only present to be true
 			return src_count == 1 and dst_count == 1;
 		}
 	};
-
+	
+	
+	/* 
+		this is the most common group. I use this group for most of my testing.
+	*/
 	class group_2 : public base_group {
 	public:
 		// initial copy of src to dst
@@ -100,8 +135,10 @@ namespace core {
 		args arg3 = args::watch;
 
 		virtual bool match_group(const std::vector<args>& arg_v) override {
+			// make sure base group is present
 			bool base_match = base_group::match_group(arg_v);
-
+			
+			// if base group is not present return false
 			if (base_match == false) {
 				return base_match;
 			}
@@ -121,7 +158,8 @@ namespace core {
 					watch_count++;
 				}
 			}
-
+			
+			// must be one and only one of each to return true
 			return copy_count == 1 and mirror_count == 1 and watch_count == 1 and base_match == true;
 		}
 	};

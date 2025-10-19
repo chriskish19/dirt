@@ -25,7 +25,7 @@ core::process::~process()
 core::codes core::process::process_entry()
 {
     {
-        global::terminal->log_out("Processing copy entries...\n"); 
+        main_output("Processing copy entries...\n"); 
         codes code = process_copy_entries();
         if (code != codes::success) {
             return code;
@@ -34,7 +34,7 @@ core::codes core::process::process_entry()
     
     
     {
-        global::terminal->log_out("Processing watch entries...\n");
+        main_output("Processing watch entries...\n");
         codes code = process_watch_entries();
         if (code != codes::success) {
             return code;
@@ -205,7 +205,7 @@ core::codes core::process::process_copy_entries()
             std::string message = "Copied " + std::to_string( size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
                  + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
 
-            global::terminal->log_out(message);
+            main_output(message);
         }
         else {
             auto start = std::chrono::high_resolution_clock::now();
@@ -228,7 +228,7 @@ core::codes core::process::process_copy_entries()
             std::string message = "Copied " + std::to_string(size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
                 + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
 
-            global::terminal->log_out(message);
+            main_output(message);
         }
 
     }
@@ -303,11 +303,9 @@ void core::queue_system::process_entry()
 {
     // background queue system thread
     std::jthread bqs_t(&core::queue_system::delayed_process_entry, this);
-    
-    auto t_line = global::terminal->get_terminal_line();
 
     while (m_runner.load() == true) {
-        global::terminal->log_out("\nwaiting...\n");
+        main_output("\nwaiting for work...");
 
         // trigger here
         {
@@ -326,26 +324,35 @@ void core::queue_system::process_entry()
             m_entry_q.swap(m_entry_buffer);
         }
 
+        std::vector<std::thread> pq_tv;
+
         if (m_entry_buffer.size() > MAX_QUEUE_SPLIT) {
             std::vector<std::queue<file_entry>> fe_qv = split_queue(m_entry_buffer, MAX_THREADS);
-            std::vector<std::jthread> pq_tv;
-            std::size_t current_q_num = 0;
+       
 
             // must make a copy!! this block goes out of scope by main thread
             // process_queue makes a copy...
             for (const auto& q : fe_qv) {
-                pq_tv.push_back(std::jthread(&core::queue_system::process_queue, this, q, current_q_num++,++t_line));
+                pq_tv.push_back(std::thread(&core::queue_system::process_queue, this, q));
             }
         }
         else {
-            process_queue(m_entry_buffer,0,++t_line);
+            process_queue(m_entry_buffer);
         }
-        
+
         std::queue<file_entry> empty_buffer;
         m_entry_buffer.swap(empty_buffer);
 
 
         m_launch_b.store(false);
+
+        for (auto& t : pq_tv) {
+            if (t.joinable()) {
+                t.join();
+            }
+        }
+
+        pq_tv.clear();
     }
 
     // exit background queue system
@@ -375,7 +382,7 @@ void core::queue_system::regular_file(file_entry& entry)
 
             if (copied == false and std::filesystem::exists(entry.dst_p) == false) {
                 std::string error = "File not copied: " + entry.src_p.string() + '\n';
-                global::terminal->log_out(error);
+                main_output(error);
             }
 #endif
         }
@@ -410,7 +417,7 @@ void core::queue_system::regular_file(file_entry& entry)
 
             if (removed == false and std::filesystem::exists(entry.dst_p) == true) {
                 std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-                global::terminal->log_out(error);
+                main_output(error);
             }
 #endif
         }
@@ -524,12 +531,12 @@ void core::queue_system::directory(file_entry& entry)
 
             if (removed == 0) {
                 std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-                global::terminal->log_out(error);
+                main_output(error);
             }
             else {
                 std::string message = "Removed files from: " + entry.dst_p.string() + '\n'
                     + "Total files removed: " + std::to_string(removed) + '\n';
-                global::terminal->log_out(message);
+                main_output(message);
 
                 entry.completed_action = directory_completed_action::delete_all;
             }
@@ -820,17 +827,10 @@ void core::queue_system::exit_process_entry()
     m_runner.store(false);
 }
 
-void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size_t queue_number, std::size_t t_line)
+void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
 {
-    system_log logger;
-    t_out terminal;
-
     // background task thread vector
     std::vector<std::thread> bgtv;
-    
-    // total size
-    auto before_buffer_size = buffer_q.size();
-    std::size_t progress_size = 0;
 
     while (buffer_q.empty() == false) {
         file_entry entry = buffer_q.front();
@@ -840,11 +840,6 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size
             continue;
         }
 
-#if LOGGER_VERBOSE
-        auto message = output_entry_data(entry, "Main Processor, Entry:");
-        logger.log_message(message);
-#endif
-
         switch_entry_type(entry);
 
         if (entry.completed_action != directory_completed_action::uninit) {
@@ -852,18 +847,7 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q,std::size
         }
 
         buffer_q.pop();
-        
-        {
-            std::lock_guard<std::mutex> local_lock(m_terminal_mtx);
-            terminal.progress_bar(++progress_size, before_buffer_size,50ull,t_line,queue_number);
-        }
     }
-
-#if LOGGER_VERBOSE
-    logger.fill();
-    logger.display();
-#endif
-
 
     for (auto& t : bgtv) {
         if (t.joinable()) {
@@ -912,7 +896,7 @@ void core::background_queue_system::regular_file(file_entry& entry)
 
             if (copied == false and std::filesystem::exists(entry.dst_p) == false) {
                 std::string error = "File not copied: " + entry.src_p.string() + '\n';
-                global::terminal->log_out(error);
+                main_output(error);
             }
             else {
                 m_delayed_q.pop();
@@ -952,7 +936,7 @@ void core::background_queue_system::regular_file(file_entry& entry)
 
             if (removed == false) {
                 std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-                global::terminal->log_out(error);
+                main_output(error);
             }
             else {
                 m_delayed_q.pop();
@@ -1083,12 +1067,12 @@ void core::background_queue_system::directory(file_entry& entry)
 #if !DISABLE_DELETE
         if (removed == 0) {
             std::string error = "Failed to delete: " + entry.dst_p.string() + '\n';
-            global::terminal->log_out(error);
+            main_output(error);
         }
         else {
             std::string message = "Removed files from: " + entry.dst_p.string() + '\n'
                 + "Total files removed: " + std::to_string(removed) + '\n';
-            global::terminal->log_out(message);
+            main_output(message);
 
             entry.completed_action = directory_completed_action::delete_all;
 
@@ -1345,10 +1329,7 @@ void core::background_queue_system::delayed_process_entry()
         system_log logger;
         while (m_delayed_q.empty() == false and m_run_dpe.load() == true) {
             file_entry entry = m_delayed_q.front();
-#if LOGGER_VERBOSE
-            auto message = output_entry_data(entry,"Background Processor, Entry:");
-            logger.log_message(message);
-#endif
+
             switch_entry_type(entry);
             
             background_task(entry);
@@ -1358,11 +1339,6 @@ void core::background_queue_system::delayed_process_entry()
         }
 
         m_launch_dpe_b.store(false);
-
-#if LOGGER_VERBOSE
-        logger.fill();
-        logger.display();
-#endif
     }
 }
 

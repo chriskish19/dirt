@@ -16,6 +16,7 @@
 #define DISABLE_DELETE 1
 #define TEST_ENTRY 1
 #define TEST_TIME_WAIT 30						// wait x seconds before flooding with work
+#define TEST_FOLDER "C:\\linux\\Block"
 
 
 // monitoring values
@@ -27,4 +28,6 @@
 
 // Logger values
 #define LOGGER_VERBOSE 0
+#define LOGS 1000
+#define LOG_LENGTH 512
 

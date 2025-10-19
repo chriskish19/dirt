@@ -109,7 +109,7 @@ namespace core {
 
 		void exit_process_entry();
 
-		void process_queue(std::queue<file_entry> buffer_q, std::size_t queue_number=0,std::size_t t_line=0);
+		void process_queue(std::queue<file_entry> buffer_q);
 
 		bool skip_entry(file_entry& entry);
 

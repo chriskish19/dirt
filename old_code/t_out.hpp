@@ -22,18 +22,17 @@ namespace core {
 
 		template<typename t>
 		void progress_bar(t current, t total = 100, t width = 50,t line=0,t thread_number=0);
-
 		static void enable_vt_mode();
-
 		void log_out(const std::string& log);
-
 		void clear_terminal();
-
 		std::size_t get_terminal_line();
-
 		void set_terminal_position(std::size_t x,std::size_t y);
+		std::size_t get_current_line() { return m_current_line; }
+		std::size_t get_max_rows();
+		void scrollConsoleWindow(int lines, bool scrollUp);
+		void set_current_line(std::size_t current_line);
 	protected:
-		
+		std::atomic<std::size_t> m_current_line = 0;
 		std::mutex m_log_mtx;
 		std::mutex m_line_mtx;
 	};
@@ -42,10 +41,7 @@ namespace core {
 	template<typename t>
 	inline void t_out::progress_bar(t current, t total, t width,t line,t thread_number)
 	{
-		// Move cursor to top of progress bars
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		COORD pos = { 0, (SHORT)line};
-		SetConsoleCursorPosition(hConsole, pos);
+		set_current_line(line);
 		
 		float percentage = static_cast<float>(current) / total * 100;
 		int filled = static_cast<int>(width * current / total);
@@ -58,5 +54,7 @@ namespace core {
 			std::cout << "\033[0m"; // Reset color
 		}
 		std::cout << "] " << std::fixed << std::setprecision(1) << percentage << "% " << current << "/" << total;
+		std::cout << std::endl;
 	}
+
 }

@@ -19,6 +19,8 @@
 #include CORE_SIM_API_INCLUDE_PATH
 #include CORE_GLB_INCLUDE_PATH
 
+#include <curses.h>
+
 #if !TEST_ENTRY
 int main(int argc, char* argv[]) {
     core::t_out::enable_vt_mode();
@@ -101,7 +103,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::unique_ptr<core::sim> p_sim = std::make_unique<core::sim>("C:\\linux\\Block");
+    std::unique_ptr<core::entry_sim> p_sim = std::make_unique<core::entry_sim>(TEST_FOLDER);
 
     auto code = p_sim->work(10);
 

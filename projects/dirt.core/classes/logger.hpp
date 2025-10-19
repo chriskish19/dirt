@@ -11,27 +11,16 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
+#include CORE_DEFINES_INCLUDE_PATH
 
-#define LOGS 1000
-#define LOG_LENGTH 512
 
 namespace core {
 	struct log {
-		log(std::size_t log_index) :m_index(log_index) {
-			message->reserve(LOG_LENGTH);
-
-		}
-
-		std::string* message = new std::string;
-
-		~log() {
-			if (message != nullptr) {
-				delete message;
-				message = nullptr;
-			}
-		}
+		log(std::size_t log_index);
+		~log();
 
 		const std::size_t m_index;
+		std::string* m_message = new std::string;
 	};
 
 
@@ -66,7 +55,6 @@ namespace core {
 		std::mutex m_v_mtx;
 	};
 
-	// use this class instead of functions
 	class system_log : public base {
 	public:
 		system_log();
@@ -77,7 +65,5 @@ namespace core {
 		void display();
 	protected:
 		std::queue<log*> m_message_queue;
-
-		
 	};
 }

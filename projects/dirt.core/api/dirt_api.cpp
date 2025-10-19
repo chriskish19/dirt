@@ -1,6 +1,4 @@
-﻿#include "dirt_api.hpp"
-
-/**********************************************************/
+﻿/**********************************************************/
 //
 // File: dirt_api.cpp
 //
@@ -128,7 +126,7 @@ void core::output_em(const code_pkg cp, const std::string location)
 	std::string message = cp.m_s_code + '\n' 
 		+ location + '\n';
 
-	global::terminal->log_out(message);
+	main_output(message);
 }
 
 std::vector<core::args> core::validate_args(const std::vector<arg_pkg>& args)
@@ -326,7 +324,7 @@ void core::output_entry(const arg_entry& e)
 	message += "Destination Path: " + e.dst_p.string() + '\n'
 	+ "Source Path: " + e.src_p.string() + '\n';
 
-	global::terminal->log_out(message);
+	main_output(message);
 }
 
 void core::output_fse(const std::filesystem::filesystem_error& e)
@@ -335,7 +333,7 @@ void core::output_fse(const std::filesystem::filesystem_error& e)
 		+ "Path 1: " + e.path1().string() + '\n'
 		+ "Path 2: " + e.path2().string() + '\n';
 	
-	global::terminal->log_out(message);
+	main_output(message);
 }
 
 std::uintmax_t core::file_numbers(const std::filesystem::path& p)
@@ -485,7 +483,7 @@ std::string core::file_type_to_string(std::filesystem::file_type type) {
 void core::output_filesystem_ec(std::error_code ec)
 {
 	std::string message = "filesystem error (" + std::to_string(ec.value()) + "): " + ec.message() + '\n';
-	global::terminal->log_out(message);
+	main_output(message);
 }
 
 std::vector<core::arg_entry> core::get_specific_entries(const std::vector<arg_entry>& v, args specific_arg)

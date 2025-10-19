@@ -1,4 +1,3 @@
-#include "logger.hpp"
 /**********************************************************/
 //
 // File: logger.cpp
@@ -16,6 +15,7 @@ core::base::base(std::size_t nol) {
 	// allocate the logs vector and fill
 	m_logs_v = new std::vector<log*>;
 	m_logs_v->reserve(nol);
+	
 	for (std::size_t i = 0; i < nol; ++i) {
 		m_logs_v->push_back(new log(i));
 	}
@@ -37,7 +37,7 @@ core::base::~base()
 
 void core::base::set_log(core::log* log_p)
 {
-	*log_p->message = time_stamped(*log_p->message);
+	*log_p->m_message = time_stamped(*log_p->m_message);
 
 	// cycle
 	if (m_v_index < (m_logs_v->size() - 1)) {
@@ -68,15 +68,9 @@ std::string core::base::time_stamped(const std::string& message)
 }
 
 core::system_log::system_log()
-	:base(LOGS)
-{
+	:base(LOGS){}
 
-}
-
-core::system_log::~system_log()
-{
-
-}
+core::system_log::~system_log(){}
 
 void core::system_log::log_message(const std::string& message)
 {
@@ -87,7 +81,7 @@ void core::system_log::log_message(const std::string& message)
 	std::size_t index = base::get_v_index(); 
 
 	log_p = base::get_buffer()->at(index);
-	*log_p->message = message;
+	*log_p->m_message = message;
 
 	base::set_log(log_p);
 }
@@ -99,7 +93,7 @@ void core::system_log::display()
 
 	while (m_message_queue.empty() == false) {
 		auto log = m_message_queue.front();
-		mt_cout << *log->message << '\n';
+		mt_cout << *log->m_message << '\n';
 
 		m_message_queue.pop();
 	}
@@ -110,5 +104,19 @@ void core::system_log::fill()
 	std::lock_guard<std::mutex> local_lock(m_v_mtx);
 	for (auto log_p : *m_logs_v) {
 		m_message_queue.emplace(log_p);
+	}
+}
+
+core::log::log(std::size_t log_index)
+	:m_index(log_index)
+{
+	m_message->reserve(LOG_LENGTH);
+}
+
+core::log::~log()
+{
+	if (m_message != nullptr) {
+		delete m_message;
+		m_message = nullptr;
 	}
 }
