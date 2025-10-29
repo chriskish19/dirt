@@ -18,9 +18,9 @@
 #include CORE_LOGGER_INCLUDE_PATH
 #include CORE_DEFINES_INCLUDE_PATH
 #include CORE_TOUT_INCLUDE_PATH
+#include CORE_WIN32_INCLUDE_PATH
 
 
-#include <Windows.h>
 
 namespace core {
 	class background_queue_system {

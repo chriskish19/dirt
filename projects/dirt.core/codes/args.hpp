@@ -24,12 +24,12 @@ namespace core {
 		watch,				// monitors the src directory for any changes
 		dirt_list_path,		// the file path to a txt file with listed entries
 		mirror,				// mirrors the src to the dst directory
-		new_files_only,		// 
-		no_deletes,
-		unknown,
-		src,
-		dst,
-		recursive,
+		new_files_only,		// any new files added to src directory are copied to dst. existing files are ignored.
+		no_deletes,			// files deleted in src are not deleted in dst directory
+		unknown,			// a placeholder argument not used on command line
+		src,				// source directory path
+		dst,				// destination directory path
+		recursive,			// includes subdirectories
 	};
 
 	
@@ -261,33 +261,52 @@ namespace core {
 	};
 
 
+
+	/* 
+		used for each entry in the dirt list file. the entries listed in the
+		dirt list file get converted into an arg_entry object.
+	*/
 	class arg_entry {
 	public:
-		std::vector<args> args_v;
-		std::filesystem::path dst_p;
-		std::filesystem::path src_p;
-		std::size_t entry_number;
+		std::vector<args> args_v;				// vector of command line arguments parsed from dirt list or cmd line
+		std::filesystem::path dst_p;			// destination path
+		std::filesystem::path src_p;			// source path
+		std::size_t entry_number;				// entry number in dirt list file begins at 1
 	};
-
+	
+	
+	
+	/* 
+		the action to perform on a file entry
+	*/
 	enum class file_action {
-		copy,
-		uninit = 1,
-		delete_dst,
-		modified,
-		previous_name,
-		new_name,
-		unknown
+		copy,						// copy the file entry
+		uninit = 1,					// default initailization value for a file_action enum
+		delete_dst,					// delete the destination file
+		modified,					// update the destination file since its been modified
+		previous_name,				// a file rename has occurred and this is the old name
+		new_name,					// a file rename has occurred and this is the new name
+		unknown						// a placeholder value 
 	};
-
+	
+	
+	
+	/* 
+		an enum for determining what action was performed on a directory entry
+	*/
 	enum class directory_completed_action {
-		recursive_copy,
-		uninit = 1,
-		delete_all,
-		previous_name,
-		new_name,
-		unknown,
+		recursive_copy,				// a recursive copy operation finished
+		uninit = 1,					// default initailization value for directory_completed_action enum 
+		delete_all,					// the entire directory entry has been deleted
+		previous_name,				// the directory was renamed and this entry contains the old name
+		new_name,					// the directory was renamed and this entry contains the new name
+		unknown,					// a placeholder value
 	};
-
+	
+	
+	/* 
+		
+	*/
 	class directory_info {
 	public:
 		std::filesystem::path p;

@@ -10,35 +10,60 @@
 
 #pragma once
 
-namespace core {
-    enum class codes {
-        success = 0,
-        uninit,
-        invalid_file_path,
-        syntax_mistake,
-        file_open_fail,
-        unknown,
-        invalid_cmd_args,
-        invalid_io_handle,
-        handle_nullptr,
-        read_dir_changes_fail,
-        no_valid_entries,
-        std_filesystem_exception_caught,
-        unknown_exception_caught,
-        invalid_directory_path,
-        exception_thrown_and_handled,
-        pointer_is_null,
-    };
+#include CORE_STL_INCLUDE_PATH
 
-    class code_pkg {
+namespace core {
+	/* 
+		common error codes in dirt.core
+	*/
+    enum class codes {
+        success = 0,								// succesful completion
+        uninit = 1,									// default initialization value
+        invalid_file_path,							// file path not on system
+        syntax_mistake,								// syntax mistake ( used when parsing dirt file )
+        file_open_fail,								// cant open the given file path
+        unknown,									// placeholder value
+        invalid_cmd_args,							// one or more command line args are invalid
+        invalid_io_handle,							// an error code returned from win32 when creating a completion handle
+        handle_nullptr,								// an error code returned from win32 handles
+        read_dir_changes_fail,						// an error code returned from win32 ReadDirectoryChangesW()
+        no_valid_entries,							// no valid entries either from command line or dirt list file
+        std_filesystem_exception_caught,			// standard exception caught in a try catch block
+        unknown_exception_caught,					// unknown exception caught in a try catch block
+        invalid_directory_path,						// an error code thats returned if a directory path is invalid
+        exception_thrown_and_handled,				// indicates an exception was thrown and caught
+        pointer_is_null,							// indicates a pointer is equal to nullptr ( no memory )
+		
+		// win32 codes
+		failed_to_register_class,					// failed to register win32 class on the system
+		hwnd_fail,									// failed to create a window handle
+		show_window_fail,							// failed to show window using ShowWindow() function
+    };
+	
+	
+	
+	/* 
+		simple class to match an enum codes to a string message explaining the code in more detail
+		also is throwable error object
+	*/
+    class code_pkg : public std::exception{
     public:
         code_pkg(codes code, std::string s_code)
             :m_code(code),m_s_code(s_code){ }
 
         const codes m_code;
         const std::string m_s_code;
+		
+		virtual const char* what(){
+			return m_s_code.c_str();
+		}
     };
-
+	
+	
+	
+	/* 
+		instantiated objects for matching enum codes to string explainations 
+	*/
     inline const code_pkg success_pkg(codes::success, "core::codes::success | message: successful execution.");
     inline const code_pkg c_uninit_pkg(codes::uninit, "core::codes::uninit | message: codes is uninitialized or default constructed.");
     inline const code_pkg invalid_file_path_pkg(codes::invalid_file_path, "core::codes::invalid_file_path | message: file path given does not exist on the system.");
@@ -55,4 +80,9 @@ namespace core {
     inline const code_pkg invalid_directory_path_pkg(codes::invalid_directory_path, "core::codes::invalid_directory_path | message: directory path given either is not a directory or it doesnt exist on the system.");
     inline const code_pkg exception_thrown_and_handled_pkg(codes::exception_thrown_and_handled, "core::codes::exception_thrown_and_handled | message: an exception was thrown and handled in a try catch block.");
     inline const code_pkg pointer_is_null_pkg(codes::pointer_is_null, "core::codes::pointer_is_null | message: the pointer has no memory and is equal to nullptr");
+	
+	// win32 code pkgs
+	inline const code_pkg failed_to_register_class_pkg(codes::failed_to_register_class,"core::codes::failed_to_register_class | message: the windows class has failed to be registerd on the system");
+	inline const code_pkg hwnd_fail_pkg(codes::hwnd_fail, "core::codes::hwnd_fail | message: failed to create window handle, call win32 function GetLastError() for more info");
+	inline const code_pkg show_window_fail(codes::show_window_fail, "core::codes::show_window_fail | message: failed to show window using the ShowWindow() function call win32 function GetLastError() for more info");
 }

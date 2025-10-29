@@ -37,7 +37,7 @@ file(GLOB_RECURSE dt_core_sf "../projects/dirt.core/*.cpp") # dt_core_sf (core s
 file(GLOB_RECURSE dt_core_hf "../projects/dirt.core/*.hpp") # dt_core_sf (core header files)
 
 # core exe
-add_executable(${dirt_core} ${dt_core_sf} ${dt_core_hf})
+add_executable(${dirt_core} WIN32 ${dt_core_sf} ${dt_core_hf})
 
 # core header file names
 # creates macros for each hpp file include path

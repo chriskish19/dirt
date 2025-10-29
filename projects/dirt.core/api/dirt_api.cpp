@@ -105,6 +105,12 @@ core::code_pkg core::match_code(codes code)
 		return exception_thrown_and_handled_pkg;
 	case codes::pointer_is_null:
 		return pointer_is_null_pkg;
+	case codes::failed_to_register_class:
+		return failed_to_register_class_pkg;
+	case codes::hwnd_fail:
+		return hwnd_fail_pkg;
+	case codes::show_window_fail:
+		return show_window_fail_pkg;
 	default:
 		return c_unknown_pkg;
 	}
