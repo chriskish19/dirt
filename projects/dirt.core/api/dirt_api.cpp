@@ -162,21 +162,40 @@ std::vector<core::args> core::validate_args(const std::vector<arg_pkg>& args)
 
 std::vector<core::arg_entry> core::parse_file(const std::filesystem::path& p, core::codes* code_p)
 {
+	// file object stream
 	std::ifstream file;
+	
+	// try to open the file from the path p
 	file.open(p);
-
+	
+	// if it fails to open we return an empty vector and set 
+	// the proper value for the error code
 	if (file.is_open() == false) {
 		*code_p = codes::file_open_fail;
 		return {};
 	}
-
-	arg_entry entry;
+	
+	// see CORE_ARGS_INCLUDE_PATH for definition.
+	// each listed entry in the file needs an object 
+	// placeholder then it gets added to the vector.
+	arg_entry entry;	
+	
+	// the return vector
 	std::vector<arg_entry> entry_v;
-	std::string line;
-	std::size_t entry_number = 0;
-	std::string last_word;
 
+	// a line of text in the file
+	std::string line;
+	
+	// numbered from top to bottom starts at zero
+	std::size_t entry_number = 0;
+	
+	// a placeholder for the previous word
+	std::string last_word;
+	
+	// main loop that goes through the file line by line starting at the top
+	// each time std::getline is called the variable line is modified to the text at next line
 	while (std::getline(file, line)) {
+		
 		// ignore blank lines
 		if (line.empty() == true) {
 			continue;
@@ -192,51 +211,73 @@ std::vector<core::arg_entry> core::parse_file(const std::filesystem::path& p, co
 			// we have a comment so skip the line
 			continue;
 		}
-
-		std::string word;
-		std::istringstream iss(line);
+		
+		// separete the words on each line
+		std::string word;					// each word
+		std::istringstream iss(line);		// string stream the line
+		
+		// loop through the line word by word (operator >> uses spaces to separete words)
 		while (iss >> word) {
 			
+			// look for matching words in the global args map
 			auto found = core::gbl_args_mp.find(word);
+			
+			/*
+				this if statement block is for setting word and last words values
+			*/
+			// if a word is matched we add it to the entry args vector
 			if (found != gbl_args_mp.end()) {
-				entry.args_v.push_back(found->second);
+				entry.args_v.push_back(found->second);	// found->second is the enum argument
 			}
-			else if(word == "args"){
-				last_word = word;
-				continue;
+			else if(word == "args"){ 					// word is args so we continue
+				last_word = word;						// set the previous word to word
+				continue;								// skip to begin loop run and on to the next word
 			}
-			else if (word == "{") {
+			else if (word == "{") {						// if open curly for word 
 				// the next word should be src
-				last_word = word;
-				continue;
+				last_word = word;						// set it to last word
+				continue;								// skip to begin loop run and on to the next word
 			}
 			
 
-
+			/*
+				this if statement block is for grabbing all the arguments (-copy -recursive etc...) 
+			*/
 			if (last_word == "args" and word == ":") {
 				// the next words should be arguments
 				while (iss >> word) {
+					// search the map for the arguments
 					auto found = core::gbl_args_mp.find(word);
-					if (found != gbl_args_mp.end()) {
+					if (found != gbl_args_mp.end()) {				// if found add them to the vector
 						entry.args_v.push_back(found->second);
 					}
 				}
 				
 			}
-
+			
+			
+			/*
+				this if statement block is for grabbing the src path
+			*/
 			if (last_word == "{" and word == "src") {
 				// the next should be the src path
 				iss >> std::quoted(word);
 				entry.src_p = word;
 			}
-
+		
+			/*
+				this if statement block is for grabbing the dst path
+			*/
 			if (word == "dst") {
 				// the next should be the dst path
 				iss >> std::quoted(word);
 				entry.dst_p = word;
 			}
 		}
-
+		
+		/*
+			this if statement block is the end of each entry
+		*/ 
 		if (line.find_first_of("}") != std::string::npos) {
 			entry_number++;
 			entry.entry_number = entry_number;
@@ -246,7 +287,8 @@ std::vector<core::arg_entry> core::parse_file(const std::filesystem::path& p, co
 			entry = arg_entry(); // reset
 		}
 	}
-
+	
+	// we successfully read the file and got the entries
 	*code_p = codes::success;
 	return entry_v;
 }
@@ -314,7 +356,11 @@ std::string core::get_last_error_w32()
 
 void core::output_entry(const arg_entry& e)
 {
+	// holds the matched arg to its string value
 	std::vector<std::string> s_v;
+	
+	// for each argument in the entry vector
+	// match its string value and add it to s_v vector
 	for (auto arg : e.args_v) {
 		auto pkg = match_arg_enum(arg);
 		s_v.push_back(pkg.m_s_arg);
@@ -322,28 +368,37 @@ void core::output_entry(const arg_entry& e)
 
 	// outputing to the console:
 	std::string message;
-
+	
+	// list each argument and add it to the message
 	message = "Entry number: " + std::to_string(e.entry_number) + '\n';
 	for (const auto& s : s_v) {
 		message += "arg: " + s + '\n';
 	}
+	
+	// add the dst path and src path to the message
 	message += "Destination Path: " + e.dst_p.string() + '\n'
 	+ "Source Path: " + e.src_p.string() + '\n';
-
+	
+	// output to console or some other display to the user
 	main_output(message);
 }
 
 void core::output_fse(const std::filesystem::filesystem_error& e)
 {
+	// create the string error message
 	std::string message = "Message: " + std::string(e.what()) + '\n' 
 		+ "Path 1: " + e.path1().string() + '\n'
 		+ "Path 2: " + e.path2().string() + '\n';
 	
+	// output the message 
 	main_output(message);
 }
 
 std::uintmax_t core::file_numbers(const std::filesystem::path& p)
 {
+	// returns 0 on a number of problems, if it does not exist and its not a directory 
+	// it will return 0 and no errors will be thrown.
+	// only counts regular files, nothing else.
 	try {
 		std::uintmax_t count = 0;
 		if (std::filesystem::exists(p) && std::filesystem::is_directory(p)) {
@@ -362,18 +417,23 @@ std::uintmax_t core::file_numbers(const std::filesystem::path& p)
 	catch (...) {
 		output_em(unknown_exception_caught_pkg);
 	}
+	
+	// exception thrown, error occured so return 0
 	return 0;
 }
 
 std::unordered_set<core::directory_info> core::get_all_directories(const std::filesystem::path& p)
 {
 	try {
+		// if it doesnt exist or its not directory, return a blank set
 		if (std::filesystem::exists(p) == false or std::filesystem::is_directory(p) == false) {
-			return {};
+			return {}; // empty set 
 		}
-
+		
+		// the returned set of directory entries
 		std::unordered_set<core::directory_info> di_set;
-
+		
+		// recursively loop through each directory  
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(p)) {
 			if (entry.is_directory() == true) {
 				directory_info di;
@@ -382,7 +442,8 @@ std::unordered_set<core::directory_info> core::get_all_directories(const std::fi
 				di_set.emplace(di);
 			}
 		}
-
+		
+		// the set is filled up so return it
 		return di_set;
 	}
 	catch (const std::filesystem::filesystem_error& e) {
@@ -392,18 +453,24 @@ std::unordered_set<core::directory_info> core::get_all_directories(const std::fi
 	catch (...) {
 		output_em(unknown_exception_caught_pkg);
 	}
+	
+	// an exception was thrown, lets return a blank set
 	return {};
 }
 
 core::codes core::copy_directory_only(const std::filesystem::path& dst, const std::filesystem::path& src)
 {
 	try {
+		// checks if src and dst are directories
 		if (std::filesystem::is_directory(dst) == false or std::filesystem::is_directory(src) == false) {
+			// if they are not directories return an error code
 			return codes::invalid_directory_path;
 		}
-
+		
+		// copy src to dst
 		std::filesystem::copy(src, dst, std::filesystem::copy_options::update_existing);
-
+		
+		// success
 		return codes::success;
 	}
 	catch (const std::filesystem::filesystem_error& e) {
@@ -413,6 +480,8 @@ core::codes core::copy_directory_only(const std::filesystem::path& dst, const st
 	catch (...) {
 		output_em(unknown_exception_caught_pkg);
 	}
+	
+	// an exception was thrown, return the code
 	return codes::exception_thrown_and_handled;
 }
 
@@ -548,19 +617,6 @@ std::vector<std::queue<core::file_entry>> core::split_queue(std::queue<file_entr
 	return file_entry_v_q;
 }
 
-bool core::find_directory(const std::filesystem::path& p, const std::filesystem::path& d)
-{
-	std::string sp = p.string();
-	std::string sd = d.string();
-
-	std::size_t found = sp.find_first_of(sd);
-	if (found != std::string::npos) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
 
 std::string core::output_entry_data(const file_entry& entry, const std::string& name)
 {
@@ -574,4 +630,701 @@ std::string core::output_entry_data(const file_entry& entry, const std::string& 
 	return message;
 	 
 }
+
+
+
+UINT core::get_window_width(HWND window_handle)
+{
+    RECT rc = {};
+    if (GetClientRect(window_handle, &rc) == FALSE) {
+        throw core::getclientrect_fail_pkg;
+    }
+
+    return rc.right - rc.left;
+}
+
+UINT core::get_window_height(HWND window_handle) {
+    RECT rc = {};
+    if (GetClientRect(window_handle, &rc) == FALSE) {
+        throw core::getclientrect_fail_pkg;
+    }
+
+    return rc.bottom - rc.top;
+}
+
+UINT core::get_window_width(HWND window_handle,core::codes* code) noexcept
+{
+    RECT rc = {};
+    if (GetClientRect(window_handle, &rc) == FALSE) {
+        *code = core::codes::getclientrect_fail;
+        return 0;
+    }
+
+    return rc.right - rc.left;
+}
+
+UINT core::get_window_height(HWND window_handle, core::codes* code) noexcept
+{
+    RECT rc = {};
+    if (GetClientRect(window_handle, &rc) == FALSE) {
+        *code = core::codes::getclientrect_fail;
+        return 0;
+    }
+
+    return rc.bottom - rc.top;
+}
+
+std::wstring core::to_wide_string(const char* narrow) {
+    /*
+
+    std::size_t mbsrtowcs( wchar_t* dst,
+                       const char** src,
+                       std::size_t len,
+                       std::mbstate_t* ps );
+
+    dst 	- 	pointer to wide character array where the results will be stored
+    src 	- 	pointer to pointer to the first element of a null-terminated multibyte string
+    len 	- 	number of wide characters available in the array pointed to by dst
+    ps 	- 	pointer to the conversion state object
+
+    */
+
+    // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    // get the length in bytes of "temp"
+    std::size_t length = 1 + std::mbsrtowcs(nullptr, &narrow, 0, &state);
+
+    // stack buffer
+    wchar_t* buffer = nullptr;
+    wchar_t stack_buffer[max_string_buffer];
+    bool heap_allocated = false;
+
+    // if length is greater than max_string_buffer, we will allocate a new buffer using new
+    if (length > max_string_buffer) {
+        buffer = new wchar_t[length];
+        heap_allocated = true;
+    }
+    else {
+        buffer = stack_buffer;
+    }
+
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+    std::size_t error_code = std::mbsrtowcs(buffer, &narrow, length, &state);
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+        // clean up first
+        if (heap_allocated == true and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // now we throw an exception after clean up
+        throw core::to_wide_string_failed_pkg;
+
+        // returns an empty string
+        return {};
+    }
+
+    // clean up
+    if (heap_allocated == true and buffer != nullptr) {
+        std::wstring r_temp(buffer);
+        delete[] buffer;
+        return r_temp;
+    }
+
+    // return the wide string using the stack buffer
+    return std::wstring(buffer);
+}
+
+std::wstring core::to_wide_string(const std::string& narrow) {
+    /*
+
+    std::size_t mbsrtowcs( wchar_t* dst,
+                       const char** src,
+                       std::size_t len,
+                       std::mbstate_t* ps );
+
+    dst 	- 	pointer to wide character array where the results will be stored
+    src 	- 	pointer to pointer to the first element of a null-terminated multibyte string
+    len 	- 	number of wide characters available in the array pointed to by dst
+    ps 	- 	pointer to the conversion state object
+
+    */
+
+    // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    // temp in order to get the address of the pointer
+    const char* temp = narrow.c_str();
+
+    // get the length in bytes of "temp"
+    std::size_t length = 1 + std::mbsrtowcs(nullptr, &temp, 0, &state);
+
+    // stack buffer
+    wchar_t* buffer = nullptr;
+    wchar_t stack_buffer[max_string_buffer];
+    bool heap_allocated = false;
+
+    // if length is greater than max_string_buffer, we will allocate a new buffer using new
+    if (length > max_string_buffer) {
+        buffer = new wchar_t[length];
+        heap_allocated = true;
+    }
+    else {
+        buffer = stack_buffer;
+    }
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+    std::size_t error_code = std::mbsrtowcs(buffer, &temp, length, &state);
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+        // clean up
+        if (heap_allocated == true and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // now we throw an exception after clean up
+        throw core::to_wide_string_failed_pkg;
+
+        // returns an empty string
+        return {};
+    }
+
+    // clean up
+    if (heap_allocated == true and buffer != nullptr) {
+        std::wstring r_temp(buffer);
+        delete[] buffer;
+        return r_temp;
+    }
+
+    // return the wide string using the buffer
+    return std::wstring(buffer);
+}
+
+std::string core::to_narrow_string(const wchar_t* wide) {
+    /*
+    *
+    Converts a sequence of wide characters from the array whose first element is pointed to by *src
+    to its narrow multibyte representation that begins in the conversion state described by *ps.
+    If dst is not null, converted characters are stored in the successive elements of the char array
+    pointed to by dst. No more than len bytes are written to the destination array.
+
+
+    std::size_t wcsrtombs( char* dst,
+                       const wchar_t** src,
+                       std::size_t len,
+                       std::mbstate_t* ps );
+
+    dst 	- 	pointer to narrow character array where the multibyte characters will be stored
+    src 	- 	pointer to pointer to the first element of a null-terminated wide string
+    len 	- 	number of bytes available in the array pointed to by dst
+    ps 	    - 	pointer to the conversion state object
+
+    */
+
+    // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    // get the wide string length, does not include '\0'
+    // returns the length in bytes
+    std::size_t length = 1 + std::wcsrtombs(nullptr, &wide, 0, &state);
+
+    // stack buffer
+    char* buffer = nullptr;
+    char stack_buffer[max_string_buffer];
+    bool heap_allocated = false;
+
+    // if length is greater than max_string_buffer, we will allocate a new buffer using new
+    if (length > max_string_buffer) {
+        buffer = new char[length];
+        heap_allocated = true;
+    }
+    else {
+        buffer = stack_buffer;
+    }
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+    std::size_t error_code = std::wcsrtombs(buffer, &wide, length, &state);
+
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+
+        // clean up
+        if (heap_allocated == true and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // throw an exception on error
+		throw core::to_narrow_string_failed_pkg;
+
+        // returns an empty string
+        return {};
+    }
+
+    // clean up
+    if (heap_allocated == true and buffer != nullptr) {
+        std::string r_temp(buffer);
+        delete[] buffer;
+        return r_temp;
+    }
+
+    // return the narrow string using the stack buffer
+    return std::string(buffer);
+}
+
+std::string core::to_narrow_string(const std::wstring& wide) {
+    /*
+   *
+   Converts a sequence of wide characters from the array whose first element is pointed to by *src
+   to its narrow multibyte representation that begins in the conversion state described by *ps.
+   If dst is not null, converted characters are stored in the successive elements of the char array
+   pointed to by dst. No more than len bytes are written to the destination array.
+
+
+   std::size_t wcsrtombs( char* dst,
+                      const wchar_t** src,
+                      std::size_t len,
+                      std::mbstate_t* ps );
+
+   dst 	- 	pointer to narrow character array where the multibyte characters will be stored
+   src 	- 	pointer to pointer to the first element of a null-terminated wide string
+   len 	- 	number of bytes available in the array pointed to by dst
+   ps 	    - 	pointer to the conversion state object
+
+   */
+
+   // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    // get the wide string length, does not include '\0'
+    // returns the length in bytes
+    const wchar_t* temp = wide.c_str();
+    std::size_t length = 1 + std::wcsrtombs(nullptr, &temp, 0, &state);
+
+    // stack buffer
+    char* buffer = nullptr;
+    char stack_buffer[max_string_buffer];
+    bool heap_allocated = false;
+
+    // if length is greater than max_string_buffer, we will allocate a new buffer using new
+    if (length > max_string_buffer) {
+        buffer = new char[length];
+        heap_allocated = true;
+    }
+    else {
+        buffer = stack_buffer;
+    }
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+
+    std::size_t error_code = std::wcsrtombs(buffer, &temp, length, &state);
+
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+
+        // clean up
+        if (heap_allocated == true and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // throw an exception on error
+		throw core::to_narrow_string_failed_pkg;
+
+        // returns an empty string
+        return {};
+    }
+
+    // clean up
+    if (heap_allocated == true and buffer != nullptr) {
+        std::string r_temp(buffer);
+        delete[] buffer;
+        return r_temp;
+    }
+
+    // return the narrow string using the stack buffer
+    return std::string(buffer);
+}
+
+std::wstring core::to_wide_string(const char* narrow, core::codes* code_p) {
+    // return nothing if code is nullptr
+    if (code_p == nullptr) {
+        return {};
+    }
+
+
+    /*
+
+    std::size_t mbsrtowcs( wchar_t* dst,
+                       const char** src,
+                       std::size_t len,
+                       std::mbstate_t* ps );
+
+    dst 	- 	pointer to wide character array where the results will be stored
+    src 	- 	pointer to pointer to the first element of a null-terminated multibyte string
+    len 	- 	number of wide characters available in the array pointed to by dst
+    ps 	- 	pointer to the conversion state object
+
+    */
+
+    // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    /*
+
+    On success, returns the number of wide characters, excluding the terminating L'\0',
+    written to the character array. If dst is a null pointer, returns the number of wide
+    characters that would have been written given unlimited length.
+
+    */
+    std::size_t length = 1 + std::mbsrtowcs(nullptr, &narrow, 0, &state);
+
+
+    wchar_t* buffer = nullptr;
+
+    // stack buffer
+    wchar_t stack_buffer[max_string_buffer];
+    buffer = stack_buffer;
+    boolean heap_alloc = false;
+
+    // if length is greater than max_string_buffer, we allocate memory:
+    if (length > max_string_buffer) {
+        buffer = new wchar_t[length];
+        heap_alloc = true;
+    }
+
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+    std::size_t error_code = std::mbsrtowcs(buffer, &narrow, length, &state);
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+        *code_p = core::codes::to_wide_string_failed;
+
+        if (heap_alloc == true and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // returns an empty string
+        return {};
+    }
+
+    std::wstring temp_buffer(buffer);
+
+    if (heap_alloc == true and buffer != nullptr) {
+        delete[] buffer;
+    }
+
+	*code_p = core::codes::success;
+
+    // return the wide string using the buffer
+    return temp_buffer;
+}
+
+std::wstring core::to_wide_string(const std::string& narrow, core::codes* code_p) {
+    // return nothing if code is nullptr
+    if (code_p == nullptr) {
+        return {};
+    }
+
+
+    /*
+
+    std::size_t mbsrtowcs( wchar_t* dst,
+                       const char** src,
+                       std::size_t len,
+                       std::mbstate_t* ps );
+
+    dst 	- 	pointer to wide character array where the results will be stored
+    src 	- 	pointer to pointer to the first element of a null-terminated multibyte string
+    len 	- 	number of wide characters available in the array pointed to by dst
+    ps 	- 	pointer to the conversion state object
+
+    */
+
+    // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    const char* temp = narrow.c_str();
+
+    /*
+
+    On success, returns the number of wide characters, excluding the terminating L'\0',
+    written to the character array. If dst is a null pointer, returns the number of wide
+    characters that would have been written given unlimited length.
+
+    */
+    std::size_t length = 1 + std::mbsrtowcs(nullptr, &temp, 0, &state);
+
+
+    wchar_t* buffer = nullptr;
+
+    // stack buffer
+    wchar_t stack_buffer[max_string_buffer];
+    buffer = stack_buffer;
+    bool heap_alloc = false;
+
+    // if length is greater than max_string_buffer, allocate more memory.
+    if (length > max_string_buffer) {
+        buffer = new wchar_t[length];
+        heap_alloc = true;
+    }
+
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+    std::size_t error_code = std::mbsrtowcs(buffer, &temp, length, &state);
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+        *code_p = core::codes::to_wide_string_failed;
+
+        if (heap_alloc and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // returns an empty string
+        return {};
+    }
+
+    std::wstring temp_buffer(buffer);
+
+    if (heap_alloc and buffer != nullptr) {
+        delete[] buffer;
+    }
+
+    *code_p = core::codes::success;
+
+    // return the wide string using the buffer
+    return temp_buffer;
+}
+
+std::string core::to_narrow_string(const wchar_t* wide, core::codes* code_p) {
+    // return nothing if code is nullptr
+    if (code_p == nullptr) {
+        return {};
+    }
+
+
+    /*
+   *
+   Converts a sequence of wide characters from the array whose first element is pointed to by *src
+   to its narrow multibyte representation that begins in the conversion state described by *ps.
+   If dst is not null, converted characters are stored in the successive elements of the char array
+   pointed to by dst. No more than len bytes are written to the destination array.
+
+
+   std::size_t wcsrtombs( char* dst,
+                      const wchar_t** src,
+                      std::size_t len,
+                      std::mbstate_t* ps );
+
+   dst 	- 	pointer to narrow character array where the multibyte characters will be stored
+   src 	- 	pointer to pointer to the first element of a null-terminated wide string
+   len 	- 	number of bytes available in the array pointed to by dst
+   ps 	    - 	pointer to the conversion state object
+
+   */
+
+   // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    // get the wide string length, does not include '\0'
+    // returns the length in bytes
+    std::size_t length = 1 + std::wcsrtombs(nullptr, &wide, 0, &state);
+
+    char* buffer = nullptr;
+    char temp_buffer[max_string_buffer];
+    bool heap_alloc = false;
+
+
+    // if length is greater than max_string_buffer, we have an error:
+    // use new to allocate memory to compensate 
+    if (length > max_string_buffer){
+        buffer = new char[length];
+        heap_alloc = true;
+    }
+    else {
+        buffer = temp_buffer;
+    }
+
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+    std::size_t error_code = std::wcsrtombs(buffer, &wide, length, &state);
+
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+        *code_p = core::codes::to_narrow_string_failed;
+
+        if (heap_alloc and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // returns an empty string
+        return {};
+    }
+
+    std::string temp_buffer_str(buffer);
+
+    if (heap_alloc and buffer != nullptr) {
+        delete[] buffer;
+    }
+
+    *code_p = core::codes::success;
+
+    // return the narrow string using the buffer
+    return temp_buffer_str;
+}
+
+std::string core::to_narrow_string(const std::wstring& wide, core::codes* code_p) {
+    // return nothing if code is nullptr
+    if (code_p == nullptr) {
+        return {};
+    }
+
+
+    /*
+   *
+   Converts a sequence of wide characters from the array whose first element is pointed to by *src
+   to its narrow multibyte representation that begins in the conversion state described by *ps.
+   If dst is not null, converted characters are stored in the successive elements of the char array
+   pointed to by dst. No more than len bytes are written to the destination array.
+
+
+   std::size_t wcsrtombs( char* dst,
+                      const wchar_t** src,
+                      std::size_t len,
+                      std::mbstate_t* ps );
+
+   dst 	- 	pointer to narrow character array where the multibyte characters will be stored
+   src 	- 	pointer to pointer to the first element of a null-terminated wide string
+   len 	- 	number of bytes available in the array pointed to by dst
+   ps 	    - 	pointer to the conversion state object
+
+   */
+
+   // Create a fresh conversion state per thread
+    std::mbstate_t state = std::mbstate_t();
+
+    const wchar_t* temp = wide.c_str();
+
+    // get the wide string length, does not include '\0'
+    // returns the length in bytes
+    std::size_t length = 1 + std::wcsrtombs(nullptr, &temp, 0, &state);
+
+    char* buffer = nullptr;
+    char temp_buffer[max_string_buffer];
+    bool heap_alloc = false;
+
+
+    // if length is greater than max_string_buffer, we have an error:
+    // use new to allocate memory to compensate 
+    if (length > max_string_buffer) {
+        buffer = new char[length];
+        heap_alloc = true;
+    }
+    else {
+        buffer = temp_buffer;
+    }
+
+
+    // according to documentation:
+    /*
+
+    The following functions should not be called from multiple threads without synchronization with
+    the std::mbstate_t* argument of a null pointer due to possible data races: std::mbrlen, std::mbrtowc,
+    std::mbsrtowcs, std::mbtowc, std::wcrtomb, std::wcsrtombs, std::wctomb.
+
+    */
+    std::size_t error_code = std::wcsrtombs(buffer, &temp, length, &state);
+
+
+    // On conversion error (if invalid wide character was encountered), 
+    // returns static_cast<std::size_t>(-1), stores EILSEQ in errno, and leaves *ps in unspecified state. 
+    if (error_code == std::size_t(-1)) {
+        *code_p = core::codes::to_narrow_string_failed;
+
+        if (heap_alloc and buffer != nullptr) {
+            delete[] buffer;
+        }
+
+        // returns an empty string
+        return {};
+    }
+
+    std::string temp_buffer_str(buffer);
+
+    if (heap_alloc and buffer != nullptr) {
+        delete[] buffer;
+    }
+
+    *code_p = core::codes::success;
+
+    // return the narrow string using the buffer
+    return temp_buffer_str;
+}
+
+
+
+
 

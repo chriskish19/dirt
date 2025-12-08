@@ -56,7 +56,7 @@
 #define CORE_LISTBOX_INCLUDE_PATH				CORE_listbox_hpp					// list box class
 #define CORE_LABEL_INCLUDE_PATH					CORE_label_hpp						// label class
 #define CORE_TEXTBOX_INCLUDE_PATH				CORE_textbox_hpp					// textbox class
-
+#define CORE_UI_INCLUDE_PATH					CORE_ui_hpp							// main ui
 
 
 /*

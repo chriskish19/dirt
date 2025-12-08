@@ -38,6 +38,10 @@
 #define LOG_LENGTH 512							// length of each log
 
 
+/*
+	Strings
+*/
+#define MAX_STRING 512
 
 /*
 	handle unicode strings/ ansi string types

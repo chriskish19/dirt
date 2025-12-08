@@ -33,11 +33,14 @@ namespace core {
         invalid_directory_path,						// an error code thats returned if a directory path is invalid
         exception_thrown_and_handled,				// indicates an exception was thrown and caught
         pointer_is_null,							// indicates a pointer is equal to nullptr ( no memory )
-		
+        to_wide_string_failed,                      // converting from narrow string to wide fail
+        to_narrow_string_failed,                    // converting from wide to narrow string failed
+
 		// win32 codes
 		failed_to_register_class,					// failed to register win32 class on the system
 		hwnd_fail,									// failed to create a window handle
 		show_window_fail,							// failed to show window using ShowWindow() function
+        getclientrect_fail,                         // failed to get the client rectangle for determining window heights and widths
     };
 	
 	
@@ -80,9 +83,14 @@ namespace core {
     inline const code_pkg invalid_directory_path_pkg(codes::invalid_directory_path, "core::codes::invalid_directory_path | message: directory path given either is not a directory or it doesnt exist on the system.");
     inline const code_pkg exception_thrown_and_handled_pkg(codes::exception_thrown_and_handled, "core::codes::exception_thrown_and_handled | message: an exception was thrown and handled in a try catch block.");
     inline const code_pkg pointer_is_null_pkg(codes::pointer_is_null, "core::codes::pointer_is_null | message: the pointer has no memory and is equal to nullptr");
-	
+    inline const code_pkg to_wide_string_failed_pkg(codes::to_wide_string_failed, "core::codes::to_wide_string_failed | message: converting from narrow string to wide failed");
+    inline const code_pkg to_narrow_string_failed_pkg(codes::to_narrow_string_failed, "core::codes::to_narrow_string_failed | message: converting from wide string to narrow has failed");
+
+
+
 	// win32 code pkgs
 	inline const code_pkg failed_to_register_class_pkg(codes::failed_to_register_class,"core::codes::failed_to_register_class | message: the windows class has failed to be registerd on the system");
 	inline const code_pkg hwnd_fail_pkg(codes::hwnd_fail, "core::codes::hwnd_fail | message: failed to create window handle, call win32 function GetLastError() for more info");
-	inline const code_pkg show_window_fail(codes::show_window_fail, "core::codes::show_window_fail | message: failed to show window using the ShowWindow() function call win32 function GetLastError() for more info");
+	inline const code_pkg show_window_fail_pkg(codes::show_window_fail, "core::codes::show_window_fail | message: failed to show window using the ShowWindow() function call win32 function GetLastError() for more info");
+    inline const code_pkg getclientrect_fail_pkg(codes::getclientrect_fail, "core::codes::getclientrect_fail | message: failed to get client rect window dimensions, call win32 function GetLastError() for more info");
 }
