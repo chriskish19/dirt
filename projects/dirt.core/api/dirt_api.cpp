@@ -1,4 +1,5 @@
-﻿/**********************************************************/
+﻿#include "dirt_api.hpp"
+/**********************************************************/
 //
 // File: dirt_api.cpp
 //
@@ -383,15 +384,14 @@ void core::output_entry(const arg_entry& e)
 	main_output(message);
 }
 
-void core::output_fse(const std::filesystem::filesystem_error& e)
+std::string core::text_output_fse(const std::filesystem::filesystem_error& e)
 {
 	// create the string error message
 	std::string message = "Message: " + std::string(e.what()) + '\n' 
 		+ "Path 1: " + e.path1().string() + '\n'
 		+ "Path 2: " + e.path2().string() + '\n';
 	
-	// output the message 
-	main_output(message);
+	return message;
 }
 
 std::uintmax_t core::file_numbers(const std::filesystem::path& p)
@@ -1322,6 +1322,96 @@ std::string core::to_narrow_string(const std::wstring& wide, core::codes* code_p
 
     // return the narrow string using the buffer
     return temp_buffer_str;
+}
+
+std::vector<core::arg_entry> core::cmd_line(int argc, char* argv[], codes* code)
+{	
+	std::vector<core::arg_entry> entry_v;
+
+	bool next_is_dtlist = false;
+	bool using_dtlist = false;
+
+	fs::path dtlist_path;
+
+	args last_arg = args();
+
+	arg_entry single_entry;
+
+	for (int i = 0; i < argc; ++i) {
+		std::string word = argv[i];
+		
+		if (last_arg == args::src) {
+			single_entry.src_p = word;
+		}
+		else if (last_arg == args::dst) {
+			single_entry.dst_p = word;
+		}
+
+		if (next_is_dtlist == true) {
+			dtlist_path = word;
+			using_dtlist = true;
+			break;
+		}
+
+		auto found = gbl_args_mp.find(word);
+		if (found != gbl_args_mp.end()) {
+			if (found->second == core::args::dirt_list_path) {
+				next_is_dtlist = true;
+			}
+			else {
+				single_entry.args_v.push_back(found->second);
+				last_arg = found->second;
+			}
+		}
+	}
+
+	if (using_dtlist == true) {
+		entry_v = parse_file(dtlist_path,code);
+		return entry_v;
+	}
+	else { // using one entry cmdline
+		entry_v.push_back(single_entry);
+		return entry_v;
+	}
+	return {};
+}
+
+core::codes core::validate(std::vector<core::arg_entry>& v)
+{
+	std::vector<std::size_t> invalid_entrys_v;
+	for (const auto& entry : v) {
+		if (validate_entry(entry) == false) {
+			main_output("error : invalid entry\n");
+			output_entry(entry);
+			invalid_entrys_v.push_back(entry.entry_number);
+		}
+	}
+
+	for (auto i : invalid_entrys_v) {
+		v.erase(v.begin() + (i - 1));
+	}
+
+	if (v.empty()) {
+		return codes::no_valid_entries;
+	}
+	return codes::success;
+}
+
+std::string core::time_now(const std::string& message)
+{
+	try {
+		auto now = std::chrono::system_clock::now();
+		std::string time = std::format("[{}]", now);
+		return time + message;
+	}
+	catch (const std::exception& e) {
+		std::cout << "exception: " << e.what() << std::endl;
+	}
+	catch (...) {
+		std::cout << "unknown exception caught..." << std::endl;
+	}
+	// exception thrown we return nothing
+	return {};
 }
 
 

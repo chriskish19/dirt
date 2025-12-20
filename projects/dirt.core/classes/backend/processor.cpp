@@ -25,7 +25,6 @@ core::process::~process()
 core::codes core::process::process_entry()
 {
     {
-        main_output("Processing copy entries...\n"); 
         codes code = process_copy_entries();
         if (code != codes::success) {
             return code;
@@ -34,7 +33,6 @@ core::codes core::process::process_entry()
     
     
     {
-        main_output("Processing watch entries...\n");
         codes code = process_watch_entries();
         if (code != codes::success) {
             return code;
@@ -51,8 +49,12 @@ core::codes core::process::watch()
     while (
         GetQueuedCompletionStatus(m_hCompletionPort,&m_bytesTransferred,&m_completionKey,&m_pOverlapped,INFINITE)) {
 
+        add(time{ "Processing file changes..." });
+
         DirWatchContext* ctx = reinterpret_cast<DirWatchContext*>(m_completionKey);
         FILE_NOTIFY_INFORMATION* pNotify = (FILE_NOTIFY_INFORMATION*)ctx->buffer;
+
+        int file_counter = 0;
 
         do {
             std::wstring fileName(pNotify->FileName, pNotify->FileNameLength / sizeof(WCHAR));
@@ -67,22 +69,25 @@ core::codes core::process::watch()
 
             try {
                 entry.src_s = std::filesystem::status(entry.src_p);
+                add_entry(entry);
+                file_counter++;
             }
             catch (const std::filesystem::filesystem_error& e) {
-                output_em(std_filesystem_exception_caught_pkg);
-                output_fse(e);
+                std::string loc = get_location();
+                add(error{ std_filesystem_exception_caught_pkg,loc });
+                add(fs_exception{ e });
             }
             catch (...) {
-                output_em(unknown_exception_caught_pkg);
+                std::string loc = get_location();
+                add(error{ unknown_exception_caught_pkg,loc });
             }
-
-            add_entry(entry);
 
             if (pNotify->NextEntryOffset == 0)
                 break;
             pNotify = (FILE_NOTIFY_INFORMATION*)((BYTE*)pNotify + pNotify->NextEntryOffset);
         } while (true);
 
+        add(time{ "Done. Added " + std::to_string(file_counter) + "files to be processed." });
 
         // signal queue system
         m_launch_b.store(true);

@@ -45,18 +45,21 @@
 /*
 	classes : big objects needed for dirt.cores functionality
 */
+#define CORE_MAIN_ENTRY_INCLUDE_PATH			CORE_main_entry_hpp					// main singleton class
+
 #define CORE_PROCESSOR_INCLUDE_PATH				CORE_processor_hpp					// processes files
-#define CORE_CMDLINE_INCLUDE_PATH				CORE_cmdline_hpp					// processes cmd line args
+// #define CORE_CMDLINE_INCLUDE_PATH				CORE_cmdline_hpp					// processes cmd line args
 #define CORE_LOGGER_INCLUDE_PATH				CORE_logger_hpp						// logger queue
 #define CORE_TOUT_INCLUDE_PATH					CORE_output_hpp						// outputing
 #define CORE_WINDOW_INCLUDE_PATH				CORE_dw_hpp							// win32 window
 
-// gui
+// windows 64 gui
 #define CORE_BUTTON_INCLUDE_PATH				CORE_button_hpp						// button class
 #define CORE_LISTBOX_INCLUDE_PATH				CORE_listbox_hpp					// list box class
 #define CORE_LABEL_INCLUDE_PATH					CORE_label_hpp						// label class
 #define CORE_TEXTBOX_INCLUDE_PATH				CORE_textbox_hpp					// textbox class
 #define CORE_UI_INCLUDE_PATH					CORE_ui_hpp							// main ui
+
 
 
 /*

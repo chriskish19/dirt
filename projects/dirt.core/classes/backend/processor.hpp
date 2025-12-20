@@ -23,7 +23,7 @@
 
 
 namespace core {
-	class background_queue_system {
+	class background_queue_system : public backend_message_queue{
 	public:
 		background_queue_system() = default;
 

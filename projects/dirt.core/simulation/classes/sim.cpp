@@ -29,11 +29,11 @@ core::entry_sim::entry_sim(const std::filesystem::path& test_dir)
 		m_b_dir_it = std::filesystem::recursive_directory_iterator(m_test_files);
 	}
 	catch (const std::filesystem::filesystem_error& e) {
-		output_em(std_filesystem_exception_caught_pkg);
-		output_fse(e);
+		add(fs_exception{ e });
 	}
 	catch (...) {
-		output_em(unknown_exception_caught_pkg);
+		std::string location = get_location();
+		add(unknown_exception{ unknown_exception_caught_pkg,location });
 	}
 }
 

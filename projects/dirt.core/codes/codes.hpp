@@ -9,8 +9,11 @@
 /**********************************************************/
 
 #pragma once
-
+#include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
+
+
+
 
 namespace core {
 	/* 

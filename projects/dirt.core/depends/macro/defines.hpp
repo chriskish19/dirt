@@ -9,6 +9,17 @@
 /**********************************************************/
 
 #pragma once
+#include CORE_NAMES_INCLUDE
+#include CORE_STL_INCLUDE_PATH
+#include CORE_WIN32_INCLUDE_PATH
+
+
+
+/*
+	building dirt
+*/
+#define TERMINAL_BUILD 1						// build dirt for running as a terminal app
+#define WIN32_GUI_BUILD 0						// build dirt with a gui webview
 
 /* 
 	testing values
@@ -19,7 +30,7 @@
 #define TEST_ENTRY 1							// change application entry point
 #define TEST_TIME_WAIT 30						// wait x seconds before flooding with work
 #define TEST_FOLDER "C:\\linux\\Block"			// absolute system path on my c drive
-
+#define FLOOD 10								// generate entries for x ms
 
 /*
 	file monitoring values
@@ -28,7 +39,7 @@
 #define BUFFER_TIME 10							// 10 seconds
 #define MAX_THREADS 4							// 4 threads
 #define MAX_QUEUE_SPLIT 1000					// 1000 files per queue
-
+#define GUI_SYNC_INTERVAL 1000					// in ms
 
 /*
 	Logger values

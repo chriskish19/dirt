@@ -60,8 +60,6 @@ namespace core{
 		codes add_dynamic_menu(HWND window_handle);
 
 		codes set_icon(HWND hwnd, const fs::path& icon_path);
-
-		ui m_main_ui;
 	};
 }
 

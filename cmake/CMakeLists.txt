@@ -54,6 +54,14 @@ foreach(HEADER_FILE ${dt_core_hf})
         target_compile_definitions(${dirt_core} PRIVATE -DCORE_NAMES_INCLUDE=${FILE_NAME_HPP})
     endif()
 endforeach()
+
+
+# define UNICODE
+target_compile_definitions(${dirt_core} PRIVATE
+        UNICODE
+        _UNICODE
+    )
+
 #############################
 # End of dirt core exe
 #############################

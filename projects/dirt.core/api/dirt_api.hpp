@@ -16,7 +16,6 @@
 #include CORE_ARGS_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
 #include CORE_TOUT_INCLUDE_PATH
-#include CORE_GLB_INCLUDE_PATH
 #include CORE_WIN32_INCLUDE_PATH
 
 
@@ -98,9 +97,9 @@ namespace core {
 	
 	
 	/*
-		outputs a file system exception error information to the console or displays to the user
+		outputs a file system exception error information to a returned string
 	*/
-	void output_fse(const std::filesystem::filesystem_error& e);
+	std::string text_output_fse(const std::filesystem::filesystem_error& e);
 	
 	
 	/*
@@ -224,4 +223,18 @@ namespace core {
 	std::wstring to_wide_string(const std::string& narrow, core::codes* code_p);
 	std::string to_narrow_string(const wchar_t* wide, core::codes* code_p);
 	std::string to_narrow_string(const std::wstring& wide, core::codes* code_p);
+
+
+	/*
+		cmd line parsing
+	*/
+	std::vector<core::arg_entry> cmd_line(int argc, char* argv[], codes* code);
+	codes validate(std::vector<core::arg_entry>& v);
+
+
+	/*
+		time
+	*/
+	std::string time_now(const std::string& message);
+
 }
