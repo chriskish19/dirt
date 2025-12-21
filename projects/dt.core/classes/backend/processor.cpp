@@ -858,9 +858,12 @@ void core::queue_system::exit_process_entry()
 
 void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
 {
-
+    add(message{ "In process queue about to process " + std::to_string(buffer_q.size()) + " files" });
+    
     while (buffer_q.empty() == false) {
         file_entry& entry = buffer_q.front();
+
+        add(message{ api::output_file_entry(entry) });
 
         if (skip_entry(entry) == true) {
             buffer_q.pop();

@@ -31,7 +31,7 @@
 #define DISABLE_DELETE 1						// no deleting when set to 1
 #define TEST_ENTRY 1							// change application entry point
 #define TEST_TIME_WAIT 30						// wait x seconds before flooding with work
-#define TEST_FOLDER "C:\\linux\\Block"			// absolute system path on my c drive
+#define TEST_FOLDER "C:\\linux"					// absolute system path on my c drive
 #define FLOOD 10								// generate entries for x ms
 
 /*

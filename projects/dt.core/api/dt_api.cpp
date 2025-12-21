@@ -153,8 +153,7 @@ core::code_pkg api::match_code(core::codes code)
 }
 
 void api::output_em(const core::code_pkg cp, const std::string location) {
-	std::string message = cp.m_s_code + '\n'
-		+ location + '\n';
+	std::string message = std::format("{}\n{}\n", cp.m_s_code, location);
 
 #if ENABLE_API_LOGS
 	api::logger->log_message(message);
@@ -163,10 +162,14 @@ void api::output_em(const core::code_pkg cp, const std::string location) {
 
 void api::output_fse(const std::filesystem::filesystem_error& e)
 {
-	// create the string error message
-	std::string message = "Message: " + std::string(e.what()) + '\n'
-		+ "Path 1: " + e.path1().string() + '\n'
-		+ "Path 2: " + e.path2().string() + '\n';
+	std::string message = std::format(
+		"Message: {}\n"
+		"Path 1: {}\n"
+		"Path 2: {}\n",
+		e.what(),
+		e.path1().string(),
+		e.path2().string()
+	);
 
 #if ENABLE_API_LOGS
 	api::logger->log_message(message);
@@ -667,13 +670,19 @@ std::vector<std::queue<core::file_entry>> api::split_queue(std::queue<core::file
 
 std::string api::output_file_entry(const core::file_entry& entry)
 {
-	std::string message = '\n'
-		+ "Source Path: " + entry.src_p.string() + '\n'
-		+ "Destination Path: " + entry.dst_p.string() + '\n'
-		+ "Action: " + action_to_string(entry.action) + '\n'
-		+ "File type: " + file_type_to_string(entry.src_s.type()) + '\n';
-	
-	return message;
+	std::string text = std::format(
+		"\n"
+		"Source Path: {}\n"
+		"Destination Path: {}\n"
+		"Action: {}\n"
+		"File type: {}\n",
+		entry.src_p.string(),
+		entry.dst_p.string(),
+		action_to_string(entry.action),
+		file_type_to_string(entry.src_s.type())
+	);
+
+	return text;
 }
 
 UINT api::get_window_width(HWND window_handle)
