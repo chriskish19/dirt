@@ -79,6 +79,8 @@ if(is_gui_build)
         comdlg32.lib    # If you use common dialogs (OpenFile, etc.)
     )
 
+    target_compile_options(${dirt_core} PRIVATE /utf-8)
+
 endif()
 
 # core header file names

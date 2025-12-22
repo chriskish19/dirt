@@ -1,4 +1,4 @@
-/**********************************************************/
+﻿/**********************************************************/
 //
 // File: main_entry.hpp
 //
@@ -86,11 +86,17 @@ namespace core {
 					gui_process_commands(command);
 					q.pop();
 				}
+				std::cout << "\r" << BLUE << frames[i % 8] << " waiting..." << DEFAULT_COLOR << CLEAR_LINE;
+				i++;
+				
 			}
 		}
 	
 		std::unique_ptr<backend> m_be = nullptr;
 		std::unique_ptr<frontend> m_fe = nullptr;
+
+		const char frames[8] = { '⣾','⣽','⣻','⢿','⡿','⣟','⣯','⣷'};
+		int i = 0;
 	};
 
 

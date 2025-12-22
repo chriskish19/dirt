@@ -29,6 +29,14 @@
 #define DT_ICON_PATH "C:\\Users\\chris\\source\\repos\\dirt\\assets\\dt_icon.ico"
 
 
+/*
+	terminal colors
+*/
+constexpr const char* BRIGHT_GREEN = "\033[92m"; 
+constexpr const char* DEFAULT_COLOR = "\033[0m";
+constexpr const char* BLUE = "\033[34m";
+constexpr const char* CLEAR_LINE = "\r\033[K";
+
 /* 
 	testing values
 	saves my ssd when testing

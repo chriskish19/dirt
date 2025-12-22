@@ -1460,7 +1460,8 @@ std::string api::time_now(const std::string& message)
 {
 	try {
 		auto now = std::chrono::system_clock::now();
-		std::string time = std::format("[{}]", now);
+		// time is green in terminal
+		std::string time = std::format("{}[{}]{}", BRIGHT_GREEN , now, DEFAULT_COLOR);
 		return time + message;
 	}
 	catch (const std::exception& e) {
