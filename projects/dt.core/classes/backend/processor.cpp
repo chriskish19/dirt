@@ -319,7 +319,6 @@ void core::queue_system::process_entry()
     std::jthread bqs_t(&core::queue_system::delayed_process_entry, this);
 
     while (m_runner.load() == true) {
-        add(message{"waiting for work..."});
 
         // trigger here
         {

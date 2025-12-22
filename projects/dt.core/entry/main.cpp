@@ -98,6 +98,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    SetConsoleOutputCP(CP_UTF8);
+
     return wWinMain(hInstance, nullptr, pCmdLine, SW_SHOW);
 }
 
