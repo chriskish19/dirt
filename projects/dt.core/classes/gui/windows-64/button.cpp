@@ -1,6 +1,6 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 
 /***********************************************
@@ -9,22 +9,21 @@
 *
 * Purpose: defines a gui button in win32
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
 
-#include NAMES_INCLUDE
-#include BUTTON_INCLUDE_PATH
+#include CORE_BUTTON_INCLUDE_PATH
 
 
-juju::button::button(button_description bd)
+core::button::button(button_description bd)
 	:m_bd(bd)
 {
 
 }
 
-juju::juju_codes juju::button::create()
+core::codes core::button::create()
 {
 	/*
 	
@@ -59,13 +58,13 @@ juju::juju_codes juju::button::create()
 	);
 
 	if (m_button_handle == nullptr) {
-		return juju_codes::hwnd_fail;
+		return core::codes::hwnd_fail;
 	}
 
-	return juju_codes::success;
+	return core::codes::success;
 }
 
-void juju::button::action(button_state bs)
+void core::button::action(button_state bs)
 {
 	m_b_state = bs;
 	m_bd.button_caller(bs);

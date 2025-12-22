@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 3.18)
 # set the name of the project
 set(dirt_core "dirt.core")
 
+# set build type
+set(build_type "win32-gui-terminal")
+
 # create the main project
 project(${dirt_core})
 
@@ -37,7 +40,46 @@ file(GLOB_RECURSE dt_core_sf "../projects/dt.core/*.cpp") # dt_core_sf (core sou
 file(GLOB_RECURSE dt_core_hf "../projects/dt.core/*.hpp") # dt_core_sf (core header files)
 
 # core exe
-add_executable(${dirt_core} ${dt_core_sf} ${dt_core_hf})
+set(is_terminal_build OFF)
+set(is_gui_build OFF)
+
+string(COMPARE EQUAL ${build_type} "terminal" is_terminal_build)
+if(is_terminal_build)
+    add_executable(${dirt_core} ${dt_core_sf} ${dt_core_hf})
+endif()
+
+string(COMPARE EQUAL ${build_type} "win32-gui" is_gui_build)
+if(is_gui_build)
+    add_executable(${dirt_core} WIN32 ${dt_core_sf} ${dt_core_hf})
+
+    # define UNICODE
+    target_compile_definitions(${dirt_core} PRIVATE
+            UNICODE
+            _UNICODE
+        )
+endif()
+
+string(COMPARE EQUAL ${build_type} "win32-gui-terminal" is_gui_build)
+if(is_gui_build)
+    add_executable(${dirt_core} ${dt_core_sf} ${dt_core_hf})
+
+    # define UNICODE
+    target_compile_definitions(${dirt_core} PRIVATE
+            UNICODE
+            _UNICODE
+        )
+
+    # Link against essential Windows libraries
+    target_link_libraries(${dirt_core} PRIVATE
+        kernel32.lib
+        user32.lib      # Needed for MessageBox, window creation, message pump
+        gdi32.lib       # If you use any GDI functions (most GUI apps do)
+        shell32.lib     # Optional but common (e.g., ShellExecute)
+        advapi32.lib    # For some registry/thread functions
+        comdlg32.lib    # If you use common dialogs (OpenFile, etc.)
+    )
+
+endif()
 
 # core header file names
 # creates macros for each hpp file include path
@@ -56,11 +98,7 @@ foreach(HEADER_FILE ${dt_core_hf})
 endforeach()
 
 
-# define UNICODE
-target_compile_definitions(${dirt_core} PRIVATE
-        UNICODE
-        _UNICODE
-    )
+
 
 #############################
 # End of dirt core exe

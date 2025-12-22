@@ -47,13 +47,59 @@ int main(int argc, char* argv[]) {
 #endif
 #endif
 
-#if WIN32_GUI_BUILD
+#if WIN32_GUI_BUILD || WIN32_GUI_AND_TERMINAL
+
+
+std::vector<core::arg_entry> entry_v;
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
-    
-
-
+    try {
+        std::unique_ptr<core::gui_entry> p_gui = std::make_unique<core::gui_entry>(entry_v);
+        p_gui->go();
+    }
+    catch (const core::code_pkg& cpe) {
+        MessageBox(NULL, api::to_wide_string(cpe.m_s_code).c_str(), L"EXCEPTION", MB_OK | MB_ICONERROR);
+        return static_cast<int>(core::codes::exception_thrown_and_handled);
+    }
+    catch (...) {
+        MessageBox(NULL, api::to_wide_string(core::unknown_exception_caught_pkg.m_s_code).c_str(), L"EXCEPTION", MB_OK | MB_ICONERROR);
+        return static_cast<int>(core::codes::unknown_exception_caught);
+    }
+   
+    return static_cast<int>(core::codes::success);
 }
+
+
+#endif
+
+
+#if WIN32_GUI_AND_TERMINAL
+
+
+int main(int argc, char* argv[]) {
+    HINSTANCE hInstance = GetModuleHandleW(NULL);
+    PWSTR pCmdLine = GetCommandLineW();
+
+    {
+        core::codes code;
+        entry_v = api::cmd_line(argc, argv, &code);
+        if (code != core::codes::success) {
+            std::cout << api::match_code(code).m_s_code << '\n';
+            std::cout << api::get_location() << '\n';
+        }
+    }
+
+    {
+        core::codes code = api::validate(entry_v);
+        if (code != core::codes::success) {
+            std::cout << api::match_code(code).m_s_code << '\n';
+            std::cout << api::get_location() << '\n';
+        }
+    }
+
+    return wWinMain(hInstance, nullptr, pCmdLine, SW_SHOW);
+}
+
 
 #endif

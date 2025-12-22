@@ -1,7 +1,7 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 /***********************************************
 * 
@@ -9,18 +9,18 @@
 *
 * Purpose: handle listboxes in a win32 window.
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#pragma once
-#include NAMES_INCLUDE
-#include DEPENDENCIES_INCLUDE_PATH
-#include CODES_INCLUDE_PATH
+#include CORE_STL_INCLUDE_PATH
+#include CORE_WIN32_INCLUDE_PATH
+#include CORE_CODES_INCLUDE_PATH
+
 
 #define LB_MAX_STRING 256
 
-namespace juju {
+namespace core {
     enum class listbox_commands {
         none = 0,
 
@@ -95,10 +95,10 @@ namespace juju {
 		listbox() = default;
         listbox(listbox_description lbd);
 
-        juju_codes create();
+        core::codes create();
 
-        juju_codes add_string(const string& list_message);
-        string get_selection(juju_codes* code);
+        core::codes add_string(const string& list_message);
+        string get_selection(core::codes* code);
 
         virtual void action(listbox_commands command);
 

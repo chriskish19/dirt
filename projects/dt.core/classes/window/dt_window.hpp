@@ -1,7 +1,7 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 /**********************************************************/
 //
@@ -14,11 +14,11 @@
 /**********************************************************/
 
 
-#include CORE_NAMES_INCLUDE
 #include CORE_WIN32_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
-#include CORE_DEFINES_INCLUDE_PATH
-
+#include CORE_API_INCLUDE_PATH
+#include CORE_UI_INCLUDE_PATH
+#include CORE_TOUT_INCLUDE_PATH
 
 
 namespace core{
@@ -44,26 +44,39 @@ namespace core{
 		starter() = default;
 		starter(const string& class_name);
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		codes message_pump() override;
 	protected:
 		LRESULT CALLBACK ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
 		codes window_settings() override;
 		codes create_window() override;
-		codes message_pump() override;
 	};
 
-	class window :starter{
+	class window : public starter , public backend_message_queue{
 	public:
 		window();
+	protected:
+		LRESULT CALLBACK ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		codes add_dynamic_menu(HWND window_handle);
+		codes set_icon(HWND hwnd, const fs::path& icon_path);
+	};
 
-		void go();
+
+	class dt_window : public window {
+	public:
+		dt_window() {
+			m_p_main_ui = std::make_unique<ui>(m_window_handle, nullptr, m_hinst, nullptr);
+			
+			if (m_p_main_ui == nullptr) {
+				throw core::pointer_is_null_pkg;
+			}
+			
+			m_p_main_ui->m_front_lb.add_string(ROS("Test string"));
+		}
 
 	protected:
 		LRESULT CALLBACK ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-		codes add_dynamic_menu(HWND window_handle);
-
-		codes set_icon(HWND hwnd, const fs::path& icon_path);
+		std::unique_ptr<ui> m_p_main_ui = nullptr;
 	};
 }
 

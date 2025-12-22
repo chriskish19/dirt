@@ -4,7 +4,7 @@
 //
 // Purpose: processor.hpp definitions
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 
@@ -49,12 +49,8 @@ core::codes core::process::watch()
     while (
         GetQueuedCompletionStatus(m_hCompletionPort,&m_bytesTransferred,&m_completionKey,&m_pOverlapped,INFINITE)) {
 
-        add(time{ "Processing file changes..." });
-
         DirWatchContext* ctx = reinterpret_cast<DirWatchContext*>(m_completionKey);
         FILE_NOTIFY_INFORMATION* pNotify = (FILE_NOTIFY_INFORMATION*)ctx->buffer;
-
-        int file_counter = 0;
 
         do {
             std::wstring fileName(pNotify->FileName, pNotify->FileNameLength / sizeof(WCHAR));
@@ -70,7 +66,6 @@ core::codes core::process::watch()
             try {
                 entry.src_s = std::filesystem::status(entry.src_p);
                 add_entry(entry);
-                file_counter++;
             }
             catch (const std::filesystem::filesystem_error& e) {
                 std::string loc = api::get_location();
@@ -86,8 +81,6 @@ core::codes core::process::watch()
                 break;
             pNotify = (FILE_NOTIFY_INFORMATION*)((BYTE*)pNotify + pNotify->NextEntryOffset);
         } while (true);
-
-        add(time{ "Done. Added " + std::to_string(file_counter) + "files to be processed." });
 
         // signal queue system
         m_launch_b.store(true);
@@ -210,8 +203,13 @@ core::codes core::process::process_copy_entries()
 
             add(message{ api::output_entry(entry) });
 
-            std::string copy_stats = "Copied " + std::to_string( size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
-                 + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
+            std::string copy_stats = std::format(
+                "Copied {} bytes in {:.3f} seconds.\n"
+                "Speed: {:.2f} MB/s\n",
+                size,
+                seconds,
+                speed / (1024.0 * 1024.0)
+            );
 
             add(message{ copy_stats });
         }
@@ -236,8 +234,13 @@ core::codes core::process::process_copy_entries()
 
             add(message{ api::output_entry(entry) });
 
-            std::string copy_stats = "Copied " + std::to_string(size) + " bytes in " + std::to_string(seconds) + " seconds.\n"
-                + "Speed: " + std::to_string(speed / (1024 * 1024)) + " MB/s\n";
+            std::string copy_stats = std::format(
+                "Copied {} bytes in {:.3f} seconds.\n"
+                "Speed: {:.2f} MB/s\n",
+                size,
+                seconds,
+                speed / (1024.0 * 1024.0)
+            );
 
             add(message{ copy_stats });
         }
@@ -858,12 +861,12 @@ void core::queue_system::exit_process_entry()
 
 void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
 {
-    add(message{ "In process queue about to process " + std::to_string(buffer_q.size()) + " files" });
+    add(time{ "In process queue about to process " + std::to_string(buffer_q.size()) + (buffer_q.size() < 2 ? " file notification" : " file notifications")});
     
+    auto q_size = buffer_q.size();
+
     while (buffer_q.empty() == false) {
         file_entry& entry = buffer_q.front();
-
-        add(message{ api::output_file_entry(entry) });
 
         if (skip_entry(entry) == true) {
             buffer_q.pop();
@@ -878,6 +881,8 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
 
         buffer_q.pop();
     }
+
+    add(time{ "Done. Processed " + std::to_string(q_size) + (q_size < 2 ? " file notification" : " file notifications") });
 }
 
 bool core::queue_system::skip_entry(file_entry& entry)

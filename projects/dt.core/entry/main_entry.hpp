@@ -26,37 +26,92 @@
 
 
 namespace core {
-	/*
-		for the terminal build
-	*/
-	void terminal_process_commands(std::shared_ptr<commands_info> ci);
+	/************************************************/
+	/*			Win32 GUI build objects				*/
+	/************************************************/
 
+	void gui_process_commands(std::shared_ptr<commands_info> ci);
 
 	class backend : public process{
 	public:
 		backend(const std::vector<arg_entry>& v);
-
-		// launch the backend
 		core::codes run();
 	protected:
-	
 	};
 
 
-
-#if! UNDER_CONSTRUCTION
-	class frontend {
+	class frontend : public dt_window{
 	public:
 	protected:
-		window main_window;
-		ui main_window_ui;
 	};
-#endif	
 	
+
+	class gui_entry{
+	public:
+		gui_entry() {
+			std::vector<core::arg_entry> empty;
+			m_be = std::make_unique<backend>(empty);
+			m_fe = std::make_unique<frontend>();
+		}
+
+		gui_entry(const std::vector<core::arg_entry>& v) {
+			m_be = std::make_unique<backend>(v);
+			m_fe = std::make_unique<frontend>();
+		}
+
+		void go() {
+			std::jthread backend_run_t([this] { m_be->run(); });
+			std::jthread backend_message_t([this](std::stop_token token) {
+				backend_messages(token);
+			});
+
+			api::logger->fill();
+			api::logger->display();
+
+			// win32 message handler
+			m_fe->message_pump();
+
+			backend_message_t.request_stop();
+		}
+
+
+	protected:
+		void backend_messages(std::stop_token token) {
+			while (token.stop_requested() == false) {
+				// timer here, seconds to wait time
+				std::this_thread::sleep_for(std::chrono::milliseconds(GUI_SYNC_INTERVAL));
+				auto q = m_be->get_current_queue();
+				while (q.empty() == false && token.stop_requested() == false) {
+					auto& command = q.front();
+					gui_process_commands(command);
+					q.pop();
+				}
+			}
+		}
+	
+		std::unique_ptr<backend> m_be = nullptr;
+		std::unique_ptr<frontend> m_fe = nullptr;
+	};
+
+
+
+	/************************************************/
+	/*			Terminal build objects				*/	
+	/************************************************/
+	
+	/*
+		for processing log messages and information
+	*/
+	void terminal_process_commands(std::shared_ptr<commands_info> ci);
+
+	/*
+		main object for running the terminal build
+	*/
 	class terminal_entry {
 	public:
-		terminal_entry(int argc, char* argv[]) 
-		:m_argc(argc),m_argv(argv){}
+		terminal_entry(int argc, char* argv[])
+			:m_argc(argc), m_argv(argv) {
+		}
 
 		codes init();
 		void go();
@@ -68,31 +123,16 @@ namespace core {
 	};
 
 
-
 	/*
 		tests the terminal build
 	*/
 	class test_terminal_entry : public entry_sim {
 	public:
 		test_terminal_entry()
-			: entry_sim(TEST_FOLDER) {}
-
+			: entry_sim(TEST_FOLDER) {
+		}
 		void go();
 	protected:
-
 	};
-
-
-
-#if! UNDER_CONSTRUCTION
-	class gui_entry {
-	public:
-		gui_entry() {}
-		void go();
-	protected:
-		std::unique_ptr<backend> m_be = nullptr;
-		std::unique_ptr<frontend> m_fe = nullptr;
-	};
-#endif
 	
 }

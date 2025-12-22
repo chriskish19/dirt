@@ -55,6 +55,9 @@ namespace core {
         invalid_io_handle,							// an error code returned from win32 when creating a completion handle
         handle_nullptr,								// an error code returned from win32 handles
         read_dir_changes_fail,						// an error code returned from win32 ReadDirectoryChangesW()
+        lb_add_string_fail,                         // failed to add a string to the listbox
+        lb_get_selection_fail,                      // failed to get a string from a listox
+        menu_fail,                                  // failed to create menu item
     };
 	
 	
@@ -109,4 +112,7 @@ namespace core {
 	inline const code_pkg hwnd_fail_pkg(codes::hwnd_fail, "core::codes::hwnd_fail | message: failed to create window handle, call win32 function GetLastError() for more info");
 	inline const code_pkg show_window_fail_pkg(codes::show_window_fail, "core::codes::show_window_fail | message: failed to show window using the ShowWindow() function call win32 function GetLastError() for more info");
     inline const code_pkg getclientrect_fail_pkg(codes::getclientrect_fail, "core::codes::getclientrect_fail | message: failed to get client rect window dimensions, call win32 function GetLastError() for more info");
+    inline const code_pkg lb_add_string_fail_pkg(codes::lb_add_string_fail, "core::codes::lb_add_string_fail | message: failed to add a string to a listbox, call win32 function GetLastError() for more info");
+    inline const code_pkg lb_get_selection_fail_pkg(codes::lb_get_selection_fail, "core::codes::lb_get_selection_fail | message: failed to get the selected item from a listbox into a string, call win32 function GetLastError() for more info");
+    inline const code_pkg menu_fail_pkg(codes::menu_fail, "core::codes::menu_fail | message: failed to create menu item, call win32 function GetLastError() for more info");
 }

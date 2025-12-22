@@ -95,7 +95,11 @@ void core::system_log::display()
 {
 	std::lock_guard<std::mutex> local_lock(display_logger.m_v_mtx);
 	for (auto log : *display_logger.get_buffer()) {
-		// send somewhere to view
+		if(log->m_message->empty() == false)
+			std::cout << *log->m_message << '\n';
+		else {
+			break;
+		}
 	}
 }
 

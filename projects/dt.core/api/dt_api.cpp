@@ -382,7 +382,7 @@ std::string api::get_last_error_w32()
 		return {}; // No error message has been recorded 
 	}
 
-	LPWSTR messageBuffer = nullptr;
+	core::w32_str_p messageBuffer = nullptr;
 
 	// Format the error message 
 	size_t size = FormatMessage(
@@ -392,19 +392,23 @@ std::string api::get_last_error_w32()
 		NULL,
 		errorMessageID,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPWSTR)&messageBuffer,
+		(core::w32_str_p)&messageBuffer,
 		0,
 		NULL
 	);
 
-	// Copy the error message into a wide string
-	std::wstring message(messageBuffer, size);
+	// Copy the error message into a core::string
+	core::string message(messageBuffer, size);
 
 	// Free the buffer allocated by FormatMessage 
 	LocalFree(messageBuffer);
 
+#if WIDE
 	// this will throw if an error occurs while converting to narrow string, keep that in mind
 	return to_narrow_string(message);
+#else
+	return message;
+#endif
 }
 
 std::string api::output_entry(const core::arg_entry& e)

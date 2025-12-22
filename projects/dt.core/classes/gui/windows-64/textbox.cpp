@@ -1,7 +1,7 @@
 
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 
 /***********************************************
@@ -10,19 +10,18 @@
 *
 * Purpose: textbox.hpp definitions
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
 
-#include NAMES_INCLUDE
-#include TEXTBOX_INCLUDE_PATH
+#include CORE_TEXTBOX_INCLUDE_PATH
 
 
-juju::textbox::textbox(textbox_description td)
+core::textbox::textbox(textbox_description td)
 	:m_td(td){}
 
-juju::juju_codes juju::textbox::create() {
+core::codes core::textbox::create() {
 	/*
 
 				HWND CreateWindowW(
@@ -56,13 +55,13 @@ juju::juju_codes juju::textbox::create() {
 	);
 
 	if (m_textbox_handle == nullptr) {
-		return juju_codes::hwnd_fail;
+		return core::codes::hwnd_fail;
 	}
 
-	return juju_codes::success;
+	return core::codes::success;
 }
 
-void juju::textbox::action(textbox_commands command) {
+void core::textbox::action(textbox_commands command) {
 	m_command = command;
 	m_td.textbox_caller(command);
 }

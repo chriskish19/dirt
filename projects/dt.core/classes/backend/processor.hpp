@@ -4,7 +4,7 @@
 //
 // Purpose: process file entries
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 

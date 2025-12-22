@@ -1,7 +1,7 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 /***********************************************
 *
@@ -9,20 +9,20 @@
 *
 * Purpose: label.hpp definitions
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#include NAMES_INCLUDE
-#include LABEL_INCLUDE_PATH
 
-juju::label::label(label_description ld)
+#include CORE_LABEL_INCLUDE_PATH
+
+core::label::label(label_description ld)
 	:m_ld(ld)
 {
 
 }
 
-juju::juju_codes juju::label::create() {
+core::codes core::label::create() {
 	/*
 
 				HWND CreateWindowW(
@@ -56,13 +56,13 @@ juju::juju_codes juju::label::create() {
 	);
 
 	if (m_label_handle == nullptr) {
-		return juju_codes::hwnd_fail;
+		return codes::hwnd_fail;
 	}
 
-	return juju_codes::success;
+	return codes::success;
 }
 
-void juju::label::action(label_commands command) {
+void core::label::action(label_commands command) {
 	m_command = command;
 	m_ld.label_caller(command);
 }

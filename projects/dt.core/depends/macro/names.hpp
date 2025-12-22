@@ -49,7 +49,7 @@
 #define CORE_PROCESSOR_INCLUDE_PATH				CORE_processor_hpp					// processes files
 #define CORE_LOGGER_INCLUDE_PATH				CORE_logger_hpp						// logger queue
 #define CORE_TOUT_INCLUDE_PATH					CORE_output_hpp						// outputing
-#define CORE_WINDOW_INCLUDE_PATH				CORE_dw_hpp							// win32 window
+#define CORE_WINDOW_INCLUDE_PATH				CORE_dt_window_hpp					// win32 window
 #define CORE_UTILITY_INCLUDE_PATH				CORE_utility_hpp					// utilities
 
 // windows 64 gui

@@ -1,7 +1,7 @@
 
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 
 /***********************************************
@@ -10,14 +10,14 @@
 *
 * Purpose: ui.hpp definitions
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#include NAMES_INCLUDE
-#include UI_INCLUDE_PATH
 
-juju::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
+#include CORE_UI_INCLUDE_PATH
+
+core::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
 {
 
     // front button setup
@@ -69,7 +69,7 @@ juju::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
 	m_lb_label.create();
 
 }
-void juju::ui::front_button_action(button_state bs)
+void core::ui::front_button_action(button_state bs)
 {
 	switch (bs) {
 		case button_state::rest:
@@ -98,7 +98,7 @@ void juju::ui::front_button_action(button_state bs)
 	}
 }
 
-void juju::ui::refresh_button_action(button_state bs)
+void core::ui::refresh_button_action(button_state bs)
 {
 	switch (bs) {
 	    case button_state::rest:
@@ -127,7 +127,7 @@ void juju::ui::refresh_button_action(button_state bs)
 	}
 }
 
-void juju::ui::front_listbox_action(listbox_commands lc) {
+void core::ui::front_listbox_action(listbox_commands lc) {
     switch (lc) {
 		case listbox_commands::error_space:
 		{
@@ -150,9 +150,8 @@ void juju::ui::front_listbox_action(listbox_commands lc) {
 		// User selected a new item.
 		case listbox_commands::select_change:
 		{
-			juju_codes code;
+			core::codes code;
 			string selected_text = m_front_lb.get_selection(&code);
-			output_code(code);
 			MessageBox(nullptr, selected_text.c_str(), ROS("Selected Item"), MB_OK);
 			break;
 		}
@@ -175,7 +174,7 @@ void juju::ui::front_listbox_action(listbox_commands lc) {
     } // end of switch(lc)
 }
 
-void juju::ui::lb_label_action(label_commands command)
+void core::ui::lb_label_action(label_commands command)
 {
 	switch (command) {
 		case label_commands::clicked:

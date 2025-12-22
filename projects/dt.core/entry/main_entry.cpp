@@ -1,3 +1,4 @@
+#include "main_entry.hpp"
 
 /**********************************************************/
 //
@@ -20,7 +21,6 @@ core::backend::backend(const std::vector<arg_entry>& v)
 core::codes core::backend::run()
 {
     {
-
         /*
             copies files from found in copy entries and sets up necessary objects for watching directories
         */
@@ -48,6 +48,135 @@ core::codes core::backend::run()
     // if we reach this point with no errors its a successful run
     // See the header "CORE_ARGS_INCLUDE_PATH" for actual code int value.
     return core::codes::success;
+}
+
+void core::gui_process_commands(std::shared_ptr<commands_info> ci)
+{
+	switch (ci->command()) {
+	case commands::error:
+	{
+		auto error_info = std::dynamic_pointer_cast<error>(ci);
+		if (error_info != nullptr) {
+			std::cout << error_info->code.m_s_code << '\n';
+			std::cout << error_info->location << '\n';
+			std::cout << error_info->time_tp << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	case commands::file_system_exception:
+	{
+		auto exception_info = std::dynamic_pointer_cast<fs_exception>(ci);
+		if (exception_info != nullptr) {
+			std::cout << exception_info->text << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	case commands::message:
+	{
+		auto message_info = std::dynamic_pointer_cast<message>(ci);
+		if (message_info != nullptr) {
+			std::cout << message_info->text << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	case commands::time_message:
+	{
+		auto time_info = std::dynamic_pointer_cast<time>(ci);
+		if (time_info != nullptr) {
+			std::cout << time_info->text << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	case commands::unknown_exception:
+	{
+		auto unknown_exception_info = std::dynamic_pointer_cast<unknown_exception>(ci);
+		if (unknown_exception_info != nullptr) {
+			std::cout << unknown_exception_info->code.m_s_code << '\n';
+			std::cout << unknown_exception_info->location << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	case commands::file_copy:
+	{
+		auto file_copy_info = std::dynamic_pointer_cast<file_copy>(ci);
+		if (file_copy_info != nullptr) {
+			std::cout << file_copy_info->code.m_s_code << '\n';
+			std::cout << file_copy_info->text << '\n';
+			std::cout << file_copy_info->time_tp << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	case commands::file_delete:
+	{
+		auto file_delete_info = std::dynamic_pointer_cast<file_delete>(ci);
+		if (file_delete_info != nullptr) {
+			std::cout << file_delete_info->code.m_s_code << '\n';
+			std::cout << file_delete_info->text << '\n';
+			std::cout << file_delete_info->time_tp << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	case commands::directory_delete:
+	{
+		auto directory_delete_info = std::dynamic_pointer_cast<directory_delete>(ci);
+		if (directory_delete_info != nullptr) {
+			std::cout << directory_delete_info->code.m_s_code << '\n';
+			std::cout << directory_delete_info->text << '\n';
+			std::cout << directory_delete_info->time_tp << '\n';
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.m_s_code << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+
+		break;
+	}
+
+	default:
+		break;
+	}
 }
 
 void core::terminal_process_commands(std::shared_ptr<commands_info> ci)

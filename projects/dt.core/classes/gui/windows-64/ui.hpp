@@ -1,29 +1,28 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 /***********************************************
 * 
 * File: ui.hpp
 *
-* Purpose: handle user interface in jujubee
+* Purpose: handle user interface in dt
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#pragma once
-#include NAMES_INCLUDE
-#include DEPENDENCIES_INCLUDE_PATH
-#include BUTTON_INCLUDE_PATH
-#include LISTBOX_INCLUDE_PATH
-#include LABEL_INCLUDE_PATH
-#include TEXTBOX_INCLUDE_PATH
+
+#include CORE_STL_INCLUDE_PATH
+#include CORE_WIN32_INCLUDE_PATH
+#include CORE_BUTTON_INCLUDE_PATH
+#include CORE_LISTBOX_INCLUDE_PATH
+#include CORE_LABEL_INCLUDE_PATH
+#include CORE_TEXTBOX_INCLUDE_PATH
 
 
-
-namespace juju {
+namespace core {
 	enum class ui_positions : std::size_t {
 		// label
 		label_x = 10,
@@ -101,7 +100,7 @@ namespace juju {
 	};
 
 */
-		juju::button_description m_launch_bd{
+		core::button_description m_launch_bd{
 			ROS("BUTTON"),
 			ROS("Launch"),
 			BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD,
@@ -116,7 +115,7 @@ namespace juju {
 			nullptr
 		};
 
-		juju::button_description m_refresh_bd{
+		core::button_description m_refresh_bd{
 			ROS("BUTTON"),
 			ROS("Refresh"),
 			BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD,
@@ -200,10 +199,6 @@ namespace juju {
 			nullptr,
 			nullptr
 		};
-
-
-
-
 
 	};
 }

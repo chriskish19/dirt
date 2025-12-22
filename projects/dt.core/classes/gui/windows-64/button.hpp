@@ -1,7 +1,7 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 /***********************************************
 * 
@@ -9,15 +9,14 @@
 *
 * Purpose: handle buttons in win32 window.
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#pragma once
-#include CORE_NAMES_INCLUDE
-#include DEPENDENCIES_INCLUDE_PATH
-#include ERROR_INCLUDE_PATH
-#include CODES_INCLUDE_PATH
+
+#include CORE_WIN32_INCLUDE_PATH
+#include CORE_CODES_INCLUDE_PATH
+
 
 namespace core {
 	enum class button_state {

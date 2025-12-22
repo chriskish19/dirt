@@ -1,7 +1,7 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 
 /***********************************************
@@ -10,18 +10,17 @@
 *
 * Purpose: handle textbox's in a win32 window.
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#pragma once
-#include NAMES_INCLUDE
-#include DEPENDENCIES_INCLUDE_PATH
-#include CODES_INCLUDE_PATH
+#include CORE_STL_INCLUDE_PATH
+#include CORE_WIN32_INCLUDE_PATH
+#include CORE_CODES_INCLUDE_PATH
 
 
 
-namespace juju {
+namespace core {
 	enum class textbox_commands {
 		none = 0,
 		change = EN_CHANGE,					// Sent when the text changes(user input or programmatically).
@@ -57,7 +56,7 @@ namespace juju {
 		textbox() = default;
 		textbox(textbox_description td);
 
-		juju_codes create();
+		core::codes create();
 
 		virtual void action(textbox_commands command);
 

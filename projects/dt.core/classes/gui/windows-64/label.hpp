@@ -1,7 +1,7 @@
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 /***********************************************
 * 
@@ -9,17 +9,16 @@
 *
 * Purpose: handle labels in a win32 window.
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#pragma once
-#include NAMES_INCLUDE
-#include DEPENDENCIES_INCLUDE_PATH
-#include CODES_INCLUDE_PATH
+
+#include CORE_WIN32_INCLUDE_PATH
+#include CORE_CODES_INCLUDE_PATH
 
 
-namespace juju {
+namespace core {
 
 	enum class label_commands {
 		clicked = STN_CLICKED,		// Sent when the label is clicked.
@@ -50,7 +49,7 @@ namespace juju {
 		label() = default;
 		label(label_description ld);
 
-		juju_codes create();
+		codes create();
 
 		virtual void action(label_commands command);
 

@@ -1,7 +1,7 @@
 
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
-#if! UNDER_CONSTRUCTION
+#if UNDER_CONSTRUCTION
 
 
 /***********************************************
@@ -10,26 +10,23 @@
 *
 * Purpose: listbox.hpp definitions
 *
-* Project: jujubee
+* Project: dt.core
 *
 ************************************************/
 
-#include NAMES_INCLUDE
-#include LISTBOX_INCLUDE_PATH
+
+#include CORE_LISTBOX_INCLUDE_PATH
 
 
-juju::listbox::listbox(listbox_description lbd)
-	:m_lbd(lbd)
-{
+core::listbox::listbox(listbox_description lbd)
+	:m_lbd(lbd) {}
 
-}
-
-void juju::listbox::action(listbox_commands command) {
+void core::listbox::action(listbox_commands command) {
 	m_command = command;
 	m_lbd.listbox_caller(command);
 }
 
-juju::juju_codes juju::listbox::create() {
+core::codes core::listbox::create() {
 	
 	/*
 	
@@ -65,32 +62,33 @@ juju::juju_codes juju::listbox::create() {
 	);
 
 	if (m_lb_handle == nullptr) {
-		return juju::juju_codes::hwnd_fail;
+		return core::codes::hwnd_fail;
 	}
 
-	return juju_codes::success;
+	return core::codes::success;
 }
 
-juju::juju_codes juju::listbox::add_string(const string& list_message) {
+core::codes core::listbox::add_string(const string& list_message) {
 	LRESULT result = SendMessage(m_lb_handle, LB_ADDSTRING, 0, (LPARAM)list_message.c_str());
 	if (result == LB_ERR) {
-		return juju::juju_codes::lb_add_string_fail;
+		return core::codes::lb_add_string_fail;
 	}
-	return juju::juju_codes::success;
+	return core::codes::success;
 }
 
-juju::string juju::listbox::get_selection(juju_codes* code) {
+core::string core::listbox::get_selection(core::codes* code) {
 	int index = SendMessage(m_lb_handle, LB_GETCURSEL, 0, 0);
 	std::vector<character> display_line(LB_MAX_STRING);
 	display_line[LB_MAX_STRING-1] = ROS('\0'); // null terminate
 	if (index != LB_ERR) {
 		SendMessage(m_lb_handle, LB_GETTEXT, index, (LPARAM)display_line.data());
-		*code = juju_codes::success;
+		*code = core::codes::success;
+		return string(display_line.data());
 	}
 	else {
-		*code = juju::juju_codes::lb_get_selection_fail;
+		*code = core::codes::lb_get_selection_fail;
+		return string{};
 	}
-	return string(display_line.data());
 }
 
 #endif
