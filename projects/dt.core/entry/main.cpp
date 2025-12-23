@@ -47,15 +47,68 @@ int main(int argc, char* argv[]) {
 #endif
 #endif
 
-#if WIN32_GUI_BUILD || WIN32_GUI_AND_TERMINAL
+#if WIN32_GUI_BUILD
+
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
+    
+    int argc = 0;
+    LPWSTR* wide_argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (wide_argv == nullptr)
+    {
+        MessageBoxA(NULL, "Failed to parse command line", "Error", MB_OK | MB_ICONERROR);
+        return -1;
+    }
+
+    
+    std::vector<std::string> argsv = api::convert_cmdline_args_to_utf8(wide_argv, argc);
+    std::vector<core::arg_entry> entry_v;
+    {
+        core::codes code;
+        entry_v = api::cmd_line(argsv , &code);
+        if (code != core::codes::success) {
+            std::cout << api::match_code(code).m_s_code << '\n';
+            std::cout << api::get_location() << '\n';
+        }
+    }
+
+    {
+        core::codes code = api::validate(entry_v);
+        if (code != core::codes::success) {
+            std::cout << api::match_code(code).m_s_code << '\n';
+            std::cout << api::get_location() << '\n';
+        }
+    }
+
+
+    try {
+        std::unique_ptr<core::gui_entry> p_gui = std::make_unique<core::gui_entry>(entry_v);
+        p_gui->go();
+    }
+    catch (const core::code_pkg& cpe) {
+        MessageBox(NULL, api::to_wide_string(cpe.m_s_code).c_str(), L"EXCEPTION", MB_OK | MB_ICONERROR);
+        return static_cast<int>(core::codes::exception_thrown_and_handled);
+    }
+    catch (...) {
+        MessageBox(NULL, api::to_wide_string(core::unknown_exception_caught_pkg.m_s_code).c_str(), L"EXCEPTION", MB_OK | MB_ICONERROR);
+        return static_cast<int>(core::codes::unknown_exception_caught);
+    }
+
+    return static_cast<int>(core::codes::success);
+}
+
+
+#endif
+
+#if WIN32_GUI_AND_TERMINAL
 
 
 std::vector<core::arg_entry> entry_v;
 
-
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
+    
     try {
-        std::unique_ptr<core::gui_entry> p_gui = std::make_unique<core::gui_entry>(entry_v);
+        std::unique_ptr<core::gui_with_terminal_entry> p_gui = std::make_unique<core::gui_with_terminal_entry>(entry_v);
         p_gui->go();
     }
     catch (const core::code_pkg& cpe) {
@@ -69,12 +122,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
    
     return static_cast<int>(core::codes::success);
 }
-
-
-#endif
-
-
-#if WIN32_GUI_AND_TERMINAL
 
 
 int main(int argc, char* argv[]) {

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.18)
 set(dirt_core "dirt.core")
 
 # set build type
-set(build_type "win32-gui-terminal")
+set(build_type "win32-gui")
 
 # create the main project
 project(${dirt_core})
@@ -30,6 +30,7 @@ string(COMPARE EQUAL ${CMAKE_CXX_COMPILER_ID} ${GCC_compiler_id} is_using_GCC_co
 if(NOT (is_using_MSVC_compiler OR is_using_CLANG_compiler OR is_using_GCC_compiler))
     message(FATAL_ERROR "Compiler not supported, You are using: ${CMAKE_CXX_COMPILER_ID}")
 endif()
+
 
 #############################
 # dirt core exe
@@ -99,9 +100,66 @@ foreach(HEADER_FILE ${dt_core_hf})
     endif()
 endforeach()
 
-
-
-
 #############################
 # End of dirt core exe
 #############################
+
+
+#############################
+# Logger library
+#############################
+
+set(logs "window_logger")
+
+# logger is linked lib (dll)
+# get logger source and headers
+file(GLOB_RECURSE logger_sf "../projects/logger/*.cpp")
+file(GLOB_RECURSE logger_hf "../projects/logger/*.hpp")
+
+# build logger dll lib
+add_library(${logs} SHARED ${logger_sf} ${logger_hf})
+
+# linker settings
+target_compile_definitions(${logs} PRIVATE 
+            -DLOGS_EXPORTS 
+            UNICODE
+            _UNICODE)
+
+# logger header file names
+# creates macros for each hpp file include path
+# very handy for name changes and file moves
+foreach(HEADER_FILE ${logger_hf})
+    get_filename_component(FILE_NAME ${HEADER_FILE} NAME_WE)
+    set(FILE_NAME_HPP "LOGGER_${FILE_NAME}_hpp")
+    set(HEADER_FILE_PATH "\"${HEADER_FILE}\"")
+    target_compile_definitions(${logs} PUBLIC -D${FILE_NAME_HPP}=${HEADER_FILE_PATH})
+    
+    # for file name changes in the project
+    # their is a file called names.hpp that manages all file name changes in the project
+    if(${FILE_NAME} STREQUAL "names")
+        target_compile_definitions(${logs} PUBLIC -DLOGGER_NAMES_INCLUDE=${FILE_NAME_HPP})
+    endif()
+endforeach()
+
+# Link Win32 libraries to gui
+target_link_libraries(${logs}
+    PRIVATE
+    user32
+    gdi32
+    shell32
+    ole32
+    oleaut32
+    uuid
+    comdlg32
+    advapi32
+)
+#############################
+# End of Logger library
+#############################
+
+
+#############################
+# Linking to dirt.core
+#############################
+target_link_libraries(${dirt_core} PUBLIC  
+${logs})

@@ -107,7 +107,7 @@ core::codes core::starter::message_pump()
 {
     // Run the message loop.
     MSG msg = { };
-    while (GetMessage(&msg, NULL, 0, 0) > 0)
+    while (GetMessage(&msg, nullptr, 0, 0) > 0)
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -210,6 +210,11 @@ core::codes core::window::add_dynamic_menu(HWND window_handle)
         return codes::menu_fail;
     }
 
+    HMENU hViewMenu = CreatePopupMenu();
+    if (hViewMenu == nullptr) {
+        return codes::menu_fail;
+    }
+
     if (!AppendMenu(hFileMenu, MF_STRING, static_cast<UINT_PTR>(window_ids::open), L"&Open")) {
         return codes::menu_fail;
     }
@@ -228,6 +233,14 @@ core::codes core::window::add_dynamic_menu(HWND window_handle)
         return codes::menu_fail;
     }
     if (!AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hHelpMenu, L"&Help")) {
+        return codes::menu_fail;
+    }
+    if (!AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hViewMenu, L"&View")) {
+        return codes::menu_fail;
+    }
+
+
+    if (!AppendMenu(hViewMenu, MF_STRING, static_cast<UINT_PTR>(window_ids::show_system_logger), L"&System Logger")) {
         return codes::menu_fail;
     }
 
@@ -283,6 +296,20 @@ LRESULT core::dt_window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
         case static_cast<int>(window_ids::label):
         {
             m_p_main_ui->m_lb_label.action(static_cast<label_commands>(HIWORD(wParam)));
+            break;
+        }
+
+        case static_cast<int>(window_ids::show_system_logger):
+        {
+            if (m_show_logger == true) {
+                ShowWindow(logger::glb_sl->get_window_handle(), SW_HIDE);
+                m_show_logger = false;
+            }
+            else {
+                ShowWindow(logger::glb_sl->get_window_handle(), SW_SHOW);
+                m_show_logger = true;
+            }
+
             break;
         }
 

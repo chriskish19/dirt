@@ -59,7 +59,9 @@ namespace core {
 		b_front,
 		b_refresh,
 		lb_box,
-		label
+		label,
+		view,
+		show_system_logger,
 	};
 
 	

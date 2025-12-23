@@ -14,14 +14,13 @@
 #include CORE_WIN32_INCLUDE_PATH
 
 
-
 /*
 	building dirt
 */
 #define TERMINAL_BUILD 0						// build dirt for running as a terminal app
-#define WIN32_GUI_BUILD 0						// build dirt with a gui
+#define WIN32_GUI_BUILD 1						// build dirt with a gui
 #define UNDER_CONSTRUCTION 1					// files being currently worked on
-#define WIN32_GUI_AND_TERMINAL 1				// both win32 gui and terminal appear
+#define WIN32_GUI_AND_TERMINAL 0				// both win32 gui and terminal appear
 
 /* 
 	assest paths

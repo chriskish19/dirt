@@ -135,7 +135,10 @@ namespace core {
 
 		codes process_entry();
 
-		codes watch();
+		codes watch(std::stop_token token);
+
+		HANDLE m_hCompletionPort = { nullptr };
+		ULONG_PTR m_completionKey = {};
 	protected:
 		codes process_watch_entries();
 		codes process_copy_entries();
@@ -149,9 +152,8 @@ namespace core {
 		std::vector<HANDLE> m_file_handle_v;
 
 		DWORD m_bytesTransferred = 0;
-		ULONG_PTR m_completionKey = {};
+		
 		LPOVERLAPPED m_pOverlapped = {nullptr};
-		HANDLE m_hCompletionPort = { nullptr };
 		HANDLE m_hIOCP = {nullptr};
 
 		file_action convert_action(DWORD action);

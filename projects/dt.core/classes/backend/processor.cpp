@@ -42,12 +42,12 @@ core::codes core::process::process_entry()
     return codes::success;
 }
 
-core::codes core::process::watch()
+core::codes core::process::watch(std::stop_token token)
 {
-    std::thread queue_sys_t(&queue_system::process_entry, this);
+    std::jthread queue_sys_t(&queue_system::process_entry, this);
     
     while (
-        GetQueuedCompletionStatus(m_hCompletionPort,&m_bytesTransferred,&m_completionKey,&m_pOverlapped,INFINITE)) {
+        GetQueuedCompletionStatus(m_hCompletionPort,&m_bytesTransferred,&m_completionKey,&m_pOverlapped,INFINITE) and token.stop_requested() == false) {
 
         DirWatchContext* ctx = reinterpret_cast<DirWatchContext*>(m_completionKey);
         FILE_NOTIFY_INFORMATION* pNotify = (FILE_NOTIFY_INFORMATION*)ctx->buffer;
@@ -100,21 +100,11 @@ core::codes core::process::watch()
             NULL
         )) {
             exit_process_entry();
-            
-            if (queue_sys_t.joinable()) {
-                queue_sys_t.join();
-            }
-
             return codes::read_dir_changes_fail;
         }
     }
 
     exit_process_entry();
-
-    if (queue_sys_t.joinable()) {
-        queue_sys_t.join();
-    }
-
     return codes::success;
 }
 
@@ -309,8 +299,17 @@ void core::process::clean_up()
         }
     }
 
-    CloseHandle(m_hCompletionPort);
-    CloseHandle(m_hIOCP);
+    if (m_hCompletionPort != nullptr && m_hCompletionPort != INVALID_HANDLE_VALUE) {
+        CloseHandle(m_hCompletionPort);
+    }
+    
+    // cant figure this out why it throws exception says invalid handle
+    /*
+    if (m_hIOCP != nullptr && m_hIOCP != INVALID_HANDLE_VALUE) {
+        CloseHandle(m_hIOCP);
+        m_hIOCP = nullptr;
+    }
+    */
 }
 
 void core::queue_system::process_entry()
@@ -319,7 +318,7 @@ void core::queue_system::process_entry()
     std::jthread bqs_t(&core::queue_system::delayed_process_entry, this);
 
     while (m_runner.load() == true) {
-
+        
         // trigger here
         {
             std::unique_lock<std::mutex> local_lock(m_launch_mtx);

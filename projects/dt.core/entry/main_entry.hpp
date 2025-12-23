@@ -10,6 +10,7 @@
 
 #pragma once
 
+// dt core headers
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
 #include CORE_ARGS_INCLUDE_PATH
@@ -23,6 +24,10 @@
 #include CORE_DEFINES_INCLUDE_PATH
 #include CORE_TOUT_INCLUDE_PATH
 
+
+// Logging Window Library
+#include LOGGER_NAMES_INCLUDE
+#include LOGGER_ALL_LOGS_INCLUDE_PATH
 
 
 namespace core {
@@ -62,12 +67,11 @@ namespace core {
 	/*			Win32 GUI build objects				*/
 	/************************************************/
 
-	void gui_process_commands(std::shared_ptr<commands_info> ci);
 
 	class backend : public process{
 	public:
 		backend(const std::vector<arg_entry>& v);
-		core::codes run();
+		core::codes run(std::stop_token token);
 	protected:
 	};
 
@@ -78,21 +82,85 @@ namespace core {
 	};
 	
 
+	class gui_with_terminal_entry {
+	public:
+		gui_with_terminal_entry() {
+			std::vector<core::arg_entry> empty;
+			m_be = std::make_unique<backend>(empty);
+			m_fe = std::make_unique<frontend>();
+		}
+
+		gui_with_terminal_entry(const std::vector<core::arg_entry>& v) {
+			m_be = std::make_unique<backend>(v);
+			m_fe = std::make_unique<frontend>();
+		}
+
+		void go() {
+			std::jthread backend_run_t([this](std::stop_token token) { m_be->run(token); });
+			std::jthread backend_message_t([this](std::stop_token token) {
+				backend_messages(token);
+				});
+
+			api::logger->fill();
+			api::logger->display();
+
+			// win32 message handler
+			m_fe->message_pump();
+
+			//PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, 0, nullptr);
+		}
+
+
+	protected:
+		void process_commands(std::shared_ptr<commands_info> ci);
+
+		void backend_messages(std::stop_token token) {
+			loading_bar progress;
+
+			while (token.stop_requested() == false) {
+				// timer here, seconds to wait time
+				std::this_thread::sleep_for(std::chrono::milliseconds(GUI_SYNC_INTERVAL));
+				auto q = m_be->get_current_queue();
+
+				if (q.empty() == false) {
+					auto& command = q.front();
+					std::cout << '\n';
+					process_commands(command);
+					q.pop();
+				}
+
+				while (q.empty() == false && token.stop_requested() == false) {
+					auto& command = q.front();
+					process_commands(command);
+					q.pop();
+				}
+
+				progress.draw();
+			}
+		}
+
+		std::unique_ptr<backend> m_be = nullptr;
+		std::unique_ptr<frontend> m_fe = nullptr;
+	};
+
+
 	class gui_entry{
 	public:
 		gui_entry() {
 			std::vector<core::arg_entry> empty;
 			m_be = std::make_unique<backend>(empty);
 			m_fe = std::make_unique<frontend>();
+			logger::glb_sl = std::make_unique<logger::system_log>();
 		}
 
 		gui_entry(const std::vector<core::arg_entry>& v) {
 			m_be = std::make_unique<backend>(v);
 			m_fe = std::make_unique<frontend>();
+			logger::glb_sl = std::make_unique<logger::system_log>();
 		}
 
 		void go() {
-			std::jthread backend_run_t([this] { m_be->run(); });
+			std::jthread backend_run_t([this](std::stop_token token) { m_be->run(token); });
 			std::jthread backend_message_t([this](std::stop_token token) {
 				backend_messages(token);
 			});
@@ -104,32 +172,26 @@ namespace core {
 			m_fe->message_pump();
 
 			backend_message_t.request_stop();
+			backend_run_t.request_stop();
+			PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, 0, nullptr);
 		}
 
 
 	protected:
+		void gui_process_commands(std::shared_ptr<commands_info> ci);
+
 		void backend_messages(std::stop_token token) {
-			loading_bar progress;
 			
 			while (token.stop_requested() == false) {
 				// timer here, seconds to wait time
 				std::this_thread::sleep_for(std::chrono::milliseconds(GUI_SYNC_INTERVAL));
 				auto q = m_be->get_current_queue();
 				
-				if (q.empty() == false) {
-					auto& command = q.front();
-					std::cout << '\n';
-					gui_process_commands(command);
-					q.pop();
-				}
-				
 				while (q.empty() == false && token.stop_requested() == false) {
 					auto& command = q.front();
 					gui_process_commands(command);
 					q.pop();
 				}
-				
-				progress.draw();
 			}
 		}
 	

@@ -27,9 +27,16 @@ namespace api {
 #endif
 
 
+	/*
+		convert wWinMain command line argvs from wide to narrow strings
+	*/
+	std::vector<std::string> convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc);
 
 
-
+	/*
+		converts a time to a string
+	*/
+	std::string time_to_string(const std::chrono::system_clock::time_point& time);
 
 
 	/* 
@@ -246,7 +253,7 @@ namespace api {
 	*/
 	std::vector<core::arg_entry> cmd_line(int argc, char* argv[], core::codes* code);
 	core::codes validate(std::vector<core::arg_entry>& v);
-
+	std::vector<core::arg_entry> cmd_line(const std::vector<std::string>& v, core::codes* code);
 
 	/*
 		time

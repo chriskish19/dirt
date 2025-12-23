@@ -20,6 +20,9 @@
 #include CORE_UI_INCLUDE_PATH
 #include CORE_TOUT_INCLUDE_PATH
 
+// Logging Window Library
+#include LOGGER_NAMES_INCLUDE
+#include LOGGER_ALL_LOGS_INCLUDE_PATH
 
 namespace core{
 	class foundation {
@@ -75,8 +78,9 @@ namespace core{
 
 	protected:
 		LRESULT CALLBACK ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
 		std::unique_ptr<ui> m_p_main_ui = nullptr;
+
+		bool m_show_logger = false;
 	};
 }
 

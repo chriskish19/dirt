@@ -1,4 +1,5 @@
-﻿
+﻿#include "dt_api.hpp"
+
 
 /**********************************************************/
 //
@@ -19,6 +20,40 @@ namespace api {
 }
 #endif
 
+
+
+std::vector<std::string> api::convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc)
+{
+	std::vector<std::string> utf8_args;
+	utf8_args.reserve(argc);
+
+	for (int i = 0; i < argc; ++i)
+	{
+		int size_needed = WideCharToMultiByte(CP_UTF8, 0, wide_argv[i], -1, nullptr, 0, nullptr, nullptr);
+		std::string str(size_needed - 1, 0);
+		WideCharToMultiByte(CP_UTF8, 0, wide_argv[i], -1, &str[0], size_needed, nullptr, nullptr);
+		utf8_args.emplace_back(std::move(str));
+	}
+
+	LocalFree(wide_argv);
+	return utf8_args;
+}
+
+std::string api::time_to_string(const std::chrono::system_clock::time_point& time)
+{
+	try {
+		std::string time = std::format("{}[{}]{}", BRIGHT_GREEN, time , DEFAULT_COLOR);
+		return time;
+	}
+	catch (const std::exception& e) {
+		output_em(core::exception_thrown_and_handled_pkg);
+	}
+	catch (...) {
+		output_em(core::unknown_exception_caught_pkg);
+	}
+	// exception thrown we return nothing
+	return {};
+}
 
 core::arg_pkg api::match_arg_enum(core::args arg)
 {
@@ -1454,6 +1489,57 @@ core::codes api::validate(std::vector<core::arg_entry>& v)
 		return core::codes::no_valid_entries;
 	}
 	return core::codes::success;
+}
+
+std::vector<core::arg_entry> api::cmd_line(const std::vector<std::string>& v, core::codes* code)
+{
+	std::vector<core::arg_entry> entry_v;
+
+	bool next_is_dtlist = false;
+	bool using_dtlist = false;
+
+	std::filesystem::path dtlist_path;
+
+	core::args last_arg = core::args();
+
+	core::arg_entry single_entry;
+
+	for (const auto& word : v) {
+		
+		if (last_arg == core::args::src) {
+			single_entry.src_p = word;
+		}
+		else if (last_arg == core::args::dst) {
+			single_entry.dst_p = word;
+		}
+
+		if (next_is_dtlist == true) {
+			dtlist_path = word;
+			using_dtlist = true;
+			break;
+		}
+
+		auto found = core::gbl_args_mp.find(word);
+		if (found != core::gbl_args_mp.end()) {
+			if (found->second == core::args::dirt_list_path) {
+				next_is_dtlist = true;
+			}
+			else {
+				single_entry.args_v.push_back(found->second);
+				last_arg = found->second;
+			}
+		}
+	}
+
+	if (using_dtlist == true) {
+		entry_v = api::parse_file(dtlist_path, code);
+		return entry_v;
+	}
+	else { // using one entry cmdline
+		entry_v.push_back(single_entry);
+		return entry_v;
+	}
+	return {};
 }
 
 std::string api::time_now(const std::string& message)
