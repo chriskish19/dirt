@@ -18,7 +18,7 @@
 core::backend::backend(const std::vector<arg_entry>& v)
     :process(v){}
 
-core::codes core::backend::run(std::stop_token token)
+core::codes core::backend::run()
 {
     {
         /*
@@ -37,7 +37,7 @@ core::codes core::backend::run(std::stop_token token)
             Main directory watching loop, monitors directories for changes and reports the changes to
             another loop which processes all the entries.
         */
-        core::codes code = watch(token);
+        core::codes code = watch();
         if (code != core::codes::success) {						// if there is an error exit the program and return the error code
             auto error_code = api::match_code(code);			// returns a code_pkg with a string message. See "CORE_CODES_INCLUDE_PATH".
             api::output_em(error_code);						    // send a message out (could be terminal or gui)
@@ -195,7 +195,7 @@ void core::test_terminal_entry::go() {
 }
 
 void core::terminal_entry::go() {
-	std::jthread backend_run_t([this](std::stop_token token) { m_be->run(token); });
+	std::jthread backend_run_t([this] { m_be->run(); });
 
 	while (true) {
 		// timer here, seconds to wait time

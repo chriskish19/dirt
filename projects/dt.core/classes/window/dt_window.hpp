@@ -76,6 +76,7 @@ namespace core{
 			m_p_main_ui->m_front_lb.add_string(ROS("Test string"));
 		}
 
+		HWND get_handle() { return m_window_handle; }
 	protected:
 		LRESULT CALLBACK ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::unique_ptr<ui> m_p_main_ui = nullptr;

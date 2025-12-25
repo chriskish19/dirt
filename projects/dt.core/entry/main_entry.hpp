@@ -59,7 +59,26 @@ namespace core {
 		const int bytes_per_frame = 3;
 	};
 	
-	
+	/*
+		draws a loading bar on a window title
+	*/
+	class window_loading_bar {
+	public:
+		window_loading_bar(HWND handle, const std::wstring& message)
+		:m_handle(handle),m_message(message){}
+
+		void draw() {
+			wchar_t next = m_frames[frame_index];
+			SetWindowText(m_handle, std::wstring(next + m_message).c_str());
+			frame_index = (frame_index + 1) % num_frames;
+		}
+	protected:
+		int frame_index = 0;
+		const int num_frames = 8;
+		HWND m_handle;
+		std::wstring m_message;
+		const std::wstring m_frames = L"⣾⣽⣻⢿⡿⣟⣯⣷";
+	};
 
 
 	
@@ -71,7 +90,7 @@ namespace core {
 	class backend : public process{
 	public:
 		backend(const std::vector<arg_entry>& v);
-		core::codes run(std::stop_token token);
+		core::codes run();
 	protected:
 	};
 
@@ -96,10 +115,8 @@ namespace core {
 		}
 
 		void go() {
-			std::jthread backend_run_t([this](std::stop_token token) { m_be->run(token); });
-			std::jthread backend_message_t([this](std::stop_token token) {
-				backend_messages(token);
-				});
+			std::jthread backend_run_t([this] { m_be->run(); });
+			std::jthread backend_message_t([this] { backend_messages(); });
 
 			api::logger->fill();
 			api::logger->display();
@@ -107,17 +124,25 @@ namespace core {
 			// win32 message handler
 			m_fe->message_pump();
 
-			//PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, 0, nullptr);
+			exit();
 		}
 
 
 	protected:
+		void exit() {
+			DestroyWindow(logger::glb_sl->get_window_handle());
+			m_be->m_run_watch.store(false);
+			m_run_backend_messages.store(false);
+			PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, m_be->m_completionKey, m_be->m_pOverlapped);
+		}
+
+
 		void process_commands(std::shared_ptr<commands_info> ci);
 
-		void backend_messages(std::stop_token token) {
+		void backend_messages() {
 			loading_bar progress;
 
-			while (token.stop_requested() == false) {
+			while (m_run_backend_messages.load() == true) {
 				// timer here, seconds to wait time
 				std::this_thread::sleep_for(std::chrono::milliseconds(GUI_SYNC_INTERVAL));
 				auto q = m_be->get_current_queue();
@@ -129,7 +154,7 @@ namespace core {
 					q.pop();
 				}
 
-				while (q.empty() == false && token.stop_requested() == false) {
+				while (q.empty() == false && m_run_backend_messages.load() == true) {
 					auto& command = q.front();
 					process_commands(command);
 					q.pop();
@@ -139,6 +164,7 @@ namespace core {
 			}
 		}
 
+		std::atomic<bool> m_run_backend_messages = true;
 		std::unique_ptr<backend> m_be = nullptr;
 		std::unique_ptr<frontend> m_fe = nullptr;
 	};
@@ -160,41 +186,43 @@ namespace core {
 		}
 
 		void go() {
-			std::jthread backend_run_t([this](std::stop_token token) { m_be->run(token); });
-			std::jthread backend_message_t([this](std::stop_token token) {
-				backend_messages(token);
-			});
-
-			api::logger->fill();
-			api::logger->display();
-
-			// win32 message handler
+			std::jthread backend_run_t([this]{ m_be->run(); });
+			std::jthread backend_message_t([this] { backend_messages(); });
 			m_fe->message_pump();
-
-			backend_message_t.request_stop();
-			backend_run_t.request_stop();
-			PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, 0, nullptr);
+			exit();
 		}
 
-
+		
 	protected:
+		void exit() {
+			DestroyWindow(logger::glb_sl->get_window_handle());
+			m_be->m_run_watch.store(false);
+			m_run_backend_messages.store(false);
+			PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, m_be->m_completionKey, m_be->m_pOverlapped);
+		}
+
 		void gui_process_commands(std::shared_ptr<commands_info> ci);
 
-		void backend_messages(std::stop_token token) {
-			
-			while (token.stop_requested() == false) {
+		void backend_messages() {
+			window_loading_bar progress(logger::glb_sl->get_window_handle(), L"Processing...");
+
+			while (m_run_backend_messages.load() == true) {
 				// timer here, seconds to wait time
 				std::this_thread::sleep_for(std::chrono::milliseconds(GUI_SYNC_INTERVAL));
 				auto q = m_be->get_current_queue();
 				
-				while (q.empty() == false && token.stop_requested() == false) {
+				while (q.empty() == false && m_run_backend_messages.load() == true) {
 					auto& command = q.front();
 					gui_process_commands(command);
 					q.pop();
 				}
+
+				progress.draw();
 			}
 		}
-	
+		
+		std::atomic<bool> m_run_backend_messages = true;
+
 		std::unique_ptr<backend> m_be = nullptr;
 		std::unique_ptr<frontend> m_fe = nullptr;
 	};

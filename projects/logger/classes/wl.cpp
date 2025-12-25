@@ -165,7 +165,7 @@ LRESULT logger::window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
     switch (uMsg) {
     case WM_DESTROY:
         DestroyWindow(hwnd);
-        return 0;
+        break;
     } // end of switch (uMsg)
 
     // no default switches needed
@@ -245,6 +245,11 @@ logger::codes logger::classic_log_window::load()
     RECT wl_rect;
     if (GetClientRect(m_handle, &wl_rect) == FALSE) {
         return codes::get_client_rect_fail;
+    }
+
+    HMENU hSysMenu = GetSystemMenu(m_handle, FALSE);
+    if (hSysMenu != NULL) {
+        EnableMenuItem(hSysMenu, SC_CLOSE, MF_BYCOMMAND | MF_GRAYED | MF_DISABLED);
     }
 
     return codes::success;
@@ -526,14 +531,22 @@ LRESULT logger::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg, WPARA
         } // end of switch
     }
     catch (const logger::le& e) {
-        string output = ROS("DESCRIPTION: ") + e.m_desc + ROS('\n') + ROS("WINDOWS ERROR: ") + e.m_w32
-            + ROS('\n') + ROS("LOCATION: ") + e.m_loc + ROS('\n');
+        string output = std::format(
+            L"DESCRIPTION: {}\n"
+            L"WINDOWS ERROR: {}\n"
+            L"LOCATION: {}\n",
+            e.m_desc, e.m_w32, e.m_loc
+        );
         OutputDebugString(output.c_str());
     }
     catch (...) {
         logger::le e(logger::codes::unknown_exception_caught, unknown_exception_caught_description);
-        string output = ROS("DESCRIPTION: ") + e.m_desc + ROS('\n') + ROS("WINDOWS ERROR: ") + e.m_w32
-            + ROS('\n') + ROS("LOCATION: ") + e.m_loc + ROS('\n');
+        string output = std::format(
+            L"DESCRIPTION: {}\n"
+            L"WINDOWS ERROR: {}\n"
+            L"LOCATION: {}\n",
+            e.m_desc, e.m_w32, e.m_loc
+        );
         OutputDebugString(output.c_str());
     }
 

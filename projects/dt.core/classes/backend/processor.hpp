@@ -135,10 +135,12 @@ namespace core {
 
 		codes process_entry();
 
-		codes watch(std::stop_token token);
+		codes watch();
 
+		LPOVERLAPPED m_pOverlapped = { nullptr };
 		HANDLE m_hCompletionPort = { nullptr };
 		ULONG_PTR m_completionKey = {};
+		std::atomic<bool> m_run_watch = true;
 	protected:
 		codes process_watch_entries();
 		codes process_copy_entries();
@@ -153,7 +155,7 @@ namespace core {
 
 		DWORD m_bytesTransferred = 0;
 		
-		LPOVERLAPPED m_pOverlapped = {nullptr};
+		
 		HANDLE m_hIOCP = {nullptr};
 
 		file_action convert_action(DWORD action);

@@ -42,12 +42,12 @@ core::codes core::process::process_entry()
     return codes::success;
 }
 
-core::codes core::process::watch(std::stop_token token)
+core::codes core::process::watch()
 {
     std::jthread queue_sys_t(&queue_system::process_entry, this);
     
     while (
-        GetQueuedCompletionStatus(m_hCompletionPort,&m_bytesTransferred,&m_completionKey,&m_pOverlapped,INFINITE) and token.stop_requested() == false) {
+        GetQueuedCompletionStatus(m_hCompletionPort,&m_bytesTransferred,&m_completionKey,&m_pOverlapped,INFINITE) && m_run_watch.load() == true) {
 
         DirWatchContext* ctx = reinterpret_cast<DirWatchContext*>(m_completionKey);
         FILE_NOTIFY_INFORMATION* pNotify = (FILE_NOTIFY_INFORMATION*)ctx->buffer;
@@ -303,7 +303,7 @@ void core::process::clean_up()
         CloseHandle(m_hCompletionPort);
     }
     
-    // cant figure this out why it throws exception says invalid handle
+    // throws an exception dont know why or how 
     /*
     if (m_hIOCP != nullptr && m_hIOCP != INVALID_HANDLE_VALUE) {
         CloseHandle(m_hIOCP);

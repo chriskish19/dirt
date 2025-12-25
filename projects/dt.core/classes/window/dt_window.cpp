@@ -54,8 +54,9 @@ LRESULT core::starter::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 {
     switch (uMsg) {
     case WM_DESTROY:
+        DestroyWindow(hwnd);
         PostQuitMessage(0);
-        return 0;
+        break;
     } // end of switch (uMsg)
 
     // no default switches needed
