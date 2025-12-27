@@ -2,13 +2,13 @@
 cmake_minimum_required(VERSION 3.18)
 
 # set the name of the project
-set(dirt_core "dirt.core")
+set(dt_core "dt-core")
 
 # set build type
 set(build_type "win32-gui")
 
 # create the main project
-project(${dirt_core})
+project(${dt_core})
 
 # using c++ 20 required
 set(CMAKE_CXX_STANDARD 20)
@@ -33,7 +33,7 @@ endif()
 
 
 #############################
-# dirt core exe
+# dt core exe
 #############################
 
 # get core source and header files
@@ -46,15 +46,15 @@ set(is_gui_build OFF)
 
 string(COMPARE EQUAL ${build_type} "terminal" is_terminal_build)
 if(is_terminal_build)
-    add_executable(${dirt_core} ${dt_core_sf} ${dt_core_hf})
+    add_executable(${dt_core} ${dt_core_sf} ${dt_core_hf})
 endif()
 
 string(COMPARE EQUAL ${build_type} "win32-gui" is_gui_build)
 if(is_gui_build)
-    add_executable(${dirt_core} WIN32 ${dt_core_sf} ${dt_core_hf})
+    add_executable(${dt_core} WIN32 ${dt_core_sf} ${dt_core_hf})
 
     # define UNICODE
-    target_compile_definitions(${dirt_core} PRIVATE
+    target_compile_definitions(${dt_core} PRIVATE
             UNICODE
             _UNICODE
         )
@@ -62,16 +62,16 @@ endif()
 
 string(COMPARE EQUAL ${build_type} "win32-gui-terminal" is_gui_build)
 if(is_gui_build)
-    add_executable(${dirt_core} ${dt_core_sf} ${dt_core_hf})
+    add_executable(${dt_core} ${dt_core_sf} ${dt_core_hf})
 
     # define UNICODE
-    target_compile_definitions(${dirt_core} PRIVATE
+    target_compile_definitions(${dt_core} PRIVATE
             UNICODE
             _UNICODE
         )
 
     # Link against essential Windows libraries
-    target_link_libraries(${dirt_core} PRIVATE
+    target_link_libraries(${dt_core} PRIVATE
         kernel32.lib
         user32.lib      # Needed for MessageBox, window creation, message pump
         gdi32.lib       # If you use any GDI functions (most GUI apps do)
@@ -80,7 +80,7 @@ if(is_gui_build)
         comdlg32.lib    # If you use common dialogs (OpenFile, etc.)
     )
 
-    target_compile_options(${dirt_core} PRIVATE /utf-8)
+    target_compile_options(${dt_core} PRIVATE /utf-8)
 
 endif()
 
@@ -91,75 +91,15 @@ foreach(HEADER_FILE ${dt_core_hf})
     get_filename_component(FILE_NAME ${HEADER_FILE} NAME_WE)
     set(FILE_NAME_HPP "CORE_${FILE_NAME}_hpp")
     set(HEADER_FILE_PATH "\"${HEADER_FILE}\"")
-    target_compile_definitions(${dirt_core} PRIVATE -D${FILE_NAME_HPP}=${HEADER_FILE_PATH})
+    target_compile_definitions(${dt_core} PRIVATE -D${FILE_NAME_HPP}=${HEADER_FILE_PATH})
     
     # for file name changes in the project
     # their is a file called names.hpp that manages all file name changes in the project
     if(${FILE_NAME} STREQUAL "names")
-        target_compile_definitions(${dirt_core} PRIVATE -DCORE_NAMES_INCLUDE=${FILE_NAME_HPP})
+        target_compile_definitions(${dt_core} PRIVATE -DCORE_NAMES_INCLUDE=${FILE_NAME_HPP})
     endif()
 endforeach()
 
 #############################
-# End of dirt core exe
+# End of dt core exe
 #############################
-
-
-#############################
-# Logger library
-#############################
-
-set(logs "window_logger")
-
-# logger is linked lib (dll)
-# get logger source and headers
-file(GLOB_RECURSE logger_sf "../projects/logger/*.cpp")
-file(GLOB_RECURSE logger_hf "../projects/logger/*.hpp")
-
-# build logger dll lib
-add_library(${logs} SHARED ${logger_sf} ${logger_hf})
-
-# linker settings
-target_compile_definitions(${logs} PRIVATE 
-            -DLOGS_EXPORTS 
-            UNICODE
-            _UNICODE)
-
-# logger header file names
-# creates macros for each hpp file include path
-# very handy for name changes and file moves
-foreach(HEADER_FILE ${logger_hf})
-    get_filename_component(FILE_NAME ${HEADER_FILE} NAME_WE)
-    set(FILE_NAME_HPP "LOGGER_${FILE_NAME}_hpp")
-    set(HEADER_FILE_PATH "\"${HEADER_FILE}\"")
-    target_compile_definitions(${logs} PUBLIC -D${FILE_NAME_HPP}=${HEADER_FILE_PATH})
-    
-    # for file name changes in the project
-    # their is a file called names.hpp that manages all file name changes in the project
-    if(${FILE_NAME} STREQUAL "names")
-        target_compile_definitions(${logs} PUBLIC -DLOGGER_NAMES_INCLUDE=${FILE_NAME_HPP})
-    endif()
-endforeach()
-
-# Link Win32 libraries to gui
-target_link_libraries(${logs}
-    PRIVATE
-    user32
-    gdi32
-    shell32
-    ole32
-    oleaut32
-    uuid
-    comdlg32
-    advapi32
-)
-#############################
-# End of Logger library
-#############################
-
-
-#############################
-# Linking to dirt.core
-#############################
-target_link_libraries(${dirt_core} PUBLIC  
-${logs})

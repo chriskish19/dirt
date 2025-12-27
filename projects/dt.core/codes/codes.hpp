@@ -46,6 +46,7 @@ namespace core {
         invalid_directory_path,						// an error code thats returned if a directory path is invalid
         file_open_fail,								// cant open the given file path
         invalid_file_path,							// file path not on system
+        write_to_file_fail,                         // failed to write data to a file
 
 		// win32 codes
 		failed_to_register_class,					// failed to register win32 class on the system
@@ -58,6 +59,7 @@ namespace core {
         lb_add_string_fail,                         // failed to add a string to the listbox
         lb_get_selection_fail,                      // failed to get a string from a listox
         menu_fail,                                  // failed to create menu item
+        get_text_metrics_fail,                      // failed to get text metrics data
     };
 	
 	
@@ -115,4 +117,6 @@ namespace core {
     inline const code_pkg lb_add_string_fail_pkg(codes::lb_add_string_fail, "core::codes::lb_add_string_fail | message: failed to add a string to a listbox, call win32 function GetLastError() for more info");
     inline const code_pkg lb_get_selection_fail_pkg(codes::lb_get_selection_fail, "core::codes::lb_get_selection_fail | message: failed to get the selected item from a listbox into a string, call win32 function GetLastError() for more info");
     inline const code_pkg menu_fail_pkg(codes::menu_fail, "core::codes::menu_fail | message: failed to create menu item, call win32 function GetLastError() for more info");
+    inline const code_pkg write_to_file_fail_pkg(codes::write_to_file_fail, "core::codes::write_to_file_fail | message: failed to write data to a file");
+    inline const code_pkg get_text_metrics_fail_pkg(codes::get_text_metrics_fail, "core::codes::get_text_metrics_fail | message: the windows function GetTextMetrics() failed to get the text settings.");
 }

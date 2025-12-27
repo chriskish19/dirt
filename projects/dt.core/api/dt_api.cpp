@@ -164,6 +164,8 @@ core::code_pkg api::match_code(core::codes code)
 		return core::file_open_fail_pkg;
 	case core::codes::invalid_file_path:
 		return core::invalid_file_path_pkg;
+	case core::codes::write_to_file_fail:
+		return core::write_to_file_fail_pkg;
 
 		// win32 codes
 	case core::codes::failed_to_register_class:
@@ -180,7 +182,8 @@ core::code_pkg api::match_code(core::codes code)
 		return core::handle_nullptr_pkg;
 	case core::codes::read_dir_changes_fail:
 		return core::read_dir_changes_fail_pkg;
-
+	case core::codes::get_text_metrics_fail:
+		return core::get_text_metrics_fail_pkg;
 	
 	default:
 		return core::c_unknown_pkg;
@@ -417,7 +420,7 @@ std::string api::get_last_error_w32()
 		return {}; // No error message has been recorded 
 	}
 
-	core::w32_str_p messageBuffer = nullptr;
+	core::character_p messageBuffer = nullptr;
 
 	// Format the error message 
 	size_t size = FormatMessage(
@@ -427,7 +430,7 @@ std::string api::get_last_error_w32()
 		NULL,
 		errorMessageID,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(core::w32_str_p)&messageBuffer,
+		(core::character_p)&messageBuffer,
 		0,
 		NULL
 	);
@@ -1542,7 +1545,7 @@ std::vector<core::arg_entry> api::cmd_line(const std::vector<std::string>& v, co
 	return {};
 }
 
-std::string api::time_now(const std::string& message)
+std::string api::terminal_time_now(const std::string& message)
 {
 	try {
 		auto now = std::chrono::system_clock::now();
@@ -1560,6 +1563,22 @@ std::string api::time_now(const std::string& message)
 	return {};
 }
 
+std::string api::time_now(const std::string& message) {
+	try {
+		auto now = std::chrono::system_clock::now();
+		// time is green in terminal
+		std::string time = std::format("[{}]", now);
+		return time + message;
+	}
+	catch (const std::exception& e) {
+		output_em(core::exception_thrown_and_handled_pkg);
+	}
+	catch (...) {
+		output_em(core::unknown_exception_caught_pkg);
+	}
+	// exception thrown we return nothing
+	return {};
+}
 
 
 

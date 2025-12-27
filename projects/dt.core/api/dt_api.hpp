@@ -33,12 +33,6 @@ namespace api {
 	std::vector<std::string> convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc);
 
 
-	/*
-		converts a time to a string
-	*/
-	std::string time_to_string(const std::chrono::system_clock::time_point& time);
-
-
 	/* 
 		returns the package (class arg_pkg which is an arg enum and the arg enum as a string)
 		given an argument from args enum. See header file CORE_ARGS_INCLUDE_PATH.
@@ -258,6 +252,8 @@ namespace api {
 	/*
 		time
 	*/
+	std::string terminal_time_now(const std::string& message);
+	std::string time_to_string(const std::chrono::system_clock::time_point& time);
 	std::string time_now(const std::string& message);
 
 }

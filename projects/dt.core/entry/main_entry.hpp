@@ -176,13 +176,13 @@ namespace core {
 			std::vector<core::arg_entry> empty;
 			m_be = std::make_unique<backend>(empty);
 			m_fe = std::make_unique<frontend>();
-			logger::glb_sl = std::make_unique<logger::system_log>();
+			core::glb_sl = std::make_unique<core::system_log_window>();
 		}
 
 		gui_entry(const std::vector<core::arg_entry>& v) {
 			m_be = std::make_unique<backend>(v);
 			m_fe = std::make_unique<frontend>();
-			logger::glb_sl = std::make_unique<logger::system_log>();
+			core::glb_sl = std::make_unique<core::system_log_window>();
 		}
 
 		void go() {

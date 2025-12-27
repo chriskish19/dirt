@@ -59,6 +59,13 @@
 #define CORE_TEXTBOX_INCLUDE_PATH				CORE_textbox_hpp					// textbox class
 #define CORE_UI_INCLUDE_PATH					CORE_ui_hpp							// main ui
 
+// logger
+#define CORE_BASE_INCLUDE_PATH					CORE_base_hpp						// base logger
+#define CORE_FILELOG_INCLUDE_PATH				CORE_file_hpp						// file logger
+#define CORE_MQSYS_INCLUDE_PATH					CORE_m_q_sys_hpp					// message queue system
+#define CORE_SYSINIT_INCLUDE_PATH				CORE_system_init_hpp				// main global object for logging
+#define CORE_WL_INCLUDE_PATH					CORE_wl_hpp							// window logger
+
 
 
 /*
