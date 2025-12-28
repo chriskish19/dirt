@@ -1,13 +1,13 @@
+/**********************************************************/
+//
+// File: textbox.hpp
+//
+// Purpose: handle textbox's in a win32 window.
+//
+// Project: dt.core
+//
+/**********************************************************/
 
-/***********************************************
-* 
-* File: textbox.hpp
-*
-* Purpose: handle textbox's in a win32 window.
-*
-* Project: dt.core
-*
-************************************************/
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
@@ -15,12 +15,8 @@
 #include CORE_WIN32_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
 
-
-
 namespace core {
 	namespace gui {
-
-
 		enum class textbox_commands {
 			none = 0,
 			change = EN_CHANGE,					// Sent when the text changes(user input or programmatically).
@@ -50,16 +46,12 @@ namespace core {
 			std::function<void(textbox_commands)> textbox_caller = nullptr;
 		};
 
-
 		class textbox {
 		public:
 			textbox() = default;
 			textbox(textbox_description td);
-
 			core::codes create();
-
 			virtual void action(textbox_commands command);
-
 			textbox_description get_td() { return m_td; }
 			HWND get_textbox_handle() { return m_textbox_handle; }
 			textbox_commands get_command() { return m_command; }

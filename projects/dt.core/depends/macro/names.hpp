@@ -4,7 +4,7 @@
 //
 // Purpose: easy file moves/ name changes
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 
@@ -16,8 +16,6 @@
 
 #pragma once
 
-
-
 /*
 	dependencies : contains all needed external include headers
 */
@@ -25,22 +23,16 @@
 #define CORE_STL_INCLUDE_PATH					CORE_stl_hpp						// specific version include stl library
 #define CORE_WIN32_INCLUDE_PATH					CORE_windows_dps_hpp				// windows headers
 
-
-
 /*
 	codes : contains common enums and error codes, also simple common objects
 */
 #define CORE_CODES_INCLUDE_PATH					CORE_codes_hpp						// error codes
 #define CORE_ARGS_INCLUDE_PATH					CORE_args_hpp						// cmdline arguments
 
-
-
 /*
 	api : header that contains only functions used throughout dirt.core
 */
 #define CORE_API_INCLUDE_PATH					CORE_dt_api_hpp						// helper functions
-
-
 
 /*
 	classes : big objects needed for dirt.cores functionality
@@ -66,15 +58,11 @@
 #define CORE_SYSINIT_INCLUDE_PATH				CORE_system_init_hpp				// main global object for logging
 #define CORE_WL_INCLUDE_PATH					CORE_wl_hpp							// window logger
 
-
-
 /*
 	simulation : everything needed for testing without mashing my ssd
 */
 #define CORE_SIM_API_INCLUDE_PATH				CORE_sim_api_hpp					// simulation api
 #define CORE_SIM_INCLUDE_PATH					CORE_sim_hpp						// sim classes
-
-
 
 /*
 	macros : common pre-processor values used throughout dirt.core

@@ -1,23 +1,19 @@
-
-/***********************************************
-*
-* File: label.cpp
-*
-* Purpose: label.hpp definitions
-*
-* Project: dt.core
-*
-************************************************/
+/**********************************************************/
+//
+// File: label.cpp
+//
+// Purpose: label.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_LABEL_INCLUDE_PATH
 
 core::gui::label::label(label_description ld)
-	:m_ld(ld)
-{
-
-}
+	:m_ld(ld){}
 
 core::codes core::gui::label::create() {
 	/*

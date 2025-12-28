@@ -1,13 +1,13 @@
+/**********************************************************/
+//
+// File: listbox.hpp
+//
+// Purpose: handle listboxes in a win32 window.
+//
+// Project: dt.core
+//
+/**********************************************************/
 
-/***********************************************
-* 
-* File: listbox.hpp
-*
-* Purpose: handle listboxes in a win32 window.
-*
-* Project: dt.core
-*
-************************************************/
 #pragma once
 #include CORE_NAMES_INCLUDE
 #include CORE_DEFINES_INCLUDE_PATH
@@ -15,10 +15,8 @@
 #include CORE_WIN32_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
 
-
 namespace core {
     namespace gui {
-
         enum class listbox_commands {
             none = 0,
 
@@ -87,19 +85,14 @@ namespace core {
             std::function<void(listbox_commands)> listbox_caller = nullptr;
         };
 
-
         class listbox {
         public:
             listbox() = default;
             listbox(listbox_description lbd);
-
             core::codes create();
-
             core::codes add_string(const string& list_message);
             string get_selection(core::codes* code);
-
             virtual void action(listbox_commands command);
-
             listbox_description get_lbd() { return m_lbd; }
             HWND get_listbox_handle() { return m_lb_handle; }
             listbox_commands get_command() { return m_command; }

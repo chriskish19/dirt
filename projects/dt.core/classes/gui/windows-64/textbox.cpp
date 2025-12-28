@@ -1,17 +1,15 @@
-
-/***********************************************
-*
-* File: textbox.cpp
-*
-* Purpose: textbox.hpp definitions
-*
-* Project: dt.core
-*
-************************************************/
+/**********************************************************/
+//
+// File: textbox.cpp
+//
+// Purpose: textbox.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_TEXTBOX_INCLUDE_PATH
-
 
 core::gui::textbox::textbox(textbox_description td)
 	:m_td(td){}

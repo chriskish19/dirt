@@ -1,11 +1,12 @@
-
-/***************************************
-*  File: m_q_sys.cpp (message queue system)
-*
-*  Purpose: m_q_sys.hpp definitions
-*
-*  Project: dt.core
-* *************************************/
+/**********************************************************/
+//
+// File: m_q_sys.cpp (message queue system)
+// 
+// Purpose: m_q_sys.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_MQSYS_INCLUDE_PATH
@@ -23,6 +24,7 @@ core::logger::log_q::~log_q()
 		if (log != nullptr) {
 			delete log;
 		}
+		m_log_q->pop();
 	}
 	
 	while (m_log_q_buffer->empty() == false) {
@@ -30,6 +32,7 @@ core::logger::log_q::~log_q()
 		if (log != nullptr) {
 			delete log;
 		}
+		m_log_q_buffer->pop();
 	}
 	
 

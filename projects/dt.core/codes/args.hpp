@@ -12,9 +12,7 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
 
-
 namespace core {
-	
 	/* 
 		these are the command line arguments as an enum type.
 	*/
@@ -32,7 +30,6 @@ namespace core {
 		recursive,			// includes subdirectories
 	};
 
-	
 	/* 
 		this class is a simple container for holding an args enum and the string value 
 		of that enum.
@@ -45,8 +42,6 @@ namespace core {
 		const args m_arg;
 		const std::string m_s_arg;
 	};
-	
-	
 	
 	/* 
 		these are instantiated objects of the arg_pkg class which just match 
@@ -63,7 +58,6 @@ namespace core {
 	inline const arg_pkg src_pkg(args::src, "src");
 	inline const arg_pkg dst_pkg(args::dst, "dst");
 	inline const arg_pkg recursive_pkg(args::recursive, "-recursive");
-	
 	
 	/* 
 		this map is used to parse the command line arguments and match them
@@ -83,9 +77,6 @@ namespace core {
 		{"-recursive" , args::recursive}
 	};
 	
-
-
-	
 	/* 
 		these group classes are useful for parsing and checking for valid command line
 		combinations of arguments I used inheritance to simplify it. base_group checks for src 
@@ -93,11 +84,8 @@ namespace core {
 	*/
 	class base_group {
 	public:
-		// src directory
-		args arg1 = args::src;
-
-		// destination directory
-		args arg2 = args::dst;
+		args arg1 = args::src;			// src directory
+		args arg2 = args::dst;			// destination directory
 		
 		/* 
 			virtual for overiding in upper classes. Checks the arg_v for 
@@ -121,31 +109,21 @@ namespace core {
 		}
 	};
 	
-	
 	/* 
 		this is the most common group. I use this group for most of my testing.
 	*/
 	class group_2 : public base_group {
 	public:
-		// initial copy of src to dst
-		args arg1 = args::copy;  
-
-		// mirrors src to dst, any changes in src are reflected in dst
-		args arg2 = args::mirror;
-
-		// watches the directory for changes
-		args arg3 = args::watch;
-
+		args arg1 = args::copy;										// initial copy of src to dst
+		args arg2 = args::mirror;									// mirrors src to dst, any changes in src are reflected in dst
+		args arg3 = args::watch;									// watches the directory for changes
 		virtual bool match_group(const std::vector<args>& arg_v) override {
-			// make sure base group is present
-			bool base_match = base_group::match_group(arg_v);
+			bool base_match = base_group::match_group(arg_v);		// make sure base group is present
 			
 			// if base group is not present return false
 			if (base_match == false) {
 				return base_match;
 			}
-
-
 			std::size_t copy_count = 0;
 			std::size_t mirror_count = 0;
 			std::size_t watch_count = 0;
@@ -160,20 +138,14 @@ namespace core {
 					watch_count++;
 				}
 			}
-			
-			// must be one and only one of each to return true
-			return copy_count == 1 and mirror_count == 1 and watch_count == 1 and base_match == true;
+			return copy_count == 1 and mirror_count == 1 and watch_count == 1 and base_match == true;			// must be one and only one of each to return true
 		}
 	};
 
 	class group_3 : public base_group {
 	public:
-		// files added to src are added to dst but files removed from src are not removed from dst
-		args arg1 = args::no_deletes;
-
-		// watches the directory for changes
-		args arg2 = args::watch;
-
+		args arg1 = args::no_deletes;		// files added to src are added to dst but files removed from src are not removed from dst
+		args arg2 = args::watch;			// watches the directory for changes
 		virtual bool match_group(const std::vector<args>& arg_v) override {
 			bool base_match = base_group::match_group(arg_v);
 
@@ -198,22 +170,14 @@ namespace core {
 
 	class group_4 : public base_group {
 	public:
-		// files added to src are added to dst but files removed from src are not removed from dst
-		args arg1 = args::no_deletes;
-
-		// watches the directory for changes
-		args arg2 = args::watch;
-
-		// initial copy of src to dst, and copy any future changes
-		args arg3 = args::copy;
-
+		args arg1 = args::no_deletes;		// files added to src are added to dst but files removed from src are not removed from dst
+		args arg2 = args::watch;			// watches the directory for changes
+		args arg3 = args::copy;				// initial copy of src to dst, and copy any future changes
 		virtual bool match_group(const std::vector<args>& arg_v) override {
 			bool base_match = base_group::match_group(arg_v);
-
 			if (base_match == false) {
 				return base_match;
 			}
-
 			std::size_t no_deletes_count = 0;
 			std::size_t watch_count = 0;
 			std::size_t copy_count = 0;
@@ -228,7 +192,6 @@ namespace core {
 					copy_count++;
 				}
 			}
-
 			return no_deletes_count == 1 and watch_count == 1 and copy_count == 1 and base_match == true;
 		}
 	};
@@ -239,30 +202,22 @@ namespace core {
 
 		virtual bool match_group(const std::vector<args>& arg_v) override {
 			bool base_match = base_group::match_group(arg_v);
-
 			if (base_match == false) {
 				return base_match;
 			}
-
 			base_match = group_3::match_group(arg_v);
-
 			if (base_match == false) {
 				return base_match;
 			}
-			
 			std::size_t new_files_only_count = 0;
 			for (auto arg : arg_v) {
 				if (arg == arg1) {
 					new_files_only_count++;
 				}
 			}
-
 			return new_files_only_count == 1 and base_match == true;
 		}
-
 	};
-
-
 
 	/* 
 		used for each entry in the dirt list file. the entries listed in the
@@ -275,8 +230,6 @@ namespace core {
 		std::filesystem::path src_p;			// source path
 		std::size_t entry_number;				// entry number in dirt list file begins at 1
 	};
-	
-	
 	
 	/* 
 		the action to perform on a file entry
@@ -291,8 +244,6 @@ namespace core {
 		unknown						// a placeholder value 
 	};
 	
-	
-	
 	/* 
 		an enum for determining what action was performed on a directory entry
 	*/
@@ -305,17 +256,11 @@ namespace core {
 		unknown,					// a placeholder value
 	};
 	
-	
-	/* 
-		
-	*/
 	class directory_info {
 	public:
 		std::filesystem::path p;
 		std::uintmax_t number_of_files;
 		directory_completed_action action;
-
-		// Equality operator for unordered_set
 		bool operator==(const directory_info& other) const {
 			return p == other.p && number_of_files == other.number_of_files;
 		}

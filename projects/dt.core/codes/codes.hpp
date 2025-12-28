@@ -13,7 +13,6 @@
 #include CORE_STL_INCLUDE_PATH
 #include CORE_WIN32_INCLUDE_PATH
 
-
 namespace core {
 	/* 
 		common error codes in dt.core
@@ -62,8 +61,6 @@ namespace core {
         get_text_metrics_fail,                      // failed to get text metrics data
     };
 	
-	
-	
 	/* 
 		simple class to match an enum codes to a string message explaining the code in more detail
 		also is throwable error object
@@ -71,20 +68,16 @@ namespace core {
     class code_pkg : public std::exception{
     public:
         code_pkg(codes code, std::string s_code)
-            :m_code(code),m_s_code(s_code){ }
-		
+            :m_code(code),m_s_code(s_code){}
 		virtual const char* what(){
 			return m_s_code.c_str();
 		}
-
         codes code() const { return m_code; }
         std::string message() const { return m_s_code; }
     protected:
         codes m_code;
         std::string m_s_code;
     };
-	
-	
 	
 	/* 
 		instantiated objects for matching enum codes to string explainations 
@@ -111,7 +104,6 @@ namespace core {
     inline const code_pkg file_delete_fail_pkg(codes::file_delete_fail, "core::codes::file_delete_fail | message: attempted to delete a file but the file was not actually deleted");
     inline const code_pkg directory_delete_fail_pkg(codes::directory_delete_fail, "core::codes::directory_delete_fail | message: attempted to delete a directory but failed to actually delete it");
 
-
 	// win32 code pkgs
 	inline const code_pkg failed_to_register_class_pkg(codes::failed_to_register_class,"core::codes::failed_to_register_class | message: the windows class has failed to be registerd on the system");
 	inline const code_pkg hwnd_fail_pkg(codes::hwnd_fail, "core::codes::hwnd_fail | message: failed to create window handle, call win32 function GetLastError() for more info");
@@ -123,41 +115,27 @@ namespace core {
     inline const code_pkg write_to_file_fail_pkg(codes::write_to_file_fail, "core::codes::write_to_file_fail | message: failed to write data to a file");
     inline const code_pkg get_text_metrics_fail_pkg(codes::get_text_metrics_fail, "core::codes::get_text_metrics_fail | message: the windows function GetTextMetrics() failed to get the text settings.");
 
-
-
     // windows logger error
     class le : public code_pkg {
     public:
         le(const code_pkg& cp, const std::string& location, const std::string& windows_error)
             : code_pkg(cp), m_loc(location), m_w32(windows_error) {}
-
         std::string location() const { return m_loc; }
         std::string windows_error() const { return m_w32; }
     protected:
         std::string m_loc;
         std::string m_w32;
     };
-
-
 
     // dt api error
     class dtapierror : public code_pkg{
     public:
         dtapierror(const code_pkg& cp, const std::string& location, const std::string& windows_error)
-            : code_pkg(cp), m_loc(location), m_w32(windows_error) {
-        }
-
+            : code_pkg(cp), m_loc(location), m_w32(windows_error) {}
         std::string location() const { return m_loc; }
         std::string windows_error() const { return m_w32; }
     protected:
         std::string m_loc;
         std::string m_w32;
     };
-
-
-
-
-
-
-
 }

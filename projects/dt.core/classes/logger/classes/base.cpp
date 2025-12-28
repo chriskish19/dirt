@@ -1,17 +1,15 @@
-#include "base.hpp"
-
-/***************************************
-*  File: base.cpp
-*
-*  Purpose: base.hpp definitions
-*
-*  Project: dt.core
-* *************************************/
+/**********************************************************/
+//
+// File: base.cpp
+//
+// Purpose: base.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_BASE_INCLUDE_PATH
-
-
 
 core::logger::base::base(std::size_t nol) {
 	// allocate the logs vector and fill

@@ -1,11 +1,10 @@
-
 /**********************************************************/
 //
 // File: sim.cpp
 //
 // Purpose: classes that simulate work and test system
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 

@@ -1,17 +1,15 @@
-
-/***********************************************
-*
-* File: listbox.cpp
-*
-* Purpose: listbox.hpp definitions
-*
-* Project: dt.core
-*
-************************************************/
+/**********************************************************/
+//
+// File: listbox.cpp
+//
+// Purpose: listbox.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_LISTBOX_INCLUDE_PATH
-
 
 core::gui::listbox::listbox(listbox_description lbd)
 	:m_lbd(lbd) {}

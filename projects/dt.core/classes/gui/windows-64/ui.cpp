@@ -1,4 +1,3 @@
-
 /***********************************************
 *
 * File: ui.cpp
@@ -62,7 +61,6 @@ core::gui::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
 
 	m_lb_label = label(m_lb_label_d);
 	m_lb_label.create();
-
 }
 void core::gui::ui::front_button_action(button_state bs)
 {

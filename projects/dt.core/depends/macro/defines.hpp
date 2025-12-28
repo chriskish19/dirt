@@ -13,7 +13,6 @@
 #include CORE_STL_INCLUDE_PATH
 #include CORE_WIN32_INCLUDE_PATH
 
-
 /*
 	building dirt
 */
@@ -26,7 +25,6 @@
 	assest paths
 */
 #define DT_ICON_PATH "C:\\Users\\chris\\source\\repos\\dirt\\assets\\dt_icon.ico"
-
 
 /*
 	terminal colors
@@ -72,7 +70,6 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 #define MAX_STRING 512
 #define LB_MAX_STRING 256
 
-
 /*
 	handle unicode strings/ ansi string types
 */
@@ -84,8 +81,6 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 
 // using wide strings
 #define WIDE 1
-
-
 
 // define types
 namespace core{
@@ -110,7 +105,6 @@ namespace core {
 	namespace fs = std::filesystem;				// for less typing
 	using ofstream = std::ofstream;
 }
-
 
 #define COUT std::cout
 #define ROS(x) x

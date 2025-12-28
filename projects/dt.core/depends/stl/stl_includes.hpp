@@ -1,11 +1,12 @@
-/***********************************************
-* File: stl_includes.hpp
-*
-* Purpose: includes all standard library headers
-*
-* Project: core
-*
-************************************************/
+/**********************************************************/
+//
+// File: stl_includes.hpp
+//
+// Purpose: includes all standard library headers
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #pragma once
 

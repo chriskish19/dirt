@@ -9,17 +9,14 @@
 /**********************************************************/
 
 #pragma once
-
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
 #include CORE_WIN32_INCLUDE_PATH	
 #include CORE_API_INCLUDE_PATH
 
-
 namespace core {
 	namespace backend {
-
 		enum class commands {
 			message,
 			update_progress_bar,
@@ -41,11 +38,9 @@ namespace core {
 
 		struct progress_bar : public commands_info {
 			float progress;
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<progress_bar>(*this);
 			}
-
 			commands command() const override {
 				return commands::update_progress_bar;
 			}
@@ -53,15 +48,11 @@ namespace core {
 
 		struct message : public commands_info {
 			message(const std::string& message)
-				:text(message) {
-			}
-
+				:text(message) {}
 			std::string text;
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<message>(*this);
 			}
-
 			commands command() const override {
 				return commands::message;
 			}
@@ -69,19 +60,12 @@ namespace core {
 
 		struct time : public commands_info {
 			time(const std::string& _message)
-				:text(_message) {
-			}
-
-
+				:text(_message) {}
 			std::string text;
 			std::chrono::system_clock::time_point time_tp = std::chrono::system_clock::now();
-
-
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<time>(*this);
 			}
-
 			commands command() const override {
 				return commands::time_message;
 			}
@@ -89,17 +73,13 @@ namespace core {
 
 		struct error : public commands_info {
 			error(const code_pkg& c, const std::string& lo)
-				:code(c), location(lo) {
-			}
-
+				:code(c), location(lo) {}
 			std::chrono::system_clock::time_point time_tp = std::chrono::system_clock::now();
 			std::string location;
 			code_pkg code;
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<error>(*this);
 			}
-
 			commands command() const override {
 				return commands::error;
 			}
@@ -107,15 +87,11 @@ namespace core {
 
 		struct fs_exception : public commands_info {
 			fs_exception(const std::filesystem::filesystem_error& e)
-				:text(api::text_output_fse(e)) {
-			}
-
+				:text(api::text_output_fse(e)) {}
 			std::string text;
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<fs_exception>(*this);
 			}
-
 			commands command() const override {
 				return commands::file_system_exception;
 			}
@@ -123,16 +99,12 @@ namespace core {
 
 		struct unknown_exception : public commands_info {
 			unknown_exception(const code_pkg& c, const std::string& lo)
-				:code(c), location(lo) {
-			}
-
+				:code(c), location(lo) {}
 			std::string location;
 			code_pkg code;
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<unknown_exception>(*this);
 			}
-
 			commands command() const override {
 				return commands::unknown_exception;
 			}
@@ -140,17 +112,13 @@ namespace core {
 
 		struct file_copy : public commands_info {
 			file_copy(const file_entry& entry, const code_pkg& c)
-				:text(api::output_file_entry(entry)), code(c) {
-			}
-
+				:text(api::output_file_entry(entry)), code(c) {}
 			code_pkg code;
 			std::string text;
 			std::chrono::system_clock::time_point time_tp = std::chrono::system_clock::now();
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<file_copy>(*this);
 			}
-
 			commands command() const override {
 				return commands::file_copy;
 			}
@@ -158,17 +126,13 @@ namespace core {
 
 		struct file_delete : public commands_info {
 			file_delete(const file_entry& entry, const code_pkg& c)
-				:text(api::output_file_entry(entry)), code(c) {
-			}
-
+				:text(api::output_file_entry(entry)), code(c) {}
 			code_pkg code;
 			std::string text;
 			std::chrono::system_clock::time_point time_tp = std::chrono::system_clock::now();
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<file_delete>(*this);
 			}
-
 			commands command() const override {
 				return commands::file_delete;
 			}
@@ -176,29 +140,22 @@ namespace core {
 
 		struct directory_delete : public commands_info {
 			directory_delete(const file_entry& entry, const code_pkg& c)
-				:text(api::output_file_entry(entry)), code(c) {
-			}
-
+				:text(api::output_file_entry(entry)), code(c) {}
 			code_pkg code;
 			std::string text;
 			std::chrono::system_clock::time_point time_tp = std::chrono::system_clock::now();
-
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<directory_delete>(*this);
 			}
-
 			commands command() const override {
 				return commands::directory_delete;
 			}
 		};
 
-
-
 		class backend_message_queue {
 		public:
 			backend_message_queue() = default;
 			void add(const commands_info& ci);
-
 			std::queue<std::shared_ptr<commands_info>> get_current_queue();
 			std::size_t get_current_size() { return m_bq.size(); }
 		protected:

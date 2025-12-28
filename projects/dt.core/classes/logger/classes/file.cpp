@@ -1,11 +1,12 @@
-
-/***************************************
-*  File: file.cpp
-*
-*  Purpose: file.hpp definitions
-*
-*  Project: dt.core
-* *************************************/
+/**********************************************************/
+//
+// File: file.cpp
+//
+// Purpose: file.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_FILELOG_INCLUDE_PATH

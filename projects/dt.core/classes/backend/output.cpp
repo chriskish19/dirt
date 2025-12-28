@@ -1,17 +1,15 @@
-
 /**********************************************************/
 //
 // File: output.cpp
 //
 // Purpose: definitions
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_TOUT_INCLUDE_PATH
-
 
 void core::backend::backend_message_queue::add(const core::backend::commands_info& ci)
 {

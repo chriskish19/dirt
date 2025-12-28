@@ -1,17 +1,17 @@
-/***********************************************
-* File: stl.hpp
-*
-* Purpose: includes all standard library headers
-*
-* Project: core
-*
-************************************************/
+/**********************************************************/
+//
+// File: stl.hpp
+//
+// Purpose: includes all standard library headers
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #ifndef CORE_STL_HPP_GUARD
 #define CORE_STL_HPP_GUARD
 
 #include CORE_NAMES_INCLUDE
-
 
 #if defined(_MSVC_LANG)
 #define USING_MSVC_CPP_LANG_VERSION _MSVC_LANG

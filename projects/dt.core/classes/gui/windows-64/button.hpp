@@ -1,13 +1,12 @@
-
-/***********************************************
-* 
-* File: button.hpp
-*
-* Purpose: handle buttons in win32 window.
-*
-* Project: dt.core
-*
-************************************************/
+/**********************************************************/
+//
+// File: button.hpp
+//
+// Purpose: handle buttons in win32 window.
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #pragma once
 #include CORE_NAMES_INCLUDE
@@ -15,17 +14,14 @@
 #include CORE_WIN32_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
 
-
 namespace core {
 	namespace gui {
-
 		enum class button_state {
 			rest = 0,
 			pressed,
 			released,
 			holding
 		};
-
 
 		struct button_description {
 			string class_name = ROS("BUTTON");
@@ -42,16 +38,12 @@ namespace core {
 			std::function<void(button_state)> button_caller = nullptr;
 		};
 
-
 		class button {
 		public:
 			button() = default;
 			button(button_description bd);
-
 			core::codes create();
-
 			virtual void action(button_state bs);
-
 			button_description get_bd() { return m_bd; }
 			HWND get_button_handle() { return m_button_handle; }
 			button_state get_button_state() { return m_b_state; }

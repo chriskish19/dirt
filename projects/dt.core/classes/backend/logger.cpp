@@ -1,4 +1,3 @@
-
 /**********************************************************/
 //
 // File: logger.cpp
@@ -11,7 +10,6 @@
 
 #include CORE_NAMES_INCLUDE
 #include CORE_LOGGER_INCLUDE_PATH
-
 
 core::backend::base::base(std::size_t nol) {
 	// allocate the logs vector and fill
@@ -119,4 +117,3 @@ core::backend::log::~log()
 		m_message = nullptr;
 	}
 }
-

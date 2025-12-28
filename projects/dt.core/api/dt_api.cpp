@@ -1,6 +1,4 @@
-﻿#include "dt_api.hpp"
-
-/**********************************************************/
+﻿/**********************************************************/
 //
 // File: dt_api.cpp
 //
@@ -18,8 +16,6 @@ namespace api {
 	std::unique_ptr<core::backend::system_log> logger = nullptr;
 }
 #endif
-
-
 
 std::vector<std::string> api::convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc)
 {

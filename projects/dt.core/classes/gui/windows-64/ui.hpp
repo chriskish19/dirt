@@ -1,13 +1,12 @@
-
-/***********************************************
-* 
-* File: ui.hpp
-*
-* Purpose: handle user interface in dt
-*
-* Project: dt.core
-*
-************************************************/
+/**********************************************************/
+//
+// File: ui.hpp
+//
+// Purpose: handle user interface in dt
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #pragma once
 #include CORE_NAMES_INCLUDE
@@ -19,11 +18,8 @@
 #include CORE_LABEL_INCLUDE_PATH
 #include CORE_TEXTBOX_INCLUDE_PATH
 
-
 namespace core {
 	namespace gui {
-
-
 		enum class ui_positions : std::size_t {
 			// label
 			label_x = 10,
@@ -50,7 +46,6 @@ namespace core {
 			launch_b_h = 50
 		};
 
-
 		enum class window_ids {
 			console = 0,
 			file,
@@ -65,26 +60,19 @@ namespace core {
 			show_system_logger,
 		};
 
-
 		class ui {
 		public:
 			ui() = default;
 			ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp);
-
-
 			button m_launch_b;
 			void front_button_action(button_state bs);
-
 			button m_refresh_b;
 			void refresh_button_action(button_state bs);
-
 			listbox m_front_lb;
 			void front_listbox_action(listbox_commands lc);
-
 			label m_lb_label;
 			void lb_label_action(label_commands command);
 		protected:
-
 			/*
 
 				struct button_description {
@@ -133,8 +121,6 @@ namespace core {
 				nullptr
 			};
 
-
-
 			/*
 
 					struct listbox_description {
@@ -169,7 +155,6 @@ namespace core {
 				nullptr
 			};
 
-
 			/*
 
 						struct label_description {
@@ -202,7 +187,6 @@ namespace core {
 				nullptr,
 				nullptr
 			};
-
 		};
 	}
 }

@@ -1,11 +1,12 @@
-/***************************************
-*  File: wl.hpp (window logger)
-*
-*  Purpose: a window which displays 
-*			system logs
-*
-*  Project: dt.core
-* *************************************/
+/**********************************************************/
+//
+// File: wl.hpp (window logger)
+//
+// Purpose: a window which displays system logs
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #pragma once
 #include CORE_NAMES_INCLUDE
@@ -13,7 +14,6 @@
 #include CORE_BASE_INCLUDE_PATH
 #include CORE_DEFINES_INCLUDE_PATH
 #include CORE_API_INCLUDE_PATH
-
 
 namespace core {
 	namespace logger {
@@ -32,59 +32,22 @@ namespace core {
 			LPVOID					lpParam;      // Pointer to additional application-defined data
 		};
 
-		// create a window from a window description
-		HWND create_window(const window_description& wd);
-
-		// register a window class
-		codes register_window(const WNDCLASSEX& wc);
-
-
+		HWND create_window(const window_description& wd);		// create a window from a window description
+		codes register_window(const WNDCLASSEX& wc);			// register a window class
 
 		class window {
 		public:
 			window() = default;
-
-			// static window procedure
-			static LRESULT CALLBACK s_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-			// initialize the window
-			virtual codes load();
+			static LRESULT CALLBACK s_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);				// static window procedure
+			virtual codes load();																					// initialize the window
 		protected:
-			// module handle
-			HINSTANCE m_module = GetModuleHandle(NULL);
-
-			// window handle
-			HWND m_handle = nullptr;
-
-			// class member function window procedure
-			virtual LRESULT CALLBACK this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-			// see above for definition
-			// init in load()
-			window_description m_wd;
-
-			// window class
-			// init in load()
-			WNDCLASSEX m_wc;
+			HINSTANCE m_module = GetModuleHandle(NULL);																// module handle
+			HWND m_handle = nullptr;																				// window handle
+			virtual LRESULT CALLBACK this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);			// class member function window procedure
+			window_description m_wd;																				// init in load()
+			WNDCLASSEX m_wc;																						// init in load()
 		};
 
-
-
-
-
-		// uses direct x to print the logs inside the window
-		class dx_log_window : public window {
-		public:
-			dx_log_window() = default;
-
-			HWND handle() { return m_handle; }
-			UINT width();
-			UINT height();
-		protected:
-			LRESULT CALLBACK this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-		};
-
-		// uses win32 api and classic window logging
 		class classic_log_window : public window, public base {
 		public:
 			classic_log_window();
@@ -92,11 +55,8 @@ namespace core {
 			codes load() override;
 			void thread_go();
 			codes wait_until_init();
-
 		protected:
 			LRESULT CALLBACK this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-			// scrolling
 			int m_nol = LOGGER_LINES - 1;
 			int m_yChar = LOGGER_FONT_SIZE + 2;
 			int m_xChar = 0;
@@ -107,11 +67,7 @@ namespace core {
 			int m_xClient = 0;
 			int m_xPos = 0;
 			int m_yPos = 0;
-
-			// custom font
-			HFONT m_clw_font = nullptr;
-
-			// init
+			HFONT m_clw_font = nullptr;					// custom font
 			std::atomic<bool> m_wait_b = false;
 			std::condition_variable m_wait_cv;
 		};

@@ -9,7 +9,6 @@
 /**********************************************************/
 
 #pragma once
-
 #include CORE_NAMES_INCLUDE
 #include CORE_STL_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
@@ -17,11 +16,7 @@
 #include CORE_LOGGER_INCLUDE_PATH
 #include CORE_WIN32_INCLUDE_PATH
 
-
-
 namespace api {
-
-
 #if ENABLE_API_LOGS
 	extern std::unique_ptr<core::backend::system_log> logger;
 #endif

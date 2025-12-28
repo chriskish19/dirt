@@ -1,23 +1,18 @@
-
-/***********************************************
-*
-* File: button.cpp
-*
-* Purpose: defines a gui button in win32
-*
-* Project: dt.core
-*
-************************************************/
+/**********************************************************/
+//
+// File: button.cpp
+//
+// Purpose: defines a gui button in win32
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_BUTTON_INCLUDE_PATH
 
-
 core::gui::button::button(button_description bd)
-	:m_bd(bd)
-{
-
-}
+	:m_bd(bd){}
 
 core::codes core::gui::button::create()
 {

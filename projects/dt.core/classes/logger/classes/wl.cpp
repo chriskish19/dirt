@@ -1,11 +1,12 @@
-
-/***************************************
-*  File: wl.cpp (window logger)
-*
-*  Purpose: wl.hpp definitions
-*
-*  Project: dt.core
-* *************************************/
+/**********************************************************/
+//
+// File: wl.cpp (window logger)
+//
+// Purpose: wl.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_WL_INCLUDE_PATH
@@ -509,7 +510,6 @@ LRESULT core::logger::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg,
     catch (...) {
         api::output_cp(unknown_exception_caught_pkg);
     }
-
 
     return core::logger::window::this_window_proc(hwnd, uMsg, wParam, lParam);
 }

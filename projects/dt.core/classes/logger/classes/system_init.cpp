@@ -1,15 +1,15 @@
-
-/***************************************
-*  File: system_init.cpp (system initialize)
-*
-*  Purpose: system_init.hpp definitions
-*
-*  Project: dt.core
-* *************************************/
+/**********************************************************/
+//
+// File: system_init.cpp (system initialize)
+//
+// Purpose: system_init.hpp definitions
+//
+// Project: dt.core
+//
+/**********************************************************/
 
 #include CORE_NAMES_INCLUDE
 #include CORE_SYSINIT_INCLUDE_PATH
-
 
 namespace core {
 	namespace logger {
@@ -22,7 +22,6 @@ namespace core {
 #endif
 	}
 }
-
 
 #if MANUAL_LOGGER
 core::logger::logger::codes core::logger::logger::init_system_log()
