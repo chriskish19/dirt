@@ -1,6 +1,5 @@
 ﻿#include "dt_api.hpp"
 
-
 /**********************************************************/
 //
 // File: dt_api.cpp
@@ -16,7 +15,7 @@
 
 #if ENABLE_API_LOGS
 namespace api {
-	std::unique_ptr<core::backend::system_log> logger = std::make_unique<core::backend::system_log>();
+	std::unique_ptr<core::backend::system_log> logger = nullptr;
 }
 #endif
 
@@ -25,6 +24,10 @@ namespace api {
 std::vector<std::string> api::convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc)
 {
 	std::vector<std::string> narrow_args;
+	if (wide_argv == nullptr) {
+		return {};
+	}
+
 
 	for (int i = 0; i < argc; ++i)
 	{
@@ -187,26 +190,56 @@ core::code_pkg api::match_code(core::codes code)
 }
 
 void api::output_em(const core::code_pkg cp, const std::string location) {
-	std::string message = std::format("{}\n{}\n", cp.message(), location);
+	std::string output = std::format("{}\n{}\n", cp.message(), location);
+
 
 #if ENABLE_API_LOGS
-	api::logger->log_message(message);
+	api::logger->log_message(output);
+#endif
+
+
+#if WIDE
+	core::codes code;
+	OutputDebugString(api::to_wide_string(output, &code).c_str());
+	if (code != core::codes::success) {
+		std::wstring w_output = std::format(
+			L"Problem with api::to_wide_string()\n File: {}\n Line: {}\n",
+			__FILEW__,
+			__LINE__
+		);
+		OutputDebugString(w_output.c_str());
+	}
+#else
+	OutputDebugString(output.c_str());
 #endif
 }
 
 void api::output_fse(const std::filesystem::filesystem_error& e)
 {
-	std::string message = std::format(
-		"Message: {}\n"
-		"Path 1: {}\n"
-		"Path 2: {}\n",
+	std::string output = std::format(
+		"Message: {}\n Path 1: {}\n Path 2: {}\n",
 		e.what(),
 		e.path1().string(),
 		e.path2().string()
 	);
 
 #if ENABLE_API_LOGS
-	api::logger->log_message(message);
+	api::logger->log_message(output);
+#endif
+
+#if WIDE
+	core::codes code;
+	OutputDebugString(api::to_wide_string(output, &code).c_str());
+	if (code != core::codes::success) {
+		std::wstring w_output = std::format(
+			L"Problem with api::to_wide_string()\n File: {}\n Line: {}\n",
+			__FILEW__,
+			__LINE__
+		);
+		OutputDebugString(w_output.c_str());
+	}
+#else
+	OutputDebugString(output.c_str());
 #endif
 }
 
@@ -709,11 +742,7 @@ std::vector<std::queue<core::file_entry>> api::split_queue(std::queue<core::file
 std::string api::output_file_entry(const core::file_entry& entry)
 {
 	std::string text = std::format(
-		"\n"
-		"Source Path: {}\n"
-		"Destination Path: {}\n"
-		"Action: {}\n"
-		"File type: {}\n",
+		"\n Source Path: {}\n Destination Path: {}\n Action: {}\n File type: {}\n",
 		entry.src_p.string(),
 		entry.dst_p.string(),
 		action_to_string(entry.action),
@@ -1465,7 +1494,9 @@ std::vector<core::arg_entry> api::cmd_line(int argc, char* argv[], core::codes* 
 		return entry_v;
 	}
 	else { // using one entry cmdline
+		single_entry.entry_number = 1;
 		entry_v.push_back(single_entry);
+		*code = core::codes::success;
 		return entry_v;
 	}
 	return {};
@@ -1480,7 +1511,9 @@ core::codes api::validate(std::vector<core::arg_entry>& v)
 			api::logger->log_message("error : invalid entry\n");
 			api::logger->log_message(output_entry(entry));
 #endif
-			
+			output_message("Error : Invalid entry\n");
+			output_message(output_entry(entry));
+
 			invalid_entrys_v.push_back(entry.entry_number);
 		}
 	}
@@ -1540,10 +1573,49 @@ std::vector<core::arg_entry> api::cmd_line(const std::vector<std::string>& v, co
 		return entry_v;
 	}
 	else { // using one entry cmdline
+		single_entry.entry_number = 1;
 		entry_v.push_back(single_entry);
+		*code = core::codes::success;
 		return entry_v;
 	}
 	return {};
+}
+
+std::vector<core::arg_entry> api::windows_cmd_line(core::codes* code)
+{
+	int argc = 0;
+	LPWSTR* wide_argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	if (wide_argv == nullptr)
+	{
+		api::output_cp(core::pointer_is_null_pkg);
+		*code = core::codes::pointer_is_null;
+		return {};
+	}
+
+
+	std::vector<std::string> argsv = api::convert_cmdline_args_to_utf8(wide_argv, argc);
+	std::vector<core::arg_entry> entry_v;
+	
+	{
+		core::codes local_code;
+		entry_v = api::cmd_line(argsv, &local_code);
+		*code = local_code;
+		if (local_code != core::codes::success) {
+			auto pkg = api::match_code(local_code);
+			api::output_cp(pkg);
+		}
+	}
+
+	{
+		core::codes local_code = api::validate(entry_v);
+		*code = local_code;
+		if (local_code != core::codes::success) {
+			auto pkg = api::match_code(local_code);
+			api::output_cp(pkg);
+		}
+	}
+
+	return entry_v;
 }
 
 std::string api::terminal_time_now(const std::string& message)
@@ -1567,7 +1639,6 @@ std::string api::terminal_time_now(const std::string& message)
 std::string api::time_now(const std::string& message) {
 	try {
 		auto now = std::chrono::system_clock::now();
-		// time is green in terminal
 		std::string time = std::format("[{}]", now);
 		return time + message;
 	}
@@ -1584,8 +1655,8 @@ std::string api::time_now(const std::string& message) {
 std::string api::time_to_string(const std::chrono::system_clock::time_point& time)
 {
 	try {
-		std::string time = std::format("[{}]", time);
-		return time;
+		std::string stime = std::format("[{}]", time);
+		return stime;
 	}
 	catch (const std::exception& e) {
 		output_em(core::exception_thrown_and_handled_pkg);
@@ -1600,25 +1671,33 @@ std::string api::time_to_string(const std::chrono::system_clock::time_point& tim
 void api::output_le(const core::le& e)
 {
 	std::string output = std::format(
-		"DESCRIPTION: {}\n"
-		"WINDOWS ERROR: {}\n"
-		"LOCATION: {}\n",
+		"DESCRIPTION: {}\n WINDOWS ERROR: {}\n LOCATION: {}\n",
 		e.message(),
 		e.windows_error(),
 		e.location()
 		);
 #if WIDE
-	OutputDebugString(api::to_wide_string(output).c_str());
+	core::codes code;
+	OutputDebugString(api::to_wide_string(output, &code).c_str());
+	if (code != core::codes::success) {
+		std::wstring w_output = std::format(
+			L"Problem with api::to_wide_string()\n File: {}\n Line: {}\n",
+			__FILEW__,
+			__LINE__
+		);
+		OutputDebugString(w_output.c_str());
+	}
 #else
 	OutputDebugString(output.c_str());
 #endif
 }
 
-void api::output_cp(const core::code_pkg& cp)
+void api::output_cp(const core::code_pkg& cp, const std::string& location)
 {
 	std::string output = std::format(
-		"DESCRIPTION: {}\n",
-		cp.message()
+		"DESCRIPTION: {}\n LOCATION: {}\n",
+		cp.message(),
+		location
 	);
 #if WIDE
 	{
@@ -1626,9 +1705,7 @@ void api::output_cp(const core::code_pkg& cp)
 		OutputDebugString(api::to_wide_string(output, &code).c_str());
 		if (code != core::codes::success) {
 			std::wstring w_output = std::format(
-				L"Problem with api::to_wide_string()\n",
-				L"File: {}\n",
-				L"Line: {}\n",
+				L"Problem with api::to_wide_string()\n File: {}\n Line: {}\n",
 				__FILEW__,
 				__LINE__
 			);
@@ -1643,9 +1720,7 @@ void api::output_cp(const core::code_pkg& cp)
 void api::output_dtapierror(const core::dtapierror& e)
 {
 	std::string output = std::format(
-		"DESCRIPTION: {}\n"
-		"WINDOWS ERROR: {}\n"
-		"LOCATION: {}\n",
+		"DESCRIPTION: {}\n WINDOWS ERROR: {}\n LOCATION: {}\n",
 		e.message(),
 		e.windows_error(),
 		e.location()
@@ -1657,9 +1732,7 @@ void api::output_dtapierror(const core::dtapierror& e)
 		OutputDebugString(api::to_wide_string(output, &code).c_str());
 		if (code != core::codes::success) {
 			std::wstring w_output = std::format(
-				L"Problem with api::to_wide_string()\n",
-				L"File: {}\n",
-				L"Line: {}\n",
+				L"Problem with api::to_wide_string()\n File: {}\n Line: {}\n",
 				__FILEW__,
 				__LINE__
 			);
@@ -1669,6 +1742,27 @@ void api::output_dtapierror(const core::dtapierror& e)
 
 #else
 	OutputDebugString(output.c_str());
+#endif
+}
+
+void api::output_message(const std::string& message)
+{
+#if WIDE
+	{
+		core::codes code;
+		OutputDebugString(api::to_wide_string(message, &code).c_str());
+		if (code != core::codes::success) {
+			std::wstring w_output = std::format(
+				L"Problem with api::to_wide_string()\n File: {}\n Line: {}\n",
+				__FILEW__,
+				__LINE__
+			);
+			OutputDebugString(w_output.c_str());
+		}
+	}
+
+#else
+	OutputDebugString(message.c_str());
 #endif
 }
 

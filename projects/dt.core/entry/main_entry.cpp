@@ -418,7 +418,7 @@ void core::main::gui_entry::gui_process_commands(std::shared_ptr<core::backend::
 		auto time_info = std::dynamic_pointer_cast<core::backend::time>(ci);
 		if (time_info != nullptr)
 		{
-			core::logger::glb_sl->log_message(api::to_wide_string(time_info->text));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::time_to_string(time_info->time_tp) + time_info->text));
 		}
 		else
 		{

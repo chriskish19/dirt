@@ -93,8 +93,6 @@ namespace core {
 			void thread_go();
 			codes wait_until_init();
 
-			// length of time stamp
-			const std::size_t m_ts_length = time_stamped(ROS("")).size();
 		protected:
 			LRESULT CALLBACK this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 

@@ -59,12 +59,12 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 /*
 	Logger values
 */
-#define ENABLE_API_LOGS 1						// get logs from api
+#define ENABLE_API_LOGS 0						// get logs from api
 #define LOGS 1000								// number of logs to cycle
 #define LOG_LENGTH 512							// length of each log
 #define LOGGER_LINES 1000
 #define LOGGER_FONT_SIZE 14
-
+#define ENABLE_VERBOSE_LOGGING 1
 
 /*
 	Strings
@@ -96,6 +96,7 @@ namespace core{
 	using const_character_p = LPCWSTR;			// const wchar_t* (read only)
 	namespace fs = std::filesystem;				// for less typing
 	using ofstream = std::wofstream;
+	using istringstream = std::wistringstream;
 }
 
 #else // ANSI

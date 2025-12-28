@@ -58,6 +58,9 @@ namespace core {
 
 			// get logs_V pointer
 			std::vector<log*>* get_buffer() { return m_logs_v; }
+
+			// counts the number of '\n' characters
+			int count_new_line(const string& message);
 		protected:
 			// vector used for each log
 			std::vector<log*>* m_logs_v = nullptr;
@@ -66,10 +69,6 @@ namespace core {
 			// not the currently last set log
 			// its a vector index
 			std::size_t m_v_index = 0;
-
-			// simple time stamp a message
-			// returns the message with a time on it ([2025-05-09-14:00:30...])
-			string time_stamped(const string& message);
 
 			// prevent concurrent access to logs vec
 			std::mutex m_v_mtx;

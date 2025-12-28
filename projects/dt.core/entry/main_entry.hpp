@@ -115,13 +115,7 @@ namespace core {
 			void go() {
 				std::jthread backend_run_t([this] { m_be->run(); });
 				std::jthread backend_message_t([this] { backend_messages(); });
-
-				api::logger->fill();
-				api::logger->display();
-
-				// win32 message handler
 				m_fe->message_pump();
-
 				exit();
 			}
 
@@ -175,12 +169,18 @@ namespace core {
 				m_be = std::make_unique<backend>(empty);
 				m_fe = std::make_unique<frontend>();
 				core::logger::glb_sl = std::make_unique<core::logger::system_log_window>();
+#if ENABLE_API_LOGS
+				api::logger = std::make_unique<core::backend::system_log>();
+#endif
 			}
 
 			gui_entry(const std::vector<core::arg_entry>& v) {
 				m_be = std::make_unique<backend>(v);
 				m_fe = std::make_unique<frontend>();
 				core::logger::glb_sl = std::make_unique<core::logger::system_log_window>();
+#if ENABLE_API_LOGS
+				api::logger = std::make_unique<core::backend::system_log>();
+#endif
 			}
 
 			void go() {

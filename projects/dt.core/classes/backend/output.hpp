@@ -69,7 +69,7 @@ namespace core {
 
 		struct time : public commands_info {
 			time(const std::string& _message)
-				:text(api::terminal_time_now(_message)) {
+				:text(_message) {
 			}
 
 

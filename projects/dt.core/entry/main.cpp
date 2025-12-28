@@ -52,30 +52,11 @@ int main(int argc, char* argv[]) {
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
     
-    int argc = 0;
-    LPWSTR* wide_argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    if (wide_argv == nullptr)
-    {
-        MessageBoxA(NULL, "Failed to parse command line", "Error", MB_OK | MB_ICONERROR);
-        return -1;
-    }
-
-    
-    std::vector<std::string> argsv = api::convert_cmdline_args_to_utf8(wide_argv, argc);
-    std::vector<core::arg_entry> entry_v;
-    {
-        core::codes code;
-        entry_v = api::cmd_line(argsv , &code);
-        if (code != core::codes::success) {
-            return static_cast<int>(code);
-        }
-    }
-
-    {
-        core::codes code = api::validate(entry_v);
-        if (code != core::codes::success) {
-            return static_cast<int>(code);
-        }
+    core::codes code;
+    auto entry_v = api::windows_cmd_line(&code);
+    if (code != core::codes::success) {
+        auto pkg = api::match_code(code);
+        api::output_cp(pkg);
     }
 
 
@@ -84,11 +65,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         p_gui->go();
     }
     catch (const core::code_pkg& cpe) {
-        MessageBox(NULL, api::to_wide_string(cpe.message()).c_str(), L"EXCEPTION", MB_OK | MB_ICONERROR);
+        api::output_cp(cpe);
         return static_cast<int>(core::codes::exception_thrown_and_handled);
     }
     catch (...) {
-        MessageBox(NULL, api::to_wide_string(core::unknown_exception_caught_pkg.message()).c_str(), L"EXCEPTION", MB_OK | MB_ICONERROR);
+        api::output_cp(core::unknown_exception_caught_pkg);
         return static_cast<int>(core::codes::unknown_exception_caught);
     }
 

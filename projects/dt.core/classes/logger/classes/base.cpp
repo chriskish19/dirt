@@ -1,3 +1,4 @@
+#include "base.hpp"
 
 /***************************************
 *  File: base.cpp
@@ -37,8 +38,6 @@ core::logger::base::~base()
 
 void core::logger::base::set_log(core::logger::log* log_p)
 {
-	*log_p->message = time_stamped(*log_p->message);
-
 	// cycle
 	if (m_v_index < (m_logs_v->size() - 1)) {
 		// next log
@@ -50,19 +49,13 @@ void core::logger::base::set_log(core::logger::log* log_p)
 	}
 }
 
-core::string core::logger::base::time_stamped(const string& message)
+int core::logger::base::count_new_line(const string& message)
 {
-	try {
-		auto now = std::chrono::system_clock::now();
-		string time = std::format(ROS("[{}]"), now);
-		return time + message;
+	int count = 0;
+	for (auto c : message) {
+		if (c == '\n') {
+			count++;
+		}
 	}
-	catch (const std::exception& e) {
-		std::cerr << "exception: " << e.what() << std::endl;
-	}
-	catch (...) {
-		std::cerr << "unknown exception caught..." << std::endl;
-	}
-	// exception thrown we return nothing
-	return {};
+	return count;
 }

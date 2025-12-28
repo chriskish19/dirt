@@ -241,6 +241,7 @@ namespace api {
 	std::vector<core::arg_entry> cmd_line(int argc, char* argv[], core::codes* code);
 	core::codes validate(std::vector<core::arg_entry>& v);
 	std::vector<core::arg_entry> cmd_line(const std::vector<std::string>& v, core::codes* code);
+	std::vector<core::arg_entry> windows_cmd_line(core::codes* code);
 
 
 	/*
@@ -256,8 +257,9 @@ namespace api {
 		errors outputed to the visual studio output window
 	*/
 	void output_le(const core::le& e);
-	void output_cp(const core::code_pkg& cp);
+	void output_cp(const core::code_pkg& cp, const std::string& location = api::get_location());
 	void output_dtapierror(const core::dtapierror& e);
+	void output_message(const std::string& message);
 
 
 	/*

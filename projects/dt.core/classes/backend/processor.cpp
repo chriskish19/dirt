@@ -871,6 +871,9 @@ void core::backend::queue_system::process_queue(std::queue<file_entry> buffer_q)
             continue;
         }
 
+#if ENABLE_VERBOSE_LOGGING
+        add(time{ api::output_file_entry(entry) });
+#endif
         switch_entry_type(entry);
 
         if (entry.completed_action != directory_completed_action::uninit) {

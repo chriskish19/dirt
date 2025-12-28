@@ -98,11 +98,15 @@ void core::logger::system_log_window::log_message(const string& message)
 	core::logger::log* log_p = nullptr;
 	std::size_t index = 0;
 	
-	index = base::get_v_index();
-	log_p = base::get_buffer()->at(index);
-	*log_p->message = message;
+	istringstream iss(message);
+	string line;
+	while (std::getline(iss, line)) {
+		index = base::get_v_index();
+		log_p = base::get_buffer()->at(index);
+		*log_p->message = line;
+		base::set_log(log_p);
+	}
 	
-	base::set_log(log_p);
 
 	InvalidateRect(m_handle, nullptr, false);
 	UpdateWindow(m_handle);
