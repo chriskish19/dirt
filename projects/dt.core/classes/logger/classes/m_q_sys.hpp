@@ -17,21 +17,25 @@
 
 
 namespace core {
-	class log_q {
-	public:
-		log_q();
-		~log_q();
+	namespace logger {
 
-		void add_message(logger::log* log);
-		std::atomic<bool> m_signal_b = false;
-		std::condition_variable m_signal_cv;
-		void exit();
-	protected:
-		std::queue<log*>* m_log_q = nullptr;
-		std::mutex m_q_mtx;
-		std::queue<log*>* m_log_q_buffer = nullptr;
 
-		// process message boolean
-		std::atomic<bool> m_run_pm = true;
-	};
+		class log_q {
+		public:
+			log_q();
+			~log_q();
+
+			void add_message(logger::log* log);
+			std::atomic<bool> m_signal_b = false;
+			std::condition_variable m_signal_cv;
+			void exit();
+		protected:
+			std::queue<log*>* m_log_q = nullptr;
+			std::mutex m_q_mtx;
+			std::queue<log*>* m_log_q_buffer = nullptr;
+
+			// process message boolean
+			std::atomic<bool> m_run_pm = true;
+		};
+	}
 }

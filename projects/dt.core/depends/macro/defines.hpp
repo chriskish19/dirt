@@ -98,8 +98,6 @@ namespace core{
 	using ofstream = std::wofstream;
 }
 
-
-
 #else // ANSI
 
 namespace core {

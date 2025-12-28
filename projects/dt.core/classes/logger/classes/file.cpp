@@ -10,75 +10,66 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_FILELOG_INCLUDE_PATH
 
-core::file::file(const fs::path& folder, const std::string& file_name)
+core::logger::file::file(const fs::path& folder, const std::string& file_name)
 {
 	m_out_file_path = folder / file_name;
 }
 
-core::codes core::file::load()
+core::codes core::logger::file::load()
 {
 	out_file.open(m_out_file_path, std::ios::out | std::ios::trunc);
 
 	if (!out_file.is_open()) {
-		// Handle the error if the file couldn't be opened
-		std::cerr << "Failed to open file: " << m_out_file_path << std::endl;
 		return codes::file_open_fail;
 	}
 
 	return codes::success;
 }
 
-core::codes core::file::write_buffer(std::vector<log>* buffer)
+core::codes core::logger::file::write_buffer(std::vector<log>* buffer)
 {
-	
-	std::string header = api::time_now("FULL BUFFER DUMP!");
-
-	try {
-		out_file << header << '\n';
-	}
-	catch (const std::ios_base::failure& e) {
-		// Handle the write error
-		std::cerr << "Write error: " << e.what() << std::endl;
-		return codes::write_to_file_fail;
-	}
-	
 	for (auto& log : *buffer) {
+#if WIDE
+		std::string message;
+		try {
+			message = api::to_narrow_string(*log.message);
+		}
+		catch (const core::dtapierror& e) {
+			api::output_dtapierror(e);
+		}
+		catch (...) {
+			api::output_cp(unknown_exception_caught_pkg);
+			return core::codes::exception_thrown_and_handled;
+		}
+#else
 		auto& message = *log.message;
-		
+#endif
 		try {
 			out_file << message;
 		}
 		catch (const std::ios_base::failure& e) {
-			// Handle the write error
-			std::cerr << "Write error: " << e.what() << std::endl;
 			return codes::write_to_file_fail;
 		}
+		catch (...) {
+			api::output_cp(unknown_exception_caught_pkg);
+			return core::codes::exception_thrown_and_handled;
+		}
 	}
-	
-	std::string footer = api::time_now("END OF BUFFER DUMP!");
-
-	try {
-		out_file << footer << '\n';
-	}
-	catch (const std::ios_base::failure& e) {
-		// Handle the write error
-		std::cerr << "Write error: " << e.what() << std::endl;
-		return codes::write_to_file_fail;
-	}
-
 
 	return codes::success;
 }
 
-core::codes core::file::write_message(const std::string& message)
+core::codes core::logger::file::write_message(const std::string& message)
 {
 	try {
 		out_file << message;
 	}
 	catch (const std::ios_base::failure& e) {
-		// Handle the write error
-		std::cerr << "Write error: " << e.what() << std::endl;
 		return codes::write_to_file_fail;
+	}
+	catch (...) {
+		api::output_cp(unknown_exception_caught_pkg);
+		return core::codes::exception_thrown_and_handled;
 	}
 	return codes::success;
 }

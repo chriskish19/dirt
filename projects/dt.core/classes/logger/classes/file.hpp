@@ -16,21 +16,23 @@
 
 
 namespace core {
-	class file {
-	public:
-		file() = default;
-		file(const fs::path& folder,const std::string& file_name);
-		
-		// opens file for writing
-		codes load();
+	namespace logger {
+		class file {
+		public:
+			file() = default;
+			file(const fs::path& folder, const std::string& file_name);
 
-		// writes a log buffer to out_file
-		codes write_buffer(std::vector<log>* buffer);
+			// opens file for writing
+			codes load();
 
-		// write a single message to out_file
-		codes write_message(const std::string& message);
-	protected:
-		fs::path m_out_file_path; // full path to out file
-		std::ofstream out_file; // output file stream file object
-	};
+			// writes a log buffer to out_file
+			codes write_buffer(std::vector<log>* buffer);
+
+			// write a single message to out_file
+			codes write_message(const std::string& message);
+		protected:
+			fs::path m_out_file_path; // full path to out file
+			std::ofstream out_file; // output file stream file object
+		};
+	}
 }

@@ -10,7 +10,7 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_WL_INCLUDE_PATH
 
-HWND core::create_window(const window_description& wd) {
+HWND core::logger::create_window(const window_description& wd) {
     /*
 
     HWND CreateWindowExW(
@@ -46,7 +46,7 @@ HWND core::create_window(const window_description& wd) {
     );
 }
 
-core::codes core::register_window(const WNDCLASSEX& wc) {
+core::codes core::logger::register_window(const WNDCLASSEX& wc) {
     ATOM atm = RegisterClassEx(&wc);
 
     if (atm == 0) {
@@ -56,22 +56,22 @@ core::codes core::register_window(const WNDCLASSEX& wc) {
     return codes::success;
 }
 
-LRESULT core::l_window::s_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT core::logger::window::s_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     // reroute to private window proc
-    l_window* p_window_rerouter = nullptr;
+    window* p_window_rerouter = nullptr;
 
     if (uMsg == WM_NCCREATE)
     {
         // Store the pointer to the window instance in the user data associated with the HWND.
         CREATESTRUCT* pCreate = (CREATESTRUCT*)lParam;
-        p_window_rerouter = (l_window*)pCreate->lpCreateParams;
+        p_window_rerouter = (window*)pCreate->lpCreateParams;
         SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)p_window_rerouter);
     }
     else
     {
         // Retrieve the pointer to the window instance from the user data associated with the HWND.
-        p_window_rerouter = (l_window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+        p_window_rerouter = (window*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
     }
 
     if (p_window_rerouter)
@@ -84,7 +84,7 @@ LRESULT core::l_window::s_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
     }
 }
 
-core::codes core::l_window::load()
+core::codes core::logger::window::load()
 {
     if (m_module == nullptr) {
         return codes::handle_nullptr;
@@ -160,7 +160,7 @@ core::codes core::l_window::load()
     return codes::success;
 }
 
-LRESULT core::l_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT core::logger::window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {
     case WM_DESTROY:
@@ -172,22 +172,22 @@ LRESULT core::l_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-core::classic_log_window::classic_log_window()
+core::logger::classic_log_window::classic_log_window()
     :base(LOGGER_LINES)
 {
     
 }
 
-core::classic_log_window::~classic_log_window()
+core::logger::classic_log_window::~classic_log_window()
 {
     
 }
 
-core::codes core::classic_log_window::load()
+core::codes core::logger::classic_log_window::load()
 {
     {
         // call the base function for regular setup
-        codes code = core::l_window::load();
+        codes code = core::logger::window::load();
         if (code != codes::success) {
             return code;
         }
@@ -228,7 +228,7 @@ core::codes core::classic_log_window::load()
     return codes::success;
 }
 
-void core::classic_log_window::thread_go()
+void core::logger::classic_log_window::thread_go()
 {
     {
         codes code = load();
@@ -246,7 +246,7 @@ void core::classic_log_window::thread_go()
     }
 }
 
-core::codes core::classic_log_window::wait_until_init()
+core::codes core::logger::classic_log_window::wait_until_init()
 {
     // wait here
     std::mutex local_mtx;
@@ -259,7 +259,7 @@ core::codes core::classic_log_window::wait_until_init()
     return codes::success;
 }
 
-LRESULT core::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT core::logger::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     
 
     try {
@@ -288,7 +288,8 @@ LRESULT core::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM 
 
                 // Extract font dimensions from the text metrics. 
                 if (GetTextMetrics(hdc, &tm) == FALSE) {
-                    throw core::get_text_metrics_fail_pkg;
+                    std::string location = api::get_location();
+                    throw core::le(get_text_metrics_fail_pkg, location, api::get_last_error_w32());
                 }
 
                 // calculate sizes
@@ -502,26 +503,13 @@ LRESULT core::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM 
             }
         } // end of switch
     }
-    catch (const core::code_pkg& e) {
-        string output = std::format(
-            L"DESCRIPTION: {}\n"
-            L"WINDOWS ERROR: {}\n"
-            L"LOCATION: {}\n",
-            e.m_s_code, e., e.m_loc
-        );
-        OutputDebugString(output.c_str());
+    catch (const core::le& e) {
+        api::output_le(e);
     }
     catch (...) {
-        core::le e(core::codes::unknown_exception_caught, unknown_exception_caught_description);
-        string output = std::format(
-            L"DESCRIPTION: {}\n"
-            L"WINDOWS ERROR: {}\n"
-            L"LOCATION: {}\n",
-            e.m_desc, e.m_w32, e.m_loc
-        );
-        OutputDebugString(output.c_str());
+        api::output_cp(unknown_exception_caught_pkg);
     }
 
 
-    return core::l_window::this_window_proc(hwnd, uMsg, wParam, lParam);
+    return core::logger::window::this_window_proc(hwnd, uMsg, wParam, lParam);
 }

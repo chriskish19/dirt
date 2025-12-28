@@ -20,7 +20,7 @@
 
 
 namespace core {
-	class entry_sim : public queue_system {
+	class entry_sim : public core::backend::queue_system {
 	public:
 		~entry_sim();
 		entry_sim(const std::filesystem::path& test_dir);

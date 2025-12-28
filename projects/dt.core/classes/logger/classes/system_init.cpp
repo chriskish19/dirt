@@ -12,25 +12,27 @@
 
 
 namespace core {
+	namespace logger {
 #if MANUAL_LOGGER
-	core::classic_log_window* log_terminal = nullptr;
-	std::thread* lt_thread = nullptr;
+		core::logger::classic_log_window* log_terminal = nullptr;
+		std::thread* lt_thread = nullptr;
 #else
-	// automatic system logger
-	std::unique_ptr<system_log_window> glb_sl = nullptr;
+		// automatic system logger
+		std::unique_ptr<system_log_window> glb_sl = nullptr;
 #endif
+	}
 }
 
 
 #if MANUAL_LOGGER
-core::codes core::init_system_log()
+core::logger::logger::codes core::logger::logger::init_system_log()
 {
 	try {
-		log_terminal = new core::classic_log_window;
-		lt_thread = new std::thread(&core::classic_log_window::thread_go, log_terminal);
+		log_terminal = new core::logger::logger::classic_log_window;
+		lt_thread = new std::thread(&core::logger::logger::classic_log_window::thread_go, log_terminal);
 		log_terminal->wait_until_init();
 	}
-	catch (const core::le& e) {
+	catch (const core::logger::logger::le& e) {
 		// core error
 		CERROR << ROS("DESCRIPTION: ") << e.m_desc << '\n' <<
 			ROS("WINOWS ERROR: ") << e.m_w32 << '\n' <<
@@ -45,12 +47,12 @@ core::codes core::init_system_log()
 	return codes::success;
 }
 
-void core::log_message(const string& message)
+void core::logger::log_message(const string& message)
 {
 	log_terminal->send_log(message);
 }
 
-core::codes core::exit_system_log()
+core::logger::codes core::logger::exit_system_log()
 {
 	log_terminal->send_log(ROS("waiting for log window to be closed..."));
 	
@@ -73,10 +75,10 @@ core::codes core::exit_system_log()
 
 #else
 
-core::system_log_window::system_log_window()
+core::logger::system_log_window::system_log_window()
 {
 	try {
-		core::classic_log_window::load();
+		core::logger::classic_log_window::load();
 	}
 	catch (const core::le& e) {
 		api::output_le(e);
@@ -88,12 +90,12 @@ core::system_log_window::system_log_window()
 	}
 }
 
-core::system_log_window::~system_log_window(){}
+core::logger::system_log_window::~system_log_window(){}
 
-void core::system_log_window::log_message(const string& message)
+void core::logger::system_log_window::log_message(const string& message)
 {
 	// get current log
-	core::log* log_p = nullptr;
+	core::logger::log* log_p = nullptr;
 	std::size_t index = 0;
 	
 	index = base::get_v_index();

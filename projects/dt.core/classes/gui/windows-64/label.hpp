@@ -11,6 +11,7 @@
 
 #pragma once
 #include CORE_NAMES_INCLUDE
+#include CORE_DEFINES_INCLUDE_PATH
 #include CORE_WIN32_INCLUDE_PATH
 #include CORE_CODES_INCLUDE_PATH
 

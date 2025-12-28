@@ -140,6 +140,19 @@ namespace core {
 
 
 
+    // dt api error
+    class dtapierror : public code_pkg{
+    public:
+        dtapierror(const code_pkg& cp, const std::string& location, const std::string& windows_error)
+            : code_pkg(cp), m_loc(location), m_w32(windows_error) {
+        }
+
+        std::string location() const { return m_loc; }
+        std::string windows_error() const { return m_w32; }
+    protected:
+        std::string m_loc;
+        std::string m_w32;
+    };
 
 
 

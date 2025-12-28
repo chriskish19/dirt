@@ -253,9 +253,11 @@ namespace api {
 
 
 	/*
-		logger errors outputed to the visual studio output window
+		errors outputed to the visual studio output window
 	*/
 	void output_le(const core::le& e);
+	void output_cp(const core::code_pkg& cp);
+	void output_dtapierror(const core::dtapierror& e);
 
 
 	/*

@@ -10,13 +10,13 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_MQSYS_INCLUDE_PATH
 
-core::log_q::log_q()
+core::logger::log_q::log_q()
 {
 	m_log_q = new std::queue<log*>;
 	m_log_q_buffer = new std::queue<log*>;
 }
 
-core::log_q::~log_q()
+core::logger::log_q::~log_q()
 {
 	while (m_log_q->empty() == false) {
 		auto log = m_log_q->front();
@@ -44,13 +44,13 @@ core::log_q::~log_q()
 	}
 }
 
-void core::log_q::add_message(core::log* log)
+void core::logger::log_q::add_message(core::logger::log* log)
 {
 	std::unique_lock<std::mutex> local_lock(m_q_mtx);
 	m_log_q_buffer->push(log);
 }
 
-void core::log_q::exit()
+void core::logger::log_q::exit()
 {
 	m_run_pm.store(false);
 	m_signal_b.store(true);

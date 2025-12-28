@@ -16,7 +16,7 @@
 
 #if ENABLE_API_LOGS
 namespace api {
-	std::unique_ptr<core::system_log> logger = std::make_unique<core::system_log>();
+	std::unique_ptr<core::backend::system_log> logger = std::make_unique<core::backend::system_log>();
 }
 #endif
 
@@ -819,7 +819,8 @@ std::wstring api::to_wide_string(const char* narrow) {
         }
 
         // now we throw an exception after clean up
-        throw core::to_wide_string_failed_pkg;
+		std::string location = get_location();
+        throw core::dtapierror(core::to_wide_string_failed_pkg,location,"");
 
         // returns an empty string
         return {};
@@ -893,7 +894,8 @@ std::wstring api::to_wide_string(const std::string& narrow) {
         }
 
         // now we throw an exception after clean up
-        throw core::to_wide_string_failed_pkg;
+		std::string location = get_location();
+		throw core::dtapierror(core::to_wide_string_failed_pkg, location, "");
 
         // returns an empty string
         return {};
@@ -973,7 +975,9 @@ std::string api::to_narrow_string(const wchar_t* wide) {
         }
 
         // throw an exception on error
-		throw core::to_narrow_string_failed_pkg;
+		std::string location = get_location();
+		throw core::dtapierror(core::to_narrow_string_failed_pkg, location, "");
+
 
         // returns an empty string
         return {};
@@ -1055,7 +1059,8 @@ std::string api::to_narrow_string(const std::wstring& wide) {
         }
 
         // throw an exception on error
-		throw core::to_narrow_string_failed_pkg;
+		std::string location = get_location();
+		throw core::dtapierror(core::to_narrow_string_failed_pkg, location, "");
 
         // returns an empty string
         return {};
@@ -1598,12 +1603,70 @@ void api::output_le(const core::le& e)
 		"DESCRIPTION: {}\n"
 		"WINDOWS ERROR: {}\n"
 		"LOCATION: {}\n",
-		e.location(),
+		e.message(),
 		e.windows_error(),
 		e.location()
 		);
 #if WIDE
 	OutputDebugString(api::to_wide_string(output).c_str());
+#else
+	OutputDebugString(output.c_str());
+#endif
+}
+
+void api::output_cp(const core::code_pkg& cp)
+{
+	std::string output = std::format(
+		"DESCRIPTION: {}\n",
+		cp.message()
+	);
+#if WIDE
+	{
+		core::codes code;
+		OutputDebugString(api::to_wide_string(output, &code).c_str());
+		if (code != core::codes::success) {
+			std::wstring w_output = std::format(
+				L"Problem with api::to_wide_string()\n",
+				L"File: {}\n",
+				L"Line: {}\n",
+				__FILEW__,
+				__LINE__
+			);
+			OutputDebugString(w_output.c_str());
+		}
+	}
+#else
+	OutputDebugString(output.c_str());
+#endif
+}
+
+void api::output_dtapierror(const core::dtapierror& e)
+{
+	std::string output = std::format(
+		"DESCRIPTION: {}\n"
+		"WINDOWS ERROR: {}\n"
+		"LOCATION: {}\n",
+		e.message(),
+		e.windows_error(),
+		e.location()
+	);
+
+#if WIDE
+	{
+		core::codes code;
+		OutputDebugString(api::to_wide_string(output, &code).c_str());
+		if (code != core::codes::success) {
+			std::wstring w_output = std::format(
+				L"Problem with api::to_wide_string()\n",
+				L"File: {}\n",
+				L"Line: {}\n",
+				__FILEW__,
+				__LINE__
+			);
+			OutputDebugString(w_output.c_str());
+		}
+	}
+
 #else
 	OutputDebugString(output.c_str());
 #endif

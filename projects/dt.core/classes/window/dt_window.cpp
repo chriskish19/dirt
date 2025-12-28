@@ -1,8 +1,3 @@
-#include "dt_window.hpp"
-
-#include CORE_NAMES_INCLUDE
-#include CORE_DEFINES_INCLUDE_PATH
-#if UNDER_CONSTRUCTION
 
 /**********************************************************/
 //
@@ -14,15 +9,15 @@
 //
 /**********************************************************/
 
-
+#include CORE_NAMES_INCLUDE
 #include CORE_WINDOW_INCLUDE_PATH
 
-core::starter::starter(const string& class_name)
+core::window::starter::starter(const string& class_name)
 {
     m_c_name = class_name;
 }
 
-LRESULT core::starter::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT core::window::starter::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     // reroute to private window proc
     starter* p_window_rerouter = nullptr;
@@ -50,7 +45,7 @@ LRESULT core::starter::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
     }
 }
 
-LRESULT core::starter::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT core::window::starter::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {
     case WM_DESTROY:
@@ -63,7 +58,7 @@ LRESULT core::starter::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-core::codes core::starter::window_settings()
+core::codes core::window::starter::window_settings()
 {
     m_wc.lpfnWndProc = WindowProc;
     m_wc.hInstance = m_hinst;
@@ -75,7 +70,7 @@ core::codes core::starter::window_settings()
     return core::codes::success;
 }
 
-core::codes core::starter::create_window()
+core::codes core::window::starter::create_window()
 {
     m_window_handle = CreateWindowEx(
         0,                                              // Optional window styles.
@@ -104,7 +99,7 @@ core::codes core::starter::create_window()
     return core::codes::success;
 }
 
-core::codes core::starter::message_pump()
+core::codes core::window::starter::message_pump()
 {
     // Run the message loop.
     MSG msg = { };
@@ -117,7 +112,7 @@ core::codes core::starter::message_pump()
     return core::codes::success;
 }
 
-core::window::window()
+core::window::window::window()
 {
     m_title = ROS("Main Window - CORE DT");
     m_c_name = ROS("MAIN WINDOW");
@@ -159,7 +154,7 @@ core::window::window()
     }
 }
 
-LRESULT core::window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT core::window::window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {
         case WM_SIZING:
@@ -194,7 +189,7 @@ LRESULT core::window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
     return starter::ThisWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-core::codes core::window::add_dynamic_menu(HWND window_handle)
+core::codes core::window::window::add_dynamic_menu(HWND window_handle)
 {
     HMENU hMenu = CreateMenu();
     if (hMenu == nullptr) {
@@ -216,17 +211,17 @@ core::codes core::window::add_dynamic_menu(HWND window_handle)
         return codes::menu_fail;
     }
 
-    if (!AppendMenu(hFileMenu, MF_STRING, static_cast<UINT_PTR>(window_ids::open), L"&Open")) {
+    if (!AppendMenu(hFileMenu, MF_STRING, static_cast<UINT_PTR>(core::gui::window_ids::open), L"&Open")) {
         return codes::menu_fail;
     }
     if (!AppendMenu(hFileMenu, MF_SEPARATOR, 0, nullptr)) {
         return codes::menu_fail;
     }
-    if (!AppendMenu(hFileMenu, MF_STRING, static_cast<UINT_PTR>(window_ids::exit), L"E&xit")) {
+    if (!AppendMenu(hFileMenu, MF_STRING, static_cast<UINT_PTR>(core::gui::window_ids::exit), L"E&xit")) {
         return codes::menu_fail;
     }
 
-    if (!AppendMenu(hHelpMenu, MF_STRING, static_cast<UINT_PTR>(window_ids::help), L"&About")) {
+    if (!AppendMenu(hHelpMenu, MF_STRING, static_cast<UINT_PTR>(core::gui::window_ids::help), L"&About")) {
         return codes::menu_fail;
     }
 
@@ -241,7 +236,7 @@ core::codes core::window::add_dynamic_menu(HWND window_handle)
     }
 
 
-    if (!AppendMenu(hViewMenu, MF_STRING, static_cast<UINT_PTR>(window_ids::show_system_logger), L"&System Logger")) {
+    if (!AppendMenu(hViewMenu, MF_STRING, static_cast<UINT_PTR>(core::gui::window_ids::show_system_logger), L"&System Logger")) {
         return codes::menu_fail;
     }
 
@@ -252,7 +247,7 @@ core::codes core::window::add_dynamic_menu(HWND window_handle)
     return codes::success;
 }
 
-core::codes core::window::set_icon(HWND hwnd, const fs::path& icon_path) {
+core::codes core::window::window::set_icon(HWND hwnd, const fs::path& icon_path) {
     HICON hIcon = (HICON)LoadImage(NULL, icon_path.c_str(), IMAGE_ICON, 0 ,0 , LR_LOADFROMFILE | LR_DEFAULTSIZE);
     
     // Set taskbar icon
@@ -264,50 +259,50 @@ core::codes core::window::set_icon(HWND hwnd, const fs::path& icon_path) {
     return codes::success;
 }
 
-LRESULT core::dt_window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT core::window::dt_window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);  // Extract the menu item ID
         switch (wmId) {
-        case static_cast<int>(window_ids::console):
+        case static_cast<int>(core::gui::window_ids::console):
         {
             break;
         }
 
-        case static_cast<int>(window_ids::b_front):
+        case static_cast<int>(core::gui::window_ids::b_front):
         {
-            m_p_main_ui->m_launch_b.action(button_state::pressed);
+            m_p_main_ui->m_launch_b.action(core::gui::button_state::pressed);
             break;
         }
 
-        case static_cast<int>(window_ids::b_refresh):
+        case static_cast<int>(core::gui::window_ids::b_refresh):
         {
-            m_p_main_ui->m_refresh_b.action(button_state::pressed);
+            m_p_main_ui->m_refresh_b.action(core::gui::button_state::pressed);
             break;
         }
 
-        case static_cast<int>(window_ids::lb_box):
+        case static_cast<int>(core::gui::window_ids::lb_box):
         {
-            m_p_main_ui->m_front_lb.action(static_cast<listbox_commands>(HIWORD(wParam)));
+            m_p_main_ui->m_front_lb.action(static_cast<core::gui::listbox_commands>(HIWORD(wParam)));
             break;
         }
 
-        case static_cast<int>(window_ids::label):
+        case static_cast<int>(core::gui::window_ids::label):
         {
-            m_p_main_ui->m_lb_label.action(static_cast<label_commands>(HIWORD(wParam)));
+            m_p_main_ui->m_lb_label.action(static_cast<core::gui::label_commands>(HIWORD(wParam)));
             break;
         }
 
-        case static_cast<int>(window_ids::show_system_logger):
+        case static_cast<int>(core::gui::window_ids::show_system_logger):
         {
             if (m_show_logger == true) {
-                ShowWindow(logger::glb_sl->get_window_handle(), SW_HIDE);
+                ShowWindow(core::logger::glb_sl->get_window_handle(), SW_HIDE);
                 m_show_logger = false;
             }
             else {
-                ShowWindow(logger::glb_sl->get_window_handle(), SW_SHOW);
+                ShowWindow(core::logger::glb_sl->get_window_handle(), SW_SHOW);
                 m_show_logger = true;
             }
 
@@ -325,5 +320,3 @@ LRESULT core::dt_window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     // no default switch needed
     return window::ThisWindowProc(hwnd, uMsg, wParam, lParam);
 }
-
-#endif

@@ -10,7 +10,9 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_BASE_INCLUDE_PATH
 
-core::base::base(std::size_t nol) {
+
+
+core::logger::base::base(std::size_t nol) {
 	// allocate the logs vector and fill
 	m_logs_v = new std::vector<log*>;
 	m_logs_v->reserve(nol);
@@ -19,7 +21,7 @@ core::base::base(std::size_t nol) {
 	}
 }
 
-core::base::~base()
+core::logger::base::~base()
 {
 	for (auto log : *m_logs_v) {
 		if (log != nullptr) {
@@ -33,7 +35,7 @@ core::base::~base()
 	}
 }
 
-void core::base::set_log(core::log* log_p)
+void core::logger::base::set_log(core::logger::log* log_p)
 {
 	*log_p->message = time_stamped(*log_p->message);
 
@@ -48,7 +50,7 @@ void core::base::set_log(core::log* log_p)
 	}
 }
 
-core::string core::base::time_stamped(const string& message)
+core::string core::logger::base::time_stamped(const string& message)
 {
 	try {
 		auto now = std::chrono::system_clock::now();

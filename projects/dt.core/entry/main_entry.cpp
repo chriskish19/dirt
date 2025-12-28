@@ -1,4 +1,3 @@
-#include "main_entry.hpp"
 
 /**********************************************************/
 //
@@ -15,10 +14,10 @@
 
 
 
-core::backend::backend(const std::vector<arg_entry>& v)
+core::main::backend::backend(const std::vector<arg_entry>& v)
     :process(v){}
 
-core::codes core::backend::run()
+core::codes core::main::backend::run()
 {
     {
         /*
@@ -50,12 +49,12 @@ core::codes core::backend::run()
     return core::codes::success;
 }
 
-void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
+void core::main::terminal_process_commands(std::shared_ptr<core::backend::commands_info> ci)
 {
 	switch (ci->command()) {
-	case commands::error:
+	case core::backend::commands::error:
 	{
-		auto error_info = std::dynamic_pointer_cast<error>(ci);
+		auto error_info = std::dynamic_pointer_cast<core::backend::error>(ci);
 		if (error_info != nullptr) {
 			std::cout << error_info->code.message() << '\n';
 			std::cout << error_info->location << '\n';
@@ -69,9 +68,9 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 		break;
 	}
 
-	case commands::file_system_exception:
+	case core::backend::commands::file_system_exception:
 	{
-		auto exception_info = std::dynamic_pointer_cast<fs_exception>(ci);
+		auto exception_info = std::dynamic_pointer_cast<core::backend::fs_exception>(ci);
 		if (exception_info != nullptr) {
 			std::cout << exception_info->text << '\n';
 		}
@@ -83,9 +82,9 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 		break;
 	}
 
-	case commands::message:
+	case core::backend::commands::message:
 	{
-		auto message_info = std::dynamic_pointer_cast<message>(ci);
+		auto message_info = std::dynamic_pointer_cast<core::backend::message>(ci);
 		if (message_info != nullptr) {
 			std::cout << message_info->text << '\n';
 		}
@@ -97,9 +96,9 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 		break;
 	}
 
-	case commands::time_message:
+	case core::backend::commands::time_message:
 	{
-		auto time_info = std::dynamic_pointer_cast<time>(ci);
+		auto time_info = std::dynamic_pointer_cast<core::backend::time>(ci);
 		if (time_info != nullptr) {
 			std::cout << time_info->text << '\n';
 		}
@@ -111,9 +110,9 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 		break;
 	}
 
-	case commands::unknown_exception:
+	case core::backend::commands::unknown_exception:
 	{
-		auto unknown_exception_info = std::dynamic_pointer_cast<unknown_exception>(ci);
+		auto unknown_exception_info = std::dynamic_pointer_cast<core::backend::unknown_exception>(ci);
 		if (unknown_exception_info != nullptr) {
 			std::cout << unknown_exception_info->code.message() << '\n';
 			std::cout << unknown_exception_info->location << '\n';
@@ -126,9 +125,9 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 		break;
 	}
 
-	case commands::file_copy:
+	case core::backend::commands::file_copy:
 	{
-		auto file_copy_info = std::dynamic_pointer_cast<file_copy>(ci);
+		auto file_copy_info = std::dynamic_pointer_cast<core::backend::file_copy>(ci);
 		if (file_copy_info != nullptr) {
 			std::cout << file_copy_info->code.message() << '\n';
 			std::cout << file_copy_info->text << '\n';
@@ -142,9 +141,9 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 		break;
 	}
 
-	case commands::file_delete:
+	case core::backend::commands::file_delete:
 	{
-		auto file_delete_info = std::dynamic_pointer_cast<file_delete>(ci);
+		auto file_delete_info = std::dynamic_pointer_cast<core::backend::file_delete>(ci);
 		if (file_delete_info != nullptr) {
 			std::cout << file_delete_info->code.message() << '\n';
 			std::cout << file_delete_info->text << '\n';
@@ -158,9 +157,9 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 		break;
 	}
 
-	case commands::directory_delete:
+	case core::backend::commands::directory_delete:
 	{
-		auto directory_delete_info = std::dynamic_pointer_cast<directory_delete>(ci);
+		auto directory_delete_info = std::dynamic_pointer_cast<core::backend::directory_delete>(ci);
 		if (directory_delete_info != nullptr) {
 			std::cout << directory_delete_info->code.message() << '\n';
 			std::cout << directory_delete_info->text << '\n';
@@ -179,7 +178,7 @@ void core::terminal_process_commands(std::shared_ptr<commands_info> ci)
 	}
 }
 
-void core::test_terminal_entry::go() {
+void core::main::test_terminal_entry::go() {
 	std::jthread worker_t(&test_terminal_entry::work, this, FLOOD);
 
 	while (true) {
@@ -194,7 +193,7 @@ void core::test_terminal_entry::go() {
 	}
 }
 
-void core::terminal_entry::go() {
+void core::main::terminal_entry::go() {
 	std::jthread backend_run_t([this] { m_be->run(); });
 
 	while (true) {
@@ -209,7 +208,7 @@ void core::terminal_entry::go() {
 	}
 }
 
-core::codes core::terminal_entry::init() {
+core::codes core::main::terminal_entry::init() {
 	{
 		codes code;
 		m_v = api::cmd_line(m_argc, m_argv, &code);
@@ -233,12 +232,12 @@ core::codes core::terminal_entry::init() {
 	return core::codes::success;
 }
 
-void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_info> ci)
+void core::main::gui_with_terminal_entry::process_commands(std::shared_ptr<core::backend::commands_info> ci)
 {
 	switch (ci->command()) {
-	case commands::error:
+	case core::backend::commands::error:
 	{
-		auto error_info = std::dynamic_pointer_cast<error>(ci);
+		auto error_info = std::dynamic_pointer_cast<core::backend::error>(ci);
 		if (error_info != nullptr) {
 			std::cout << error_info->code.message() << '\n';
 			std::cout << error_info->location << '\n';
@@ -252,9 +251,9 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 		break;
 	}
 
-	case commands::file_system_exception:
+	case core::backend::commands::file_system_exception:
 	{
-		auto exception_info = std::dynamic_pointer_cast<fs_exception>(ci);
+		auto exception_info = std::dynamic_pointer_cast<core::backend::fs_exception>(ci);
 		if (exception_info != nullptr) {
 			std::cout << exception_info->text << '\n';
 		}
@@ -266,9 +265,9 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 		break;
 	}
 
-	case commands::message:
+	case core::backend::commands::message:
 	{
-		auto message_info = std::dynamic_pointer_cast<message>(ci);
+		auto message_info = std::dynamic_pointer_cast<core::backend::message>(ci);
 		if (message_info != nullptr) {
 			std::cout << message_info->text << '\n';
 		}
@@ -280,9 +279,9 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 		break;
 	}
 
-	case commands::time_message:
+	case core::backend::commands::time_message:
 	{
-		auto time_info = std::dynamic_pointer_cast<time>(ci);
+		auto time_info = std::dynamic_pointer_cast<core::backend::time>(ci);
 		if (time_info != nullptr) {
 			std::cout << time_info->text << '\n';
 		}
@@ -294,9 +293,9 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 		break;
 	}
 
-	case commands::unknown_exception:
+	case core::backend::commands::unknown_exception:
 	{
-		auto unknown_exception_info = std::dynamic_pointer_cast<unknown_exception>(ci);
+		auto unknown_exception_info = std::dynamic_pointer_cast<core::backend::unknown_exception>(ci);
 		if (unknown_exception_info != nullptr) {
 			std::cout << unknown_exception_info->code.message() << '\n';
 			std::cout << unknown_exception_info->location << '\n';
@@ -309,9 +308,9 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 		break;
 	}
 
-	case commands::file_copy:
+	case core::backend::commands::file_copy:
 	{
-		auto file_copy_info = std::dynamic_pointer_cast<file_copy>(ci);
+		auto file_copy_info = std::dynamic_pointer_cast<core::backend::file_copy>(ci);
 		if (file_copy_info != nullptr) {
 			std::cout << file_copy_info->code.message() << '\n';
 			std::cout << file_copy_info->text << '\n';
@@ -325,9 +324,9 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 		break;
 	}
 
-	case commands::file_delete:
+	case core::backend::commands::file_delete:
 	{
-		auto file_delete_info = std::dynamic_pointer_cast<file_delete>(ci);
+		auto file_delete_info = std::dynamic_pointer_cast<core::backend::file_delete>(ci);
 		if (file_delete_info != nullptr) {
 			std::cout << file_delete_info->code.message() << '\n';
 			std::cout << file_delete_info->text << '\n';
@@ -341,9 +340,9 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 		break;
 	}
 
-	case commands::directory_delete:
+	case core::backend::commands::directory_delete:
 	{
-		auto directory_delete_info = std::dynamic_pointer_cast<directory_delete>(ci);
+		auto directory_delete_info = std::dynamic_pointer_cast<core::backend::directory_delete>(ci);
 		if (directory_delete_info != nullptr) {
 			std::cout << directory_delete_info->code.message() << '\n';
 			std::cout << directory_delete_info->text << '\n';
@@ -362,139 +361,139 @@ void core::gui_with_terminal_entry::process_commands(std::shared_ptr<commands_in
 	}
 }
 
-void core::gui_entry::gui_process_commands(std::shared_ptr<commands_info> ci)
+void core::main::gui_entry::gui_process_commands(std::shared_ptr<core::backend::commands_info> ci)
 {
 	switch (ci->command())
 	{
-	case commands::error:
+	case core::backend::commands::error:
 	{
-		auto error_info = std::dynamic_pointer_cast<error>(ci);
+		auto error_info = std::dynamic_pointer_cast<core::backend::error>(ci);
 		if (error_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(error_info->code.message()));
-			core::glb_sl->log_message(api::to_wide_string(error_info->location));
-			core::glb_sl->log_message(api::to_wide_string(
+			core::logger::glb_sl->log_message(api::to_wide_string(error_info->code.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(error_info->location));
+			core::logger::glb_sl->log_message(api::to_wide_string(
 				api::time_to_string(error_info->time_tp)));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
 
-	case commands::file_system_exception:
+	case core::backend::commands::file_system_exception:
 	{
-		auto exception_info = std::dynamic_pointer_cast<fs_exception>(ci);
+		auto exception_info = std::dynamic_pointer_cast<core::backend::fs_exception>(ci);
 		if (exception_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(exception_info->text));
+			core::logger::glb_sl->log_message(api::to_wide_string(exception_info->text));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
 
-	case commands::message:
+	case core::backend::commands::message:
 	{
-		auto message_info = std::dynamic_pointer_cast<message>(ci);
+		auto message_info = std::dynamic_pointer_cast<core::backend::message>(ci);
 		if (message_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(message_info->text));
+			core::logger::glb_sl->log_message(api::to_wide_string(message_info->text));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
 
-	case commands::time_message:
+	case core::backend::commands::time_message:
 	{
-		auto time_info = std::dynamic_pointer_cast<time>(ci);
+		auto time_info = std::dynamic_pointer_cast<core::backend::time>(ci);
 		if (time_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(time_info->text));
+			core::logger::glb_sl->log_message(api::to_wide_string(time_info->text));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
 
-	case commands::unknown_exception:
+	case core::backend::commands::unknown_exception:
 	{
-		auto unknown_exception_info = std::dynamic_pointer_cast<unknown_exception>(ci);
+		auto unknown_exception_info = std::dynamic_pointer_cast<core::backend::unknown_exception>(ci);
 		if (unknown_exception_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(unknown_exception_info->code.message()));
-			core::glb_sl->log_message(api::to_wide_string(unknown_exception_info->location));
+			core::logger::glb_sl->log_message(api::to_wide_string(unknown_exception_info->code.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(unknown_exception_info->location));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
 
-	case commands::file_copy:
+	case core::backend::commands::file_copy:
 	{
-		auto file_copy_info = std::dynamic_pointer_cast<file_copy>(ci);
+		auto file_copy_info = std::dynamic_pointer_cast<core::backend::file_copy>(ci);
 		if (file_copy_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(file_copy_info->code.message()));
-			core::glb_sl->log_message(api::to_wide_string(file_copy_info->text));
-			core::glb_sl->log_message(api::to_wide_string(
+			core::logger::glb_sl->log_message(api::to_wide_string(file_copy_info->code.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(file_copy_info->text));
+			core::logger::glb_sl->log_message(api::to_wide_string(
 				api::time_to_string(file_copy_info->time_tp)));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
 
-	case commands::file_delete:
+	case core::backend::commands::file_delete:
 	{
-		auto file_delete_info = std::dynamic_pointer_cast<file_delete>(ci);
+		auto file_delete_info = std::dynamic_pointer_cast<core::backend::file_delete>(ci);
 		if (file_delete_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(file_delete_info->code.message()));
-			core::glb_sl->log_message(api::to_wide_string(file_delete_info->text));
-			core::glb_sl->log_message(api::to_wide_string(
+			core::logger::glb_sl->log_message(api::to_wide_string(file_delete_info->code.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(file_delete_info->text));
+			core::logger::glb_sl->log_message(api::to_wide_string(
 				api::time_to_string(file_delete_info->time_tp)));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
 
-	case commands::directory_delete:
+	case core::backend::commands::directory_delete:
 	{
-		auto directory_delete_info = std::dynamic_pointer_cast<directory_delete>(ci);
+		auto directory_delete_info = std::dynamic_pointer_cast<core::backend::directory_delete>(ci);
 		if (directory_delete_info != nullptr)
 		{
-			core::glb_sl->log_message(api::to_wide_string(directory_delete_info->code.message()));
-			core::glb_sl->log_message(api::to_wide_string(directory_delete_info->text));
-			core::glb_sl->log_message(api::to_wide_string(
+			core::logger::glb_sl->log_message(api::to_wide_string(directory_delete_info->code.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(directory_delete_info->text));
+			core::logger::glb_sl->log_message(api::to_wide_string(
 				api::time_to_string(directory_delete_info->time_tp)));
 		}
 		else
 		{
-			core::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
-			core::glb_sl->log_message(api::to_wide_string(api::get_location()));
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
 		}
 		break;
 	}
