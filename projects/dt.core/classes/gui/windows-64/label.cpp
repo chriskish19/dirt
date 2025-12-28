@@ -1,7 +1,3 @@
-#pragma once
-#include CORE_NAMES_INCLUDE
-#include CORE_DEFINES_INCLUDE_PATH
-#if UNDER_CONSTRUCTION
 
 /***********************************************
 *
@@ -13,16 +9,17 @@
 *
 ************************************************/
 
-
+#pragma once
+#include CORE_NAMES_INCLUDE
 #include CORE_LABEL_INCLUDE_PATH
 
-core::label::label(label_description ld)
+core::gui::label::label(label_description ld)
 	:m_ld(ld)
 {
 
 }
 
-core::codes core::label::create() {
+core::codes core::gui::label::create() {
 	/*
 
 				HWND CreateWindowW(
@@ -62,9 +59,7 @@ core::codes core::label::create() {
 	return codes::success;
 }
 
-void core::label::action(label_commands command) {
+void core::gui::label::action(label_commands command) {
 	m_command = command;
 	m_ld.label_caller(command);
 }
-
-#endif

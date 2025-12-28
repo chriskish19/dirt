@@ -1,9 +1,4 @@
 
-#include CORE_NAMES_INCLUDE
-#include CORE_DEFINES_INCLUDE_PATH
-#if UNDER_CONSTRUCTION
-
-
 /***********************************************
 *
 * File: ui.cpp
@@ -14,10 +9,10 @@
 *
 ************************************************/
 
-
+#include CORE_NAMES_INCLUDE
 #include CORE_UI_INCLUDE_PATH
 
-core::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
+core::gui::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
 {
 
     // front button setup
@@ -69,7 +64,7 @@ core::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
 	m_lb_label.create();
 
 }
-void core::ui::front_button_action(button_state bs)
+void core::gui::ui::front_button_action(button_state bs)
 {
 	switch (bs) {
 		case button_state::rest:
@@ -98,7 +93,7 @@ void core::ui::front_button_action(button_state bs)
 	}
 }
 
-void core::ui::refresh_button_action(button_state bs)
+void core::gui::ui::refresh_button_action(button_state bs)
 {
 	switch (bs) {
 	    case button_state::rest:
@@ -127,7 +122,7 @@ void core::ui::refresh_button_action(button_state bs)
 	}
 }
 
-void core::ui::front_listbox_action(listbox_commands lc) {
+void core::gui::ui::front_listbox_action(listbox_commands lc) {
     switch (lc) {
 		case listbox_commands::error_space:
 		{
@@ -174,7 +169,7 @@ void core::ui::front_listbox_action(listbox_commands lc) {
     } // end of switch(lc)
 }
 
-void core::ui::lb_label_action(label_commands command)
+void core::gui::ui::lb_label_action(label_commands command)
 {
 	switch (command) {
 		case label_commands::clicked:
@@ -203,6 +198,3 @@ void core::ui::lb_label_action(label_commands command)
 
 	} // end of switch(command)
 }
-
-
-#endif

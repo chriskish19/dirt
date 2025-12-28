@@ -1,9 +1,4 @@
 
-#include CORE_NAMES_INCLUDE
-#include CORE_DEFINES_INCLUDE_PATH
-#if UNDER_CONSTRUCTION
-
-
 /***********************************************
 *
 * File: textbox.cpp
@@ -14,14 +9,14 @@
 *
 ************************************************/
 
-
+#include CORE_NAMES_INCLUDE
 #include CORE_TEXTBOX_INCLUDE_PATH
 
 
-core::textbox::textbox(textbox_description td)
+core::gui::textbox::textbox(textbox_description td)
 	:m_td(td){}
 
-core::codes core::textbox::create() {
+core::codes core::gui::textbox::create() {
 	/*
 
 				HWND CreateWindowW(
@@ -61,9 +56,9 @@ core::codes core::textbox::create() {
 	return core::codes::success;
 }
 
-void core::textbox::action(textbox_commands command) {
+void core::gui::textbox::action(textbox_commands command) {
 	m_command = command;
 	m_td.textbox_caller(command);
 }
 
-#endif
+

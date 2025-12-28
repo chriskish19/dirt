@@ -23,11 +23,7 @@
 #include CORE_UI_INCLUDE_PATH
 #include CORE_DEFINES_INCLUDE_PATH
 #include CORE_TOUT_INCLUDE_PATH
-
-
-// Logging Window Library
-#include LOGGER_NAMES_INCLUDE
-#include LOGGER_ALL_LOGS_INCLUDE_PATH
+#include CORE_SYSINIT_INCLUDE_PATH
 
 
 namespace core {
@@ -130,7 +126,7 @@ namespace core {
 
 	protected:
 		void exit() {
-			DestroyWindow(logger::glb_sl->get_window_handle());
+			DestroyWindow(core::glb_sl->get_window_handle());
 			m_be->m_run_watch.store(false);
 			m_run_backend_messages.store(false);
 			PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, m_be->m_completionKey, m_be->m_pOverlapped);
@@ -195,7 +191,7 @@ namespace core {
 		
 	protected:
 		void exit() {
-			DestroyWindow(logger::glb_sl->get_window_handle());
+			DestroyWindow(core::glb_sl->get_window_handle());
 			m_be->m_run_watch.store(false);
 			m_run_backend_messages.store(false);
 			PostQueuedCompletionStatus(m_be->m_hCompletionPort, 0, m_be->m_completionKey, m_be->m_pOverlapped);
@@ -204,7 +200,7 @@ namespace core {
 		void gui_process_commands(std::shared_ptr<commands_info> ci);
 
 		void backend_messages() {
-			window_loading_bar progress(logger::glb_sl->get_window_handle(), L"Processing...");
+			window_loading_bar progress(core::glb_sl->get_window_handle(), L"Processing...");
 
 			while (m_run_backend_messages.load() == true) {
 				// timer here, seconds to wait time

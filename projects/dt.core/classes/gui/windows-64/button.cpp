@@ -1,7 +1,3 @@
-#include CORE_NAMES_INCLUDE
-#include CORE_DEFINES_INCLUDE_PATH
-#if UNDER_CONSTRUCTION
-
 
 /***********************************************
 *
@@ -13,17 +9,17 @@
 *
 ************************************************/
 
-
+#include CORE_NAMES_INCLUDE
 #include CORE_BUTTON_INCLUDE_PATH
 
 
-core::button::button(button_description bd)
+core::gui::button::button(button_description bd)
 	:m_bd(bd)
 {
 
 }
 
-core::codes core::button::create()
+core::codes core::gui::button::create()
 {
 	/*
 	
@@ -64,7 +60,7 @@ core::codes core::button::create()
 	return core::codes::success;
 }
 
-void core::button::action(button_state bs)
+void core::gui::button::action(button_state bs)
 {
 	m_b_state = bs;
 	m_bd.button_caller(bs);
@@ -98,5 +94,3 @@ switch (bs) {
 	}
 
 */
-
-#endif

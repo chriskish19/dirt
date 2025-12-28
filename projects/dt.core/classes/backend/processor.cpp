@@ -11,18 +11,18 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_PROCESSOR_INCLUDE_PATH
 
-core::process::process(const std::vector<arg_entry>& entry_v)
+core::backend::process::process(const std::vector<arg_entry>& entry_v)
 {
     m_watch_entries_v = api::get_specific_entries(entry_v,args::watch);
     m_copy_entries_v = api::get_specific_entries(entry_v, args::copy);
 }
 
-core::process::~process()
+core::backend::process::~process()
 {
     clean_up();
 }
 
-core::codes core::process::process_entry()
+core::codes core::backend::process::process_entry()
 {
     {
         codes code = process_copy_entries();
@@ -42,7 +42,7 @@ core::codes core::process::process_entry()
     return codes::success;
 }
 
-core::codes core::process::watch()
+core::codes core::backend::process::watch()
 {
     std::jthread queue_sys_t(&queue_system::process_entry, this);
     
@@ -108,7 +108,7 @@ core::codes core::process::watch()
     return codes::success;
 }
 
-core::codes core::process::process_watch_entries()
+core::codes core::backend::process::process_watch_entries()
 {
     m_hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
     if (m_hIOCP == nullptr) {
@@ -164,7 +164,7 @@ core::codes core::process::process_watch_entries()
     return codes::success;
 }
 
-core::codes core::process::process_copy_entries()
+core::codes core::backend::process::process_copy_entries()
 {
     std::vector<codes> errors;
     
@@ -245,7 +245,7 @@ core::codes core::process::process_copy_entries()
     return codes::success;
 }
 
-core::file_action core::process::convert_action(DWORD action)
+core::file_action core::backend::process::convert_action(DWORD action)
 {
     switch (action) {
     case FILE_ACTION_ADDED:
@@ -263,7 +263,7 @@ core::file_action core::process::convert_action(DWORD action)
     }
 }
 
-core::directory_completed_action core::process::convert_directory_action(DWORD action)
+core::directory_completed_action core::backend::process::convert_directory_action(DWORD action)
 {
     switch (action) {
     case FILE_ACTION_ADDED:
@@ -279,7 +279,7 @@ core::directory_completed_action core::process::convert_directory_action(DWORD a
     }
 }
 
-void core::process::clean_up()
+void core::backend::process::clean_up()
 {
     for (auto handle : m_file_handle_v) {
         CloseHandle(handle);
@@ -312,10 +312,10 @@ void core::process::clean_up()
     */
 }
 
-void core::queue_system::process_entry()
+void core::backend::queue_system::process_entry()
 {
     // background queue system thread
-    std::jthread bqs_t(&core::queue_system::delayed_process_entry, this);
+    std::jthread bqs_t(&core::backend::queue_system::delayed_process_entry, this);
 
     while (m_runner.load() == true) {
         
@@ -345,7 +345,7 @@ void core::queue_system::process_entry()
             // must make a copy!! this block goes out of scope by main thread
             // process_queue makes a copy...
             for (const auto& q : fe_qv) {
-                pq_tv.push_back(std::thread(&core::queue_system::process_queue, this, q));
+                pq_tv.push_back(std::thread(&core::backend::queue_system::process_queue, this, q));
             }
         }
         else {
@@ -371,13 +371,13 @@ void core::queue_system::process_entry()
     exit_dpe();
 }
 
-void core::queue_system::add_entry(const file_entry& entry)
+void core::backend::queue_system::add_entry(const file_entry& entry)
 {
     std::unique_lock<std::mutex> local_lock(m_queue_mtx);
     m_entry_q.emplace(entry);
 }
 
-void core::queue_system::regular_file(file_entry& entry)
+void core::backend::queue_system::regular_file(file_entry& entry)
 {
     switch (entry.action) {
     case file_action::copy:
@@ -496,7 +496,7 @@ void core::queue_system::regular_file(file_entry& entry)
     } // switch end
 }
 
-void core::queue_system::directory(file_entry& entry)
+void core::backend::queue_system::directory(file_entry& entry)
 {
     switch (entry.action) {
     case file_action::copy:
@@ -623,7 +623,7 @@ void core::queue_system::directory(file_entry& entry)
 
 }
 
-void core::queue_system::not_found(file_entry& entry)
+void core::backend::queue_system::not_found(file_entry& entry)
 {
     std::filesystem::file_status d_fs;
     try {
@@ -677,7 +677,7 @@ void core::queue_system::not_found(file_entry& entry)
     }
 }
 
-void core::queue_system::rename(file_entry& entry)
+void core::backend::queue_system::rename(file_entry& entry)
 {
     try {
         std::filesystem::path old_file_name = m_old_name.filename();
@@ -698,7 +698,7 @@ void core::queue_system::rename(file_entry& entry)
     }
 }
 
-void core::queue_system::background_task(const file_entry& entry)
+void core::backend::queue_system::background_task(const file_entry& entry)
 {
     switch (entry.completed_action) {
     case directory_completed_action::recursive_copy:
@@ -771,7 +771,7 @@ void core::queue_system::background_task(const file_entry& entry)
     }
 }
 
-void core::queue_system::filesystem_ec(const std::filesystem::filesystem_error& e, const file_entry& entry)
+void core::backend::queue_system::filesystem_ec(const std::filesystem::filesystem_error& e, const file_entry& entry)
 {
     switch (e.code().value()) {
     case static_cast<int>(std::errc::no_such_file_or_directory):
@@ -807,7 +807,7 @@ void core::queue_system::filesystem_ec(const std::filesystem::filesystem_error& 
     }
 }
 
-void core::queue_system::switch_entry_type(file_entry& entry)
+void core::backend::queue_system::switch_entry_type(file_entry& entry)
 {
     switch (entry.src_s.type())
     {
@@ -847,7 +847,7 @@ void core::queue_system::switch_entry_type(file_entry& entry)
     }
 }
 
-void core::queue_system::exit_process_entry()
+void core::backend::queue_system::exit_process_entry()
 {
     // signal queue system to finish
     m_launch_b.store(true);
@@ -857,7 +857,7 @@ void core::queue_system::exit_process_entry()
     m_runner.store(false);
 }
 
-void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
+void core::backend::queue_system::process_queue(std::queue<file_entry> buffer_q)
 {
     add(time{ "In process queue about to process " + std::to_string(buffer_q.size()) + (buffer_q.size() < 2 ? " file notification" : " file notifications")});
     
@@ -883,7 +883,7 @@ void core::queue_system::process_queue(std::queue<file_entry> buffer_q)
     add(time{ "Done. Processed " + std::to_string(q_size) + (q_size < 2 ? " file notification" : " file notifications") });
 }
 
-bool core::queue_system::skip_entry(file_entry& entry)
+bool core::backend::queue_system::skip_entry(file_entry& entry)
 {
     auto set = entry.p_di_set;
     std::filesystem::path partial_path;
@@ -905,7 +905,7 @@ bool core::queue_system::skip_entry(file_entry& entry)
     return false;
 }
 
-void core::background_queue_system::regular_file(file_entry& entry)
+void core::backend::background_queue_system::regular_file(file_entry& entry)
 {
     switch (entry.action) {
     case file_action::copy:
@@ -1035,7 +1035,7 @@ void core::background_queue_system::regular_file(file_entry& entry)
     } // switch end
 }
 
-void core::background_queue_system::directory(file_entry& entry)
+void core::backend::background_queue_system::directory(file_entry& entry)
 {
     switch (entry.action) {
     case file_action::copy:
@@ -1168,7 +1168,7 @@ void core::background_queue_system::directory(file_entry& entry)
     } // switch end
 }
 
-void core::background_queue_system::not_found(file_entry& entry)
+void core::backend::background_queue_system::not_found(file_entry& entry)
 {
     std::filesystem::file_status d_fs;
     try {
@@ -1223,7 +1223,7 @@ void core::background_queue_system::not_found(file_entry& entry)
     }
 }
 
-void core::background_queue_system::rename(file_entry& entry)
+void core::backend::background_queue_system::rename(file_entry& entry)
 {
     try {
         std::filesystem::path old_file_name = m_old_name.filename();
@@ -1244,7 +1244,7 @@ void core::background_queue_system::rename(file_entry& entry)
     }
 }
 
-void core::background_queue_system::background_task(const file_entry& entry)
+void core::backend::background_queue_system::background_task(const file_entry& entry)
 {
     switch (entry.completed_action) {
     case directory_completed_action::recursive_copy:
@@ -1317,7 +1317,7 @@ void core::background_queue_system::background_task(const file_entry& entry)
     }
 }
 
-void core::background_queue_system::switch_entry_type(file_entry& entry)
+void core::backend::background_queue_system::switch_entry_type(file_entry& entry)
 {
     switch (entry.src_s.type())
     {
@@ -1357,7 +1357,7 @@ void core::background_queue_system::switch_entry_type(file_entry& entry)
     }
 }
 
-void core::background_queue_system::delayed_process_entry()
+void core::backend::background_queue_system::delayed_process_entry()
 {
     while (m_run_dpe.load() == true) {
         
@@ -1386,13 +1386,13 @@ void core::background_queue_system::delayed_process_entry()
     }
 }
 
-void core::background_queue_system::add_delayed_entry(const file_entry& entry)
+void core::backend::background_queue_system::add_delayed_entry(const file_entry& entry)
 {
     std::unique_lock<std::mutex> local_lock(m_dq_mtx);
     m_delayed_q.emplace(entry);
 }
 
-void core::background_queue_system::filesystem_ec(const std::filesystem::filesystem_error& e, const file_entry& entry)
+void core::backend::background_queue_system::filesystem_ec(const std::filesystem::filesystem_error& e, const file_entry& entry)
 {
     switch (e.code().value()) {
     case static_cast<int>(std::errc::no_such_file_or_directory):
@@ -1428,7 +1428,7 @@ void core::background_queue_system::filesystem_ec(const std::filesystem::filesys
     }
 }
 
-void core::background_queue_system::exit_dpe()
+void core::backend::background_queue_system::exit_dpe()
 {
     // exit the while loop
     m_run_dpe.store(false);

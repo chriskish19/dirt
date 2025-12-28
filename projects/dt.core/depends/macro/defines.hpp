@@ -70,6 +70,8 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 	Strings
 */
 #define MAX_STRING 512
+#define LB_MAX_STRING 256
+
 
 /*
 	handle unicode strings/ ansi string types

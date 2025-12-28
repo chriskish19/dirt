@@ -24,22 +24,18 @@ namespace api {
 
 std::vector<std::string> api::convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc)
 {
-	std::vector<std::string> utf8_args;
-	utf8_args.reserve(argc);
+	std::vector<std::string> narrow_args;
 
 	for (int i = 0; i < argc; ++i)
 	{
-		int size_needed = WideCharToMultiByte(CP_UTF8, 0, wide_argv[i], -1, nullptr, 0, nullptr, nullptr);
-		std::string str(size_needed - 1, 0);
-		WideCharToMultiByte(CP_UTF8, 0, wide_argv[i], -1, &str[0], size_needed, nullptr, nullptr);
-		utf8_args.emplace_back(std::move(str));
+		narrow_args.push_back(api::to_narrow_string(wide_argv[i]));
 	}
 
 	LocalFree(wide_argv);
-	return utf8_args;
+	return narrow_args;
 }
 
-std::string api::time_to_string(const std::chrono::system_clock::time_point& time)
+std::string api::terminal_time_to_string(const std::chrono::system_clock::time_point& time)
 {
 	try {
 		std::string time = std::format("{}[{}]{}", BRIGHT_GREEN, time , DEFAULT_COLOR);
@@ -191,7 +187,7 @@ core::code_pkg api::match_code(core::codes code)
 }
 
 void api::output_em(const core::code_pkg cp, const std::string location) {
-	std::string message = std::format("{}\n{}\n", cp.m_s_code, location);
+	std::string message = std::format("{}\n{}\n", cp.message(), location);
 
 #if ENABLE_API_LOGS
 	api::logger->log_message(message);
@@ -1578,6 +1574,39 @@ std::string api::time_now(const std::string& message) {
 	}
 	// exception thrown we return nothing
 	return {};
+}
+
+std::string api::time_to_string(const std::chrono::system_clock::time_point& time)
+{
+	try {
+		std::string time = std::format("[{}]", time);
+		return time;
+	}
+	catch (const std::exception& e) {
+		output_em(core::exception_thrown_and_handled_pkg);
+	}
+	catch (...) {
+		output_em(core::unknown_exception_caught_pkg);
+	}
+	// exception thrown we return nothing
+	return {};
+}
+
+void api::output_le(const core::le& e)
+{
+	std::string output = std::format(
+		"DESCRIPTION: {}\n"
+		"WINDOWS ERROR: {}\n"
+		"LOCATION: {}\n",
+		e.location(),
+		e.windows_error(),
+		e.location()
+		);
+#if WIDE
+	OutputDebugString(api::to_wide_string(output).c_str());
+#else
+	OutputDebugString(output.c_str());
+#endif
 }
 
 

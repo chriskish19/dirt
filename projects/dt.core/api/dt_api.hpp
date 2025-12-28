@@ -23,14 +23,8 @@ namespace api {
 
 
 #if ENABLE_API_LOGS
-	extern std::unique_ptr<core::system_log> logger;
+	extern std::unique_ptr<core::backend::system_log> logger;
 #endif
-
-
-	/*
-		convert wWinMain command line argvs from wide to narrow strings
-	*/
-	std::vector<std::string> convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc);
 
 
 	/* 
@@ -228,7 +222,6 @@ namespace api {
 	std::string to_narrow_string(const std::wstring& wide);
 	
 	
-	
 	/*
 	 	String conversions:
 		
@@ -249,11 +242,24 @@ namespace api {
 	core::codes validate(std::vector<core::arg_entry>& v);
 	std::vector<core::arg_entry> cmd_line(const std::vector<std::string>& v, core::codes* code);
 
+
 	/*
 		time
 	*/
 	std::string terminal_time_now(const std::string& message);
-	std::string time_to_string(const std::chrono::system_clock::time_point& time);
+	std::string terminal_time_to_string(const std::chrono::system_clock::time_point& time);
 	std::string time_now(const std::string& message);
+	std::string time_to_string(const std::chrono::system_clock::time_point& time);
 
+
+	/*
+		logger errors outputed to the visual studio output window
+	*/
+	void output_le(const core::le& e);
+
+
+	/*
+		convert wWinMain command line argvs from wide to narrow strings
+	*/
+	std::vector<std::string> convert_cmdline_args_to_utf8(LPWSTR* wide_argv, int argc);
 }

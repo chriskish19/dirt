@@ -1,9 +1,4 @@
 
-#include CORE_NAMES_INCLUDE
-#include CORE_DEFINES_INCLUDE_PATH
-#if UNDER_CONSTRUCTION
-
-
 /***********************************************
 *
 * File: listbox.cpp
@@ -14,19 +9,19 @@
 *
 ************************************************/
 
-
+#include CORE_NAMES_INCLUDE
 #include CORE_LISTBOX_INCLUDE_PATH
 
 
-core::listbox::listbox(listbox_description lbd)
+core::gui::listbox::listbox(listbox_description lbd)
 	:m_lbd(lbd) {}
 
-void core::listbox::action(listbox_commands command) {
+void core::gui::listbox::action(listbox_commands command) {
 	m_command = command;
 	m_lbd.listbox_caller(command);
 }
 
-core::codes core::listbox::create() {
+core::codes core::gui::listbox::create() {
 	
 	/*
 	
@@ -68,7 +63,7 @@ core::codes core::listbox::create() {
 	return core::codes::success;
 }
 
-core::codes core::listbox::add_string(const string& list_message) {
+core::codes core::gui::listbox::add_string(const string& list_message) {
 	LRESULT result = SendMessage(m_lb_handle, LB_ADDSTRING, 0, (LPARAM)list_message.c_str());
 	if (result == LB_ERR) {
 		return core::codes::lb_add_string_fail;
@@ -76,7 +71,7 @@ core::codes core::listbox::add_string(const string& list_message) {
 	return core::codes::success;
 }
 
-core::string core::listbox::get_selection(core::codes* code) {
+core::string core::gui::listbox::get_selection(core::codes* code) {
 	int index = SendMessage(m_lb_handle, LB_GETCURSEL, 0, 0);
 	std::vector<character> display_line(LB_MAX_STRING);
 	display_line[LB_MAX_STRING-1] = ROS('\0'); // null terminate
@@ -90,5 +85,3 @@ core::string core::listbox::get_selection(core::codes* code) {
 		return string{};
 	}
 }
-
-#endif

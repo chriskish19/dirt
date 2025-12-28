@@ -79,22 +79,16 @@ core::system_log_window::system_log_window()
 		core::classic_log_window::load();
 	}
 	catch (const core::le& e) {
-		string output = ROS("DESCRIPTION: ") + e.m_desc + ROS('\n') + ROS("WINDOWS ERROR: ") + e.m_w32
-			+ ROS('\n') + ROS("LOCATION: ") + e.m_loc + ROS('\n');
-		OutputDebugString(output.c_str());
+		api::output_le(e);
 	}
 	catch (...) {
-		core::le e(core::codes::unknown_exception_caught, unknown_exception_caught_description);
-		string output = ROS("DESCRIPTION: ") + e.m_desc + ROS('\n') + ROS("WINDOWS ERROR: ") + e.m_w32
-			+ ROS('\n') + ROS("LOCATION: ") + e.m_loc + ROS('\n');
-		OutputDebugString(output.c_str());
+		std::string location = api::get_location();
+		core::le e(unknown_exception_caught_pkg,location, api::get_last_error_w32());
+		api::output_le(e);
 	}
 }
 
-core::system_log_window::~system_log_window()
-{	
-
-}
+core::system_log_window::~system_log_window(){}
 
 void core::system_log_window::log_message(const string& message)
 {
