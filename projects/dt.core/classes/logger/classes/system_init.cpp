@@ -77,7 +77,7 @@ core::logger::codes core::logger::exit_system_log()
 core::logger::system_log_window::system_log_window()
 {
 	try {
-		core::logger::classic_log_window::load();
+		core::logger::log_window::load();
 	}
 	catch (const core::le& e) {
 		api::output_le(e);
@@ -97,18 +97,12 @@ void core::logger::system_log_window::log_message(const string& message)
 	core::logger::log* log_p = nullptr;
 	std::size_t index = 0;
 	
-	istringstream iss(message);
-	string line;
-	while (std::getline(iss, line)) {
-		index = base::get_v_index();
-		log_p = base::get_buffer()->at(index);
-		*log_p->message = line;
-		base::set_log(log_p);
-	}
+	index = base::get_v_index();
+	log_p = base::get_buffer()->at(index);
+	*log_p->message = message;
+	base::set_log(log_p);
 	
-
-	InvalidateRect(m_handle, nullptr, false);
-	UpdateWindow(m_handle);
+	AppendText(m_p_main_ui->m_output_tb.get_textbox_handle(), message.c_str());
 }
 
 #endif

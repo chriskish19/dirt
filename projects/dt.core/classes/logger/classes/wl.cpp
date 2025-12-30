@@ -1,3 +1,4 @@
+#include "wl.hpp"
 /**********************************************************/
 //
 // File: wl.cpp (window logger)
@@ -179,10 +180,7 @@ core::logger::classic_log_window::classic_log_window()
     
 }
 
-core::logger::classic_log_window::~classic_log_window()
-{
-    
-}
+core::logger::classic_log_window::~classic_log_window(){}
 
 core::codes core::logger::classic_log_window::load()
 {
@@ -342,7 +340,7 @@ LRESULT core::logger::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg,
                 si.nMax = 2 + m_xClientMax / m_xChar;
                 si.nPage = m_xClient / m_xChar;
                 SetScrollInfo(hwnd, SB_HORZ, &si, TRUE);
-                
+
                 return 0;
             }
 
@@ -501,6 +499,91 @@ LRESULT core::logger::classic_log_window::this_window_proc(HWND hwnd, UINT uMsg,
                 // Indicate that painting is finished.
                 EndPaint(hwnd, &ps);
                 return 0;
+            }
+        } // end of switch
+    }
+    catch (const core::le& e) {
+        api::output_le(e);
+    }
+    catch (...) {
+        api::output_cp(unknown_exception_caught_pkg);
+    }
+
+    return core::logger::window::this_window_proc(hwnd, uMsg, wParam, lParam);
+}
+
+core::codes core::logger::log_window::load()
+{
+    {
+        // call the base function for regular setup
+        codes code = core::logger::window::load();
+        if (code != codes::success) {
+            return code;
+        }
+    }
+    
+    HMENU hSysMenu = GetSystemMenu(m_handle, FALSE);
+    if (hSysMenu != NULL) {
+        EnableMenuItem(hSysMenu, SC_CLOSE, MF_BYCOMMAND | MF_GRAYED | MF_DISABLED);
+    }
+
+
+    m_p_main_ui = std::make_unique<core::gui::system_log_window_ui>(m_handle, nullptr, m_module, nullptr);
+    if (m_p_main_ui == nullptr) {
+        throw core::pointer_is_null_pkg;
+    }
+
+    return core::codes::success;
+}
+
+LRESULT core::logger::log_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    try {
+        
+        switch (uMsg) {
+
+            case WM_CREATE:
+            {
+            
+                break;
+            }
+
+            case WM_SHOWWINDOW:
+            {
+                break;
+            }
+
+            case WM_SIZE:
+            {
+                // Retrieve the dimensions of the client area. 
+                m_yClient = HIWORD(lParam);
+                m_xClient = LOWORD(lParam);
+
+                MoveWindow(
+                    m_p_main_ui->m_cmdinputbar_tb.get_textbox_handle(),
+                    m_p_main_ui->m_cmdinputbar_tb.get_td().xPos,
+                    m_p_main_ui->m_cmdinputbar_tb.get_td().yPos,
+                    m_xClient,
+                    m_p_main_ui->m_cmdinputbar_tb.get_td().height,
+                    true
+                );
+
+                auto cmdinput_height = m_p_main_ui->m_cmdinputbar_tb.get_td().height;
+                MoveWindow(
+                    m_p_main_ui->m_output_tb.get_textbox_handle(),
+                    m_p_main_ui->m_output_tb.get_td().xPos,
+                    m_p_main_ui->m_output_tb.get_td().yPos,
+                    m_xClient,
+                    m_yClient - cmdinput_height,
+                    true
+                );
+
+                break;
+            }
+
+            case WM_PAINT:
+            {
+                break;
             }
         } // end of switch
     }

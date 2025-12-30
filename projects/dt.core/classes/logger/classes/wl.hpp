@@ -14,6 +14,8 @@
 #include CORE_BASE_INCLUDE_PATH
 #include CORE_DEFINES_INCLUDE_PATH
 #include CORE_API_INCLUDE_PATH
+#include CORE_UI_INCLUDE_PATH
+
 
 namespace core {
 	namespace logger {
@@ -70,6 +72,25 @@ namespace core {
 			HFONT m_clw_font = nullptr;					// custom font
 			std::atomic<bool> m_wait_b = false;
 			std::condition_variable m_wait_cv;
+		};
+
+		class log_window : public window, public base{
+		public:
+			log_window():base(LOGGER_LINES){}
+			codes load() override;
+		protected:
+			LRESULT CALLBACK this_window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+			std::unique_ptr<core::gui::system_log_window_ui> m_p_main_ui = nullptr;
+			int m_yClient = 0;
+			int m_xClient = 0;
+
+			void AppendText(HWND hwndEdit, const wchar_t* text)
+			{
+				int len = GetWindowTextLength(hwndEdit);
+				SendMessage(hwndEdit, EM_SETSEL, len, len);
+				SendMessage(hwndEdit, EM_REPLACESEL, FALSE, (LPARAM)text);
+				SendMessage(hwndEdit, EM_SCROLLCARET, 0, 0);  // Auto-scroll to bottom
+			}
 		};
 	}
 }

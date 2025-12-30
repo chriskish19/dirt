@@ -1,3 +1,5 @@
+#include "ui.hpp"
+
 /***********************************************
 *
 * File: ui.cpp
@@ -11,7 +13,7 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_UI_INCLUDE_PATH
 
-core::gui::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
+core::gui::main_window_ui::main_window_ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
 {
 
     // front button setup
@@ -62,7 +64,7 @@ core::gui::ui::ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
 	m_lb_label = label(m_lb_label_d);
 	m_lb_label.create();
 }
-void core::gui::ui::front_button_action(button_state bs)
+void core::gui::main_window_ui::front_button_action(button_state bs)
 {
 	switch (bs) {
 		case button_state::rest:
@@ -91,7 +93,7 @@ void core::gui::ui::front_button_action(button_state bs)
 	}
 }
 
-void core::gui::ui::refresh_button_action(button_state bs)
+void core::gui::main_window_ui::refresh_button_action(button_state bs)
 {
 	switch (bs) {
 	    case button_state::rest:
@@ -120,7 +122,7 @@ void core::gui::ui::refresh_button_action(button_state bs)
 	}
 }
 
-void core::gui::ui::front_listbox_action(listbox_commands lc) {
+void core::gui::main_window_ui::front_listbox_action(listbox_commands lc) {
     switch (lc) {
 		case listbox_commands::error_space:
 		{
@@ -167,7 +169,7 @@ void core::gui::ui::front_listbox_action(listbox_commands lc) {
     } // end of switch(lc)
 }
 
-void core::gui::ui::lb_label_action(label_commands command)
+void core::gui::main_window_ui::lb_label_action(label_commands command)
 {
 	switch (command) {
 		case label_commands::clicked:
@@ -195,4 +197,113 @@ void core::gui::ui::lb_label_action(label_commands command)
 			break;
 
 	} // end of switch(command)
+}
+
+core::gui::system_log_window_ui::system_log_window_ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)
+{
+	
+	m_cmdinputbar_td.window = window;
+	m_cmdinputbar_td.menu = (HMENU)window_ids::cmdline;
+	m_cmdinputbar_td.hinst = hinst;
+	m_cmdinputbar_td.lpParam = lp;
+	m_cmdinputbar_td.textbox_caller = [this](textbox_commands command) {
+		this->cmdinputbar_action(command);
+		};
+
+	m_cmdinputbar_tb = textbox(m_cmdinputbar_td);
+	m_cmdinputbar_tb.create();
+
+
+	m_output_td.window = window;
+	m_output_td.menu = (HMENU)window_ids::cmdline;
+	m_output_td.hinst = hinst;
+	m_output_td.lpParam = lp;
+	m_output_td.textbox_caller = [this](textbox_commands command) {
+		this->output_action(command);
+		};
+
+	m_output_tb = textbox(m_output_td);
+	m_output_tb.create();
+}
+
+void core::gui::system_log_window_ui::cmdinputbar_action(textbox_commands command)
+{
+	switch (command)
+	{
+
+	case textbox_commands::change:  
+		break;
+
+	case textbox_commands::update: 
+		break;
+
+	case textbox_commands::set_focus:  
+		break;
+
+	case textbox_commands::kill_focus:  
+		break;
+
+	case textbox_commands::error_out_of_memory:  
+		break;
+
+	case textbox_commands::scroll_horizontal:  
+		break;
+
+	case textbox_commands::vertical_scroll:  
+		break;
+
+	case textbox_commands::max_length:  
+		break;
+
+	case textbox_commands::left_aligned:  
+		break;
+
+	case textbox_commands::right_aligned: 
+		break;
+
+	default:
+		// Unhandled or unknown notification code
+		break;
+	}
+}
+
+void core::gui::system_log_window_ui::output_action(textbox_commands command)
+{
+	switch (command)
+	{
+
+	case textbox_commands::change:
+		break;
+
+	case textbox_commands::update:
+		break;
+
+	case textbox_commands::set_focus:
+		break;
+
+	case textbox_commands::kill_focus:
+		break;
+
+	case textbox_commands::error_out_of_memory:
+		break;
+
+	case textbox_commands::scroll_horizontal:
+		break;
+
+	case textbox_commands::vertical_scroll:
+		break;
+
+	case textbox_commands::max_length:
+		break;
+
+	case textbox_commands::left_aligned:
+		break;
+
+	case textbox_commands::right_aligned:
+		break;
+
+	default:
+		// Unhandled or unknown notification code
+		break;
+	}
 }

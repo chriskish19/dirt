@@ -29,7 +29,7 @@ namespace core {
         // make sure to call this if you call init_system_log()
         codes LOGS_API exit_system_log();
 #else
-        class system_log_window : public classic_log_window {
+        class system_log_window : public log_window {
         public:
             system_log_window();
             ~system_log_window();

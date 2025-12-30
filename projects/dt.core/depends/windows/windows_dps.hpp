@@ -12,3 +12,5 @@
 #define NOMINMAX // Prevents min/max macros from being defined
 #include <windows.h>
 #include <gdiplus.h>
+#include <Richedit.h>
+#include <Commctrl.h>

@@ -303,9 +303,8 @@ void core::backend::process::clean_up()
         CloseHandle(m_hCompletionPort);
     }
     
-    // throws an exception dont know why or how 
     /*
-    if (m_hIOCP != nullptr && m_hIOCP != INVALID_HANDLE_VALUE) {
+    if (m_hIOCP != NULL && m_hIOCP != INVALID_HANDLE_VALUE) {
         CloseHandle(m_hIOCP);
         m_hIOCP = nullptr;
     }
@@ -859,7 +858,7 @@ void core::backend::queue_system::exit_process_entry()
 
 void core::backend::queue_system::process_queue(std::queue<file_entry> buffer_q)
 {
-    add(time{ "In process queue about to process " + std::to_string(buffer_q.size()) + (buffer_q.size() < 2 ? " file notification" : " file notifications")});
+    add(time{ "In process queue about to process " + std::to_string(buffer_q.size()) + (buffer_q.size() < 2 ? " file notification\n" : " file notifications\n")});
     
     auto q_size = buffer_q.size();
 
@@ -883,7 +882,7 @@ void core::backend::queue_system::process_queue(std::queue<file_entry> buffer_q)
         buffer_q.pop();
     }
 
-    add(time{ "Done. Processed " + std::to_string(q_size) + (q_size < 2 ? " file notification" : " file notifications") });
+    add(time{ "Done. Processed " + std::to_string(q_size) + (q_size < 2 ? " file notification\n" : " file notifications\n") });
 }
 
 bool core::backend::queue_system::skip_entry(file_entry& entry)

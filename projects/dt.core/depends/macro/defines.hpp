@@ -62,7 +62,7 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 #define LOG_LENGTH 512							// length of each log
 #define LOGGER_LINES 1000
 #define LOGGER_FONT_SIZE 14
-#define ENABLE_VERBOSE_LOGGING 1
+#define ENABLE_VERBOSE_LOGGING 0
 
 /*
 	Strings

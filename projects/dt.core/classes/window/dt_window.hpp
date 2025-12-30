@@ -59,7 +59,7 @@ namespace core{
 		class dt_window : public window {
 		public:
 			dt_window() {
-				m_p_main_ui = std::make_unique<core::gui::ui>(m_window_handle, nullptr, m_hinst, nullptr);
+				m_p_main_ui = std::make_unique<core::gui::main_window_ui>(m_window_handle, nullptr, m_hinst, nullptr);
 				if (m_p_main_ui == nullptr) {
 					throw core::pointer_is_null_pkg;
 				}
@@ -68,7 +68,7 @@ namespace core{
 			HWND get_handle() { return m_window_handle; }
 		protected:
 			LRESULT CALLBACK ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-			std::unique_ptr<core::gui::ui> m_p_main_ui = nullptr;
+			std::unique_ptr<core::gui::main_window_ui> m_p_main_ui = nullptr;
 			bool m_show_logger = false;
 		};
 	}
