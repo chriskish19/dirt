@@ -50,6 +50,7 @@
 #define CORE_LABEL_INCLUDE_PATH					CORE_label_hpp						// label class
 #define CORE_TEXTBOX_INCLUDE_PATH				CORE_textbox_hpp					// textbox class
 #define CORE_UI_INCLUDE_PATH					CORE_ui_hpp							// main ui
+#define CORE_BAR_INCLUDE_PATH					CORE_bar_hpp						// progress bar class
 
 // logger
 #define CORE_BASE_INCLUDE_PATH					CORE_base_hpp						// base logger

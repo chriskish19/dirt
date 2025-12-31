@@ -63,6 +63,16 @@ core::gui::main_window_ui::main_window_ui(HWND window, HMENU menu, HINSTANCE hin
 
 	m_lb_label = label(m_lb_label_d);
 	m_lb_label.create();
+
+	// progress bar 1
+	m_progress_bar1_d.window = window;
+	m_progress_bar1_d.menu = (HMENU)window_ids::progress_bar1;
+	m_progress_bar1_d.hinst = hinst;
+	m_progress_bar1_d.lpParam = lp;
+	m_progress_bar1_d.bar_caller = nullptr; // no caller for progress bars
+
+	m_progress_bar1 = bar(m_progress_bar1_d);
+	m_progress_bar1.create();
 }
 void core::gui::main_window_ui::front_button_action(button_state bs)
 {

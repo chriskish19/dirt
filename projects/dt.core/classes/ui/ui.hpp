@@ -17,6 +17,7 @@
 #include CORE_LISTBOX_INCLUDE_PATH
 #include CORE_LABEL_INCLUDE_PATH
 #include CORE_TEXTBOX_INCLUDE_PATH
+#include CORE_BAR_INCLUDE_PATH
 
 namespace core {
 	namespace gui {
@@ -59,6 +60,7 @@ namespace core {
 			view,
 			show_system_logger,
 			cmdline,
+			progress_bar1
 		};
 
 		class main_window_ui {
@@ -73,7 +75,40 @@ namespace core {
 			void front_listbox_action(listbox_commands lc);
 			label m_lb_label;
 			void lb_label_action(label_commands command);
+
+			bar m_progress_bar1;
 		protected:
+			/*
+				struct bar_description {
+					string class_name = PROGRESS_CLASS;
+					string window_name = ROS("#bar");
+					DWORD style_flags = 0;
+					std::size_t xPos = 0;
+					std::size_t yPos = 0;
+					std::size_t width = 0;
+					std::size_t height = 0;
+					HWND window = nullptr;
+					HMENU menu = nullptr;
+					HINSTANCE hinst = GetModuleHandle(NULL);
+					LPVOID lpParam = nullptr;
+					std::function<void(bar_state)> bar_caller = nullptr;
+				};
+			*/
+			core::gui::bar_description m_progress_bar1_d{
+				PROGRESS_CLASS,
+				ROS("#bar"),
+				WS_CHILD | WS_VISIBLE | PBS_SMOOTH,
+				500,
+				10,
+				100,
+				20,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr
+			};			
+	
 			/*
 
 				struct button_description {

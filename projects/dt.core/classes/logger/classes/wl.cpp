@@ -97,11 +97,11 @@ core::codes core::logger::window::load()
             NULL,
             ROS("LogWindow"),
             ROS("System Log"),
-            WS_OVERLAPPEDWINDOW | WS_VSCROLL | WS_HSCROLL,
+            WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            CW_USEDEFAULT,
-            CW_USEDEFAULT,
+            LOG_WINDOW_WIDTH,
+            LOG_WINDOW_HEIGHT,
             NULL,
             NULL,
             m_module,
@@ -544,7 +544,7 @@ LRESULT core::logger::log_window::this_window_proc(HWND hwnd, UINT uMsg, WPARAM 
 
             case WM_CREATE:
             {
-            
+                
                 break;
             }
 

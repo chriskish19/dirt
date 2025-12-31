@@ -157,18 +157,23 @@ core::window::window::window()
 LRESULT core::window::window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg) {
+        case WM_CREATE:
+        {
+            INITCOMMONCONTROLSEX icex;
+            icex.dwSize = sizeof(icex);
+            icex.dwICC = ICC_PROGRESS_CLASS;
+            InitCommonControlsEx(&icex);
+            break;
+        }
+    
         case WM_SIZING:
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
-
             // lParam holds a pointer to a RECT structure
             RECT* lw_rect_p = reinterpret_cast<RECT*>(lParam);
-
             FillRect(hdc, lw_rect_p, (HBRUSH)(COLOR_WINDOW + 1));
-
             EndPaint(hwnd, &ps);
-
             break;
         }
 
@@ -176,11 +181,8 @@ LRESULT core::window::window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
-
             FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
-
             EndPaint(hwnd, &ps);
-
             break;
         }
     } // end of switch (uMsg)

@@ -4,7 +4,7 @@
 //
 // Purpose: main entry point
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 
@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
 #if WIN32_GUI_BUILD
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
     LoadLibrary(L"Msftedit.dll");
-    
     core::codes code;
     auto entry_v = api::windows_cmd_line(&code);
     if (code != core::codes::success) {

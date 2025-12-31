@@ -4,7 +4,7 @@
 //
 // Purpose: windows header includes
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 
@@ -13,4 +13,6 @@
 #include <windows.h>
 #include <gdiplus.h>
 #include <Richedit.h>
-#include <Commctrl.h>
+#include <commctrl.h>
+
+#pragma comment(lib, "comctl32.lib")

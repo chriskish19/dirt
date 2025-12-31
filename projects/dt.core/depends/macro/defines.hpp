@@ -2,9 +2,9 @@
 //
 // File: defines.hpp
 //
-// Purpose: define macros used throughout dirt.core
+// Purpose: define macros used throughout dt.core
 //
-// Project: dirt.core
+// Project: dt.core
 //
 /**********************************************************/
 
@@ -63,6 +63,8 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 #define LOGGER_LINES 1000
 #define LOGGER_FONT_SIZE 14
 #define ENABLE_VERBOSE_LOGGING 0
+#define LOG_WINDOW_WIDTH 1200
+#define LOG_WINDOW_HEIGHT 600
 
 /*
 	Strings

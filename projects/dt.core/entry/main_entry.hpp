@@ -143,6 +143,7 @@ namespace core {
 				m_be = std::make_unique<backend>(empty);
 				m_fe = std::make_unique<frontend>();
 				core::logger::glb_sl = std::make_unique<core::logger::system_log_window>();
+				SendMessage(m_fe->get_ui_p()->m_progress_bar1.get_bar_handle(), PBM_SETRANGE, 0, MAKELPARAM(0, 100));
 #if ENABLE_API_LOGS
 				api::logger = std::make_unique<core::backend::system_log>();
 #endif
@@ -151,6 +152,7 @@ namespace core {
 				m_be = std::make_unique<backend>(v);
 				m_fe = std::make_unique<frontend>();
 				core::logger::glb_sl = std::make_unique<core::logger::system_log_window>();
+				SendMessage(m_fe->get_ui_p()->m_progress_bar1.get_bar_handle(), PBM_SETRANGE, 0, MAKELPARAM(0, 100));
 #if ENABLE_API_LOGS
 				api::logger = std::make_unique<core::backend::system_log>();
 #endif
@@ -170,6 +172,7 @@ namespace core {
 			}
 			void gui_process_commands(std::shared_ptr<core::backend::commands_info> ci);
 			void backend_messages() {
+				int progress_status = 0;
 				window_loading_bar progress(core::logger::glb_sl->get_window_handle(), L"Processing...");
 				while (m_run_backend_messages.load() == true) {
 					// timer here, seconds to wait time
@@ -181,6 +184,8 @@ namespace core {
 						q.pop();
 					}
 					progress.draw();
+					progress_status = (progress_status + 1 ) % 100;
+					SendMessage(m_fe->get_ui_p()->m_progress_bar1.get_bar_handle(), PBM_SETPOS, progress_status, 0);
 				}
 			}
 			std::atomic<bool> m_run_backend_messages = true;

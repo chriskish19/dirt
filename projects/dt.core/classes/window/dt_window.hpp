@@ -59,16 +59,17 @@ namespace core{
 		class dt_window : public window {
 		public:
 			dt_window() {
-				m_p_main_ui = std::make_unique<core::gui::main_window_ui>(m_window_handle, nullptr, m_hinst, nullptr);
+				m_p_main_ui = std::make_shared<core::gui::main_window_ui>(m_window_handle, nullptr, m_hinst, nullptr);
 				if (m_p_main_ui == nullptr) {
 					throw core::pointer_is_null_pkg;
 				}
 				m_p_main_ui->m_front_lb.add_string(ROS("Test string"));
 			}
 			HWND get_handle() { return m_window_handle; }
+			std::shared_ptr<core::gui::main_window_ui> get_ui_p() { return m_p_main_ui; }
 		protected:
 			LRESULT CALLBACK ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-			std::unique_ptr<core::gui::main_window_ui> m_p_main_ui = nullptr;
+			std::shared_ptr<core::gui::main_window_ui> m_p_main_ui = nullptr;
 			bool m_show_logger = false;
 		};
 	}
