@@ -268,6 +268,15 @@ LRESULT core::window::dt_window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wPa
     {
         int wmId = LOWORD(wParam);  // Extract the menu item ID
         switch (wmId) {
+        case static_cast<int>(core::gui::window_ids::help):
+        {
+            MessageBox(nullptr,
+                APP_INFO,
+                L"Directory Tool",
+                MB_OK | MB_ICONINFORMATION | MB_SETFOREGROUND);
+            break;
+        }
+        
         case static_cast<int>(core::gui::window_ids::console):
         {
             break;
@@ -308,6 +317,30 @@ LRESULT core::window::dt_window::ThisWindowProc(HWND hwnd, UINT uMsg, WPARAM wPa
                 m_show_logger = true;
             }
 
+            break;
+        }
+
+        case static_cast<int>(core::gui::window_ids::b_copy):
+        {
+            m_p_main_ui->m_copy_b.action(core::gui::button_state::pressed);
+            break;
+        }
+
+        case static_cast<int>(core::gui::window_ids::b_new):
+        {
+            m_p_main_ui->m_new_b.action(core::gui::button_state::pressed);
+            break;
+        }
+
+        case static_cast<int>(core::gui::window_ids::b_open):
+        {
+            m_p_main_ui->m_open_b.action(core::gui::button_state::pressed);
+            break;
+        }
+
+        case static_cast<int>(core::gui::window_ids::b_save):
+        {
+            m_p_main_ui->m_save_b.action(core::gui::button_state::pressed);
             break;
         }
 

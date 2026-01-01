@@ -365,6 +365,32 @@ void core::main::gui_entry::gui_process_commands(std::shared_ptr<core::backend::
 {
 	switch (ci->command())
 	{
+	case core::backend::commands::update_progress_bar:
+	{
+		auto progress_bar_info = std::dynamic_pointer_cast<core::backend::progress_bar>(ci);
+		if (progress_bar_info != nullptr) {
+			switch (progress_bar_info->bar_number) {
+			case core::backend::progress_bar::id::one:
+				SendMessage(m_fe->get_ui_p()->m_progress_bar1.get_bar_handle(), PBM_SETPOS, progress_bar_info->progress, 0);
+				break;
+			case core::backend::progress_bar::id::two:
+				SendMessage(m_fe->get_ui_p()->m_progress_bar2.get_bar_handle(), PBM_SETPOS, progress_bar_info->progress, 0);
+				break;
+			case core::backend::progress_bar::id::three:
+				break;
+			case core::backend::progress_bar::id::four:
+				break;
+			default:
+				break;
+			}
+		}
+		else {
+			core::logger::glb_sl->log_message(api::to_wide_string(core::pointer_is_null_pkg.message()));
+			core::logger::glb_sl->log_message(api::to_wide_string(api::get_location()));
+		}
+		break;
+	}
+
 	case core::backend::commands::error:
 	{
 		auto error_info = std::dynamic_pointer_cast<core::backend::error>(ci);

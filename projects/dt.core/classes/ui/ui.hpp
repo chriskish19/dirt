@@ -18,31 +18,32 @@
 #include CORE_LABEL_INCLUDE_PATH
 #include CORE_TEXTBOX_INCLUDE_PATH
 #include CORE_BAR_INCLUDE_PATH
+#include CORE_TASKBAR_INCLUDE_PATH
 
 namespace core {
 	namespace gui {
 		enum class ui_positions : std::size_t {
 			// label
 			label_x = 10,
-			label_y = 10,
+			label_y = 100,
 			label_w = 100,
 			label_h = 20,
 
 			// front listbox
 			front_lb_x = 10,
-			front_lb_y = 30,
+			front_lb_y = 120,
 			front_lb_w = 400,
 			front_lb_h = 400,
 
 			// refresh button
 			refresh_b_x = 10,
-			refresh_b_y = 420,
+			refresh_b_y = 510,
 			refresh_b_w = 100,
 			refresh_b_h = 50,
 
 			// launch button
 			launch_b_x = 310,
-			launch_b_y = 420,
+			launch_b_y = 510,
 			launch_b_w = 100,
 			launch_b_h = 50
 		};
@@ -60,7 +61,12 @@ namespace core {
 			view,
 			show_system_logger,
 			cmdline,
-			progress_bar1
+			progress_bar1,
+			progress_bar2,
+			b_new,
+			b_open,
+			b_save,
+			b_copy,
 		};
 
 		class main_window_ui {
@@ -75,9 +81,91 @@ namespace core {
 			void front_listbox_action(listbox_commands lc);
 			label m_lb_label;
 			void lb_label_action(label_commands command);
-
 			bar m_progress_bar1;
+			bar m_progress_bar2;
+			button m_new_b;
+			void new_button_action(button_state bs);
+			button m_open_b;
+			void open_button_action(button_state bs);
+			button m_save_b;
+			void save_button_action(button_state bs);
+			button m_copy_b;
+			void copy_button_action(button_state bs);
 		protected:
+			/*
+
+				struct button_description {
+					string class_name = ROS("BUTTON");
+					string window_name = ROS("#num");
+					DWORD style_flags = 0;
+					std::size_t xPos = 0;
+					std::size_t yPos = 0;
+					std::size_t width = 0;
+					std::size_t height = 0;
+					HWND window = nullptr;
+					HMENU menu = nullptr;
+					HINSTANCE hinst = GetModuleHandle(NULL);
+					LPVOID lpParam = nullptr;
+					std::function<void(button_state)> button_caller = nullptr;
+				};
+
+			*/
+			core::gui::button_description m_new_bd{
+				ROS("BUTTON"),
+				ROS(""),
+				BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD |BS_BITMAP,
+				0,
+				0,
+				50,
+				60,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr
+			};
+			core::gui::button_description m_open_bd{
+				ROS("BUTTON"),
+				ROS(""),
+				BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_BITMAP,
+				50,
+				0,
+				50,
+				60,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr
+			};
+			core::gui::button_description m_save_bd{
+				ROS("BUTTON"),
+				ROS(""),
+				BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_BITMAP,
+				100,
+				0,
+				50,
+				60,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr
+			};
+			core::gui::button_description m_copy_bd{
+				ROS("BUTTON"),
+				ROS(""),
+				BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_BITMAP,
+				150,
+				0,
+				50,
+				60,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr
+			};
 			/*
 				struct bar_description {
 					string class_name = PROGRESS_CLASS;
@@ -97,7 +185,7 @@ namespace core {
 			core::gui::bar_description m_progress_bar1_d{
 				PROGRESS_CLASS,
 				ROS("#bar"),
-				WS_CHILD | WS_VISIBLE | PBS_SMOOTH,
+				WS_CHILD | WS_VISIBLE,
 				500,
 				10,
 				100,
@@ -108,7 +196,20 @@ namespace core {
 				nullptr,
 				nullptr
 			};			
-	
+			core::gui::bar_description m_progress_bar2_d{
+				PROGRESS_CLASS,
+				ROS("#bar"),
+				WS_CHILD | WS_VISIBLE,
+				500,
+				50,
+				100,
+				20,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr
+			};
 			/*
 
 				struct button_description {

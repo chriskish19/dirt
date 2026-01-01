@@ -37,6 +37,14 @@ namespace core {
 		};
 
 		struct progress_bar : public commands_info {
+			enum class id {
+				one = 1,
+				two,
+				three,
+				four
+			};
+			progress_bar(float _progress,progress_bar::id bar)
+				:progress(_progress),bar_number(bar){}
 			float progress;
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<progress_bar>(*this);
@@ -44,6 +52,7 @@ namespace core {
 			commands command() const override {
 				return commands::update_progress_bar;
 			}
+			id bar_number;
 		};
 
 		struct message : public commands_info {

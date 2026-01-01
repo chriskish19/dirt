@@ -858,31 +858,30 @@ void core::backend::queue_system::exit_process_entry()
 
 void core::backend::queue_system::process_queue(std::queue<file_entry> buffer_q)
 {
+    m_bar_id_counter++;
     add(time{ "In process queue about to process " + std::to_string(buffer_q.size()) + (buffer_q.size() < 2 ? " file notification\n" : " file notifications\n")});
-    
     auto q_size = buffer_q.size();
-
+    std::size_t processed = 0;
     while (buffer_q.empty() == false) {
         file_entry& entry = buffer_q.front();
-
+        processed++;
+        float percentage = (processed / (float)q_size) * 100;
+        add(progress_bar{ percentage,static_cast<core::backend::progress_bar::id>(m_bar_id_counter.load())});
         if (skip_entry(entry) == true) {
             buffer_q.pop();
             continue;
         }
-
 #if ENABLE_VERBOSE_LOGGING
         add(time{ api::output_file_entry(entry) });
 #endif
         switch_entry_type(entry);
-
         if (entry.completed_action != directory_completed_action::uninit) {
             background_task(entry);
         }
-
         buffer_q.pop();
     }
-
     add(time{ "Done. Processed " + std::to_string(q_size) + (q_size < 2 ? " file notification\n" : " file notifications\n") });
+    m_bar_id_counter--;
 }
 
 bool core::backend::queue_system::skip_entry(file_entry& entry)

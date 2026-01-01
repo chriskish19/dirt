@@ -73,6 +73,92 @@ core::gui::main_window_ui::main_window_ui(HWND window, HMENU menu, HINSTANCE hin
 
 	m_progress_bar1 = bar(m_progress_bar1_d);
 	m_progress_bar1.create();
+
+	// progress bar 2
+	m_progress_bar2_d.window = window;
+	m_progress_bar2_d.menu = (HMENU)window_ids::progress_bar2;
+	m_progress_bar2_d.hinst = hinst;
+	m_progress_bar2_d.lpParam = lp;
+	m_progress_bar2_d.bar_caller = nullptr; // no caller for progress bars
+
+	m_progress_bar2 = bar(m_progress_bar2_d);
+	m_progress_bar2.create();
+
+	// new button
+	m_new_bd.window = window;
+	m_new_bd.menu = (HMENU)window_ids::b_new;
+	m_new_bd.hinst = hinst;
+	m_new_bd.lpParam = lp;
+	m_new_bd.button_caller = [this](button_state bs) {
+		this->new_button_action(bs);
+		};
+
+	m_new_b = button(m_new_bd);
+	m_new_b.create();
+	HBITMAP hnewBmp = (HBITMAP)LoadImage(
+		NULL,
+		DT_NEW_BUTTON_PATH,
+		IMAGE_BITMAP,
+		0, 0,
+		LR_LOADFROMFILE);
+	SendMessage(m_new_b.get_button_handle(), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hnewBmp);
+
+	// open button
+	m_open_bd.window = window;
+	m_open_bd.menu = (HMENU)window_ids::b_open;
+	m_open_bd.hinst = hinst;
+	m_open_bd.lpParam = lp;
+	m_open_bd.button_caller = [this](button_state bs) {
+		this->open_button_action(bs);
+		};
+
+	m_open_b = button(m_open_bd);
+	m_open_b.create();
+	HBITMAP hopenBmp = (HBITMAP)LoadImage(
+		NULL,
+		DT_OPEN_BUTTON_PATH,
+		IMAGE_BITMAP,
+		0, 0,
+		LR_LOADFROMFILE);
+	SendMessage(m_open_b.get_button_handle(), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hopenBmp);
+
+	// save button
+	m_save_bd.window = window;
+	m_save_bd.menu = (HMENU)window_ids::b_save;
+	m_save_bd.hinst = hinst;
+	m_save_bd.lpParam = lp;
+	m_save_bd.button_caller = [this](button_state bs) {
+		this->save_button_action(bs);
+		};
+
+	m_save_b = button(m_save_bd);
+	m_save_b.create();
+	HBITMAP hsaveBmp = (HBITMAP)LoadImage(
+		NULL,
+		DT_SAVE_BUTTON_PATH,
+		IMAGE_BITMAP,
+		0, 0,
+		LR_LOADFROMFILE);
+	SendMessage(m_save_b.get_button_handle(), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hsaveBmp);
+
+	// copy button
+	m_copy_bd.window = window;
+	m_copy_bd.menu = (HMENU)window_ids::b_copy;
+	m_copy_bd.hinst = hinst;
+	m_copy_bd.lpParam = lp;
+	m_copy_bd.button_caller = [this](button_state bs) {
+		this->copy_button_action(bs);
+		};
+
+	m_copy_b = button(m_copy_bd);
+	m_copy_b.create();
+	HBITMAP hcopyBmp = (HBITMAP)LoadImage(
+		NULL,
+		DT_COPY_BUTTON_PATH,
+		IMAGE_BITMAP,
+		0, 0,
+		LR_LOADFROMFILE);
+	SendMessage(m_copy_b.get_button_handle(), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hcopyBmp);
 }
 void core::gui::main_window_ui::front_button_action(button_state bs)
 {
@@ -207,6 +293,122 @@ void core::gui::main_window_ui::lb_label_action(label_commands command)
 			break;
 
 	} // end of switch(command)
+}
+
+void core::gui::main_window_ui::new_button_action(button_state bs)
+{
+	switch (bs) {
+	case button_state::rest:
+	{
+		return;
+	}
+
+	case button_state::pressed:
+	{
+		MessageBox(nullptr, L"New Button Clicked!", L"Notification", MB_OK | MB_ICONINFORMATION);
+		break;
+	}
+
+	case button_state::released:
+	{
+		break;
+	}
+
+	case button_state::holding:
+	{
+		break;
+	}
+
+	default:
+		break;
+	}
+}
+
+void core::gui::main_window_ui::open_button_action(button_state bs)
+{
+	switch (bs) {
+	case button_state::rest:
+	{
+		return;
+	}
+
+	case button_state::pressed:
+	{
+		MessageBox(nullptr, L"Open Button Clicked!", L"Notification", MB_OK | MB_ICONINFORMATION);
+		break;
+	}
+
+	case button_state::released:
+	{
+		break;
+	}
+
+	case button_state::holding:
+	{
+		break;
+	}
+
+	default:
+		break;
+	}
+}
+
+void core::gui::main_window_ui::save_button_action(button_state bs)
+{
+	switch (bs) {
+	case button_state::rest:
+	{
+		return;
+	}
+
+	case button_state::pressed:
+	{
+		MessageBox(nullptr, L"Save Button Clicked!", L"Notification", MB_OK | MB_ICONINFORMATION);
+		break;
+	}
+
+	case button_state::released:
+	{
+		break;
+	}
+
+	case button_state::holding:
+	{
+		break;
+	}
+
+	default:
+		break;
+	}
+}
+
+void core::gui::main_window_ui::copy_button_action(button_state bs)
+{
+	switch (bs) {
+	case button_state::rest:
+	{
+		return;
+	}
+
+	case button_state::pressed:
+	{
+		MessageBox(nullptr, L"Copy Button Clicked!", L"Notification", MB_OK | MB_ICONINFORMATION);
+		break;
+	}
+
+	case button_state::released:
+	{
+		break;
+	}
+
+	case button_state::holding:
+	{
+		break;
+	}
+
+	default:
+		break;
+	}
 }
 
 core::gui::system_log_window_ui::system_log_window_ui(HWND window, HMENU menu, HINSTANCE hinst, LPVOID lp)

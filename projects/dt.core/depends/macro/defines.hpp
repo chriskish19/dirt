@@ -25,6 +25,16 @@
 	assest paths
 */
 #define DT_ICON_PATH "C:\\Users\\chris\\source\\repos\\dirt\\assets\\dt_icon.ico"
+#define DT_TOOLBAR_PATH L"C:\\Users\\chris\\source\\repos\\dirt\\assets\\toolbar.bmp"
+#define DT_NEW_BUTTON_PATH L"C:\\Users\\chris\\source\\repos\\dirt\\assets\\new.bmp"
+#define DT_OPEN_BUTTON_PATH L"C:\\Users\\chris\\source\\repos\\dirt\\assets\\open.bmp"
+#define DT_SAVE_BUTTON_PATH L"C:\\Users\\chris\\source\\repos\\dirt\\assets\\save.bmp"
+#define DT_COPY_BUTTON_PATH L"C:\\Users\\chris\\source\\repos\\dirt\\assets\\copy.bmp"
+
+/*
+	info
+*/
+#define APP_INFO L"DT App Version 1.0.0\n2026 Chris Hopkins"
 
 /*
 	terminal colors
