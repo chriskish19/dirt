@@ -21,7 +21,7 @@ namespace core {
 
 			floods the system with data and checks how it handles it
 		*/
-		codes full_timed_gui_entry(std::size_t duration);
+		codes full_system_test(std::size_t duration);
 	}
 }
 

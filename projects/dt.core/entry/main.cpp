@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
 #endif
 #if WIN32_GUI_BUILD
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
-    core::logger::glb_sl = std::make_unique<core::logger::system_log_window>();
     LoadLibrary(L"Msftedit.dll");
+    core::logger::glb_sl = std::make_unique<core::logger::system_log_window>();
     try {
         std::unique_ptr<core::main::Cmain> p_gui = std::make_unique<core::main::Cmain>(core::main::build::gui);
         p_gui->go();

@@ -15,8 +15,6 @@
 #include CORE_API_INCLUDE_PATH
 #include CORE_PROCESSOR_INCLUDE_PATH
 #include CORE_LOGGER_INCLUDE_PATH
-#include CORE_SIM_INCLUDE_PATH
-#include CORE_SIM_API_INCLUDE_PATH
 #include CORE_WINDOW_INCLUDE_PATH
 #include CORE_UI_INCLUDE_PATH
 #include CORE_DEFINES_INCLUDE_PATH
@@ -32,7 +30,8 @@
 namespace core {
 	namespace main {
 #if !TERMINAL_BUILD
-		class Cmain : public core::main::messages{
+		class Cmain : public core::main::messages
+		{
 		public:
 			Cmain(core::main::build type) 
 				:messages(type) {}

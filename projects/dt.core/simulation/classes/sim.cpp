@@ -11,7 +11,7 @@
 #include CORE_NAMES_INCLUDE
 #include CORE_SIM_INCLUDE_PATH
 
-core::test::backend::~backend()
+test::base::~base()
 {
 	m_s_runner.store(false);
 
@@ -21,8 +21,8 @@ core::test::backend::~backend()
 	}
 }
 
-core::test::backend::backend(const std::filesystem::path& test_dir)
-	:m_test_files(test_dir)
+test::base::base(const std::filesystem::path& test_dir)
+	:Cbackend(std::vector<core::arg_entry>()),m_test_files(test_dir)
 {
 	try {
 		m_b_dir_it = std::filesystem::recursive_directory_iterator(m_test_files);
@@ -32,11 +32,11 @@ core::test::backend::backend(const std::filesystem::path& test_dir)
 	}
 	catch (...) {
 		std::string location = api::get_location();
-		add(core::backend::unknown_exception{ unknown_exception_caught_pkg,location });
+		add(core::backend::unknown_exception{ core::unknown_exception_caught_pkg,location });
 	}
 }
 
-core::codes core::test::backend::work(std::size_t ms) {
+core::codes test::base::work(std::size_t ms) {
 	std::thread queue_sys_t(&queue_system::process_entry, this);
 
 	while (m_s_runner.load() == true) {
@@ -63,14 +63,14 @@ core::codes core::test::backend::work(std::size_t ms) {
 		queue_sys_t.join();
 	}
 
-	return codes::success;
+	return core::codes::success;
 }
 
-core::file_entry core::test::backend::make_entry()
+core::file_entry test::base::make_entry()
 {
-	file_entry entry;
-	entry.action = file_action::copy;
-	entry.args_v = { args::copy,args::recursive,args::watch };
+	core::file_entry entry;
+	entry.action = core::file_action::copy;
+	entry.args_v = { core::args::copy,core::args::recursive,core::args::watch };
 	entry.completed_action = {};
 	entry.dst_p = std::filesystem::path();
 	entry.p_di_set = m_test_set;
@@ -84,3 +84,4 @@ core::file_entry core::test::backend::make_entry()
 
 	return entry;
 }
+

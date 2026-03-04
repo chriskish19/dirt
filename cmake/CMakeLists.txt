@@ -93,6 +93,33 @@ if(is_gui_terminal_build)
 
 endif()
 
+
+string(COMPARE EQUAL ${build_type} "system-test" is_system_test)
+if(is_system_test)
+    add_executable(${dt_core} ${dt_core_sf} ${dt_core_hf})
+
+    # define UNICODE
+    target_compile_definitions(${dt_core} PRIVATE
+            UNICODE
+            _UNICODE
+            SYSTEM_TEST=1
+        )
+
+    # Link against essential Windows libraries
+    target_link_libraries(${dt_core} PRIVATE
+        kernel32.lib
+        user32.lib      # Needed for MessageBox, window creation, message pump
+        gdi32.lib       # If you use any GDI functions (most GUI apps do)
+        shell32.lib     # Optional but common (e.g., ShellExecute)
+        advapi32.lib    # For some registry/thread functions
+        comdlg32.lib    # If you use common dialogs (OpenFile, etc.)
+    )
+
+    target_compile_options(${dt_core} PRIVATE /utf-8)
+
+endif()
+
+
 # core header file names
 # creates macros for each hpp file include path
 # very handy for name changes and file moves
@@ -110,7 +137,7 @@ foreach(HEADER_FILE ${dt_core_hf})
 endforeach()
 
 # assets converted to macro names that hold the file paths
-if(is_gui_build OR is_gui_terminal_build)
+if(is_gui_build OR is_gui_terminal_build OR is_system_test)
     # assets
     file(GLOB dt_buttons "../assets/*.bmp")
     foreach(BUTTON ${dt_buttons})

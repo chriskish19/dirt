@@ -12,7 +12,11 @@
 #include CORE_SIM_API_INCLUDE_PATH
 
 
-core::codes core::test_api::full_timed_gui_entry(std::size_t duration)
+core::codes core::test_api::full_system_test(std::size_t duration)
 {
+    
+
+
+
     return codes();
 }
