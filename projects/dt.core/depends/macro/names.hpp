@@ -67,8 +67,7 @@
 /*
 	simulation : everything needed for testing without mashing my ssd
 */
-#define CORE_SIM_API_INCLUDE_PATH				CORE_sim_api_hpp					// simulation api
-#define CORE_SIM_INCLUDE_PATH					CORE_sim_hpp						// sim classes
+#define CORE_TAPI_INCLUDE_PATH					CORE_t_api_hpp						// test functions
 
 /*
 	macros : common pre-processor values used throughout dirt.core

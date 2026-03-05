@@ -23,6 +23,7 @@ namespace test {
 		core::codes work(std::size_t ms);
 		virtual void go() = 0;
 		virtual void exit() = 0;
+		virtual void process() = 0;
 	protected:
 		std::unordered_set<core::directory_info>* m_test_set = new std::unordered_set<core::directory_info>();
 		core::file_entry make_entry();
@@ -39,14 +40,34 @@ namespace test {
 	public:
 		main():base(TEST_FOLDER){}
 
+		void process() override {
+			while (m_run_messages.load() == true) {
+				// timer here, seconds to wait time
+				std::this_thread::sleep_for(std::chrono::milliseconds(GUI_SYNC_INTERVAL));
+
+				auto q = get_current_queue();
+				while (q.empty() == false && m_run_messages.load() == true) {
+					auto& command = q.front();
+					process_commands(command);
+					q.pop();
+				}
+
+				draw_progress();
+			}
+		}
+
 		void go() override {
 
 		}
 
 	protected:
 		void exit() override {
-
+			m_run_watch.store(false);
+			m_run_messages.store(false);
+			PostQueuedCompletionStatus(m_hCompletionPort, 0, m_completionKey, m_pOverlapped);
 		}
+
+		std::atomic<bool> m_run_messages = true;
 	};
 #endif
 

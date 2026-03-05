@@ -35,12 +35,14 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 	testing values
 	saves my ssd when testing
 */ 
-#define DISABLE_COPY 1							// no copying when set to 1
-#define DISABLE_DELETE 1						// no deleting when set to 1
-#define TEST_ENTRY 1							// change application entry point
-#define TEST_TIME_WAIT 30						// wait x seconds before flooding with work
-#define TEST_FOLDER "C:\\linux"					// absolute system path on my c drive
-#define FLOOD 10								// generate entries for x ms
+#define DISABLE_COPY 0							// no copying when set to 1
+#define DISABLE_DELETE 0						// no deleting when set to 1
+#define TEST_TIME_DELAY 1000					// wait x milli-seconds before flooding with work
+#define TEST_CYCLE_DELETE_DELAY 20000			// wait x milli-seconds between creating files and deleting
+#define TEST_FILES_COUNT 1000					// number of files to create
+#define TEST_FILE_SIZE_IN_BYTES 1000			// 1kb per file size
+#define TEST_CYCLE_RUN 500000					// run the test for x milliseconds
+
 
 /*
 	file monitoring values

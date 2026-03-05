@@ -24,7 +24,7 @@
 #include CORE_FRONTEND_INCLUDE_PATH
 #include CORE_BACKEND_INCLUDE_PATH
 #include CORE_MESSAGES_INCLUDE_PATH
-
+#include CORE_TAPI_INCLUDE_PATH
 
 
 namespace core {
@@ -67,12 +67,37 @@ namespace core {
 		public:
 			Cterminal(int argc, char* argv[])
 				:Cmain(build::terminal,argc,argv){}
-
+#if !SYSTEM_TEST
 			void go() override {
 				std::jthread backend_begin_t([this] { m_backend->begin(); });
 				process();
 				exit();
 			}
+#else
+			void go() override {
+				std::jthread backend_begin_t([this] { m_backend->begin(); });
+				std::jthread process_message_t([this] { process(); });
+				
+				std::filesystem::path test_directory;
+				if (m_entry_v.empty() == false) {
+					test_directory = m_entry_v.front().src_p;
+				}
+				
+				auto start = std::chrono::steady_clock::now();
+				auto duration = std::chrono::milliseconds(TEST_CYCLE_RUN);
+				std::chrono::milliseconds elapsed = {};
+				while (elapsed <= duration) {
+					auto now = std::chrono::steady_clock::now();
+					test_api::create_files(test_directory, TEST_FILES_COUNT, TEST_FILE_SIZE_IN_BYTES);
+					std::this_thread::sleep_for(std::chrono::milliseconds(TEST_CYCLE_DELETE_DELAY));
+					test_api::clear_directory(test_directory);
+					std::this_thread::sleep_for(std::chrono::milliseconds(TEST_CYCLE_DELETE_DELAY));
+					elapsed = duration_cast<std::chrono::milliseconds>(now - start);
+				}
+				
+				exit();
+			}
+#endif
 		protected:
 			void exit() override {
 				m_backend->m_run_watch.store(false);

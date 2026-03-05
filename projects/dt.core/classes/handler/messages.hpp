@@ -30,6 +30,7 @@ namespace core{
 			messages(build type, int argc, char* argv[]);
 
 			void process();
+			std::vector<core::arg_entry> get_entry_v() { return m_entry_v; }
 		protected:
 			std::atomic<bool> m_run_messages = true;
 			std::unique_ptr<core::backend::Cbackend> m_backend = nullptr;
