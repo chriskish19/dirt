@@ -5,3 +5,9 @@ args : -copy -watch -mirror
 	src "D:/dirt test src"
 	dst D:/dirt_test_dst
 }
+
+args : -copy -watch -mirror
+{
+	src D:/dt_src_2
+	dst D:/dt_dst_2
+}

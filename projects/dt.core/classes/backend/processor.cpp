@@ -336,7 +336,7 @@ void core::backend::queue_system::process_entry()
         }
 
         std::vector<std::thread> pq_tv;
-
+#if MAX_THREADS > 1
         if (m_entry_buffer.size() > MAX_QUEUE_SPLIT) {
             std::vector<std::queue<file_entry>> fe_qv = api::split_queue(m_entry_buffer, MAX_THREADS);
        
@@ -350,7 +350,9 @@ void core::backend::queue_system::process_entry()
         else {
             process_queue(m_entry_buffer);
         }
-
+#else
+        process_queue(m_entry_buffer);
+#endif
         std::queue<file_entry> empty_buffer;
         m_entry_buffer.swap(empty_buffer);
 
@@ -858,15 +860,23 @@ void core::backend::queue_system::exit_process_entry()
 
 void core::backend::queue_system::process_queue(std::queue<file_entry> buffer_q)
 {
-    m_bar_id_counter++;
-    add(time{ "In process queue about to process " + std::to_string(buffer_q.size()) + (buffer_q.size() < 2 ? " file notification\n" : " file notifications\n")});
+    m_thread_number++;
     auto q_size = buffer_q.size();
+#if TERMINAL_BUILD
+    m_q_size += q_size;
+#endif
+    add(time{ std::format("Thread #{} in process queue about to process {} file notifications\n", m_thread_number.load(), q_size) });
     std::size_t processed = 0;
     while (buffer_q.empty() == false) {
-        file_entry& entry = buffer_q.front();
+        file_entry& entry = buffer_q.front(); 
         processed++;
-        float percentage = (processed / (float)q_size) * 100;
-        add(progress_bar{ percentage,static_cast<core::backend::progress_bar::id>(m_bar_id_counter.load())});
+        m_processed++;
+
+#if TERMINAL_BUILD
+        float percentage = (m_processed.load() / (float)m_q_size.load()) * 100;
+        add(progress_bar{ percentage,m_thread_number.load() });
+#endif
+        
         if (skip_entry(entry) == true) {
             buffer_q.pop();
             continue;
@@ -880,8 +890,12 @@ void core::backend::queue_system::process_queue(std::queue<file_entry> buffer_q)
         }
         buffer_q.pop();
     }
-    add(time{ "Done. Processed " + std::to_string(q_size) + (q_size < 2 ? " file notification\n" : " file notifications\n") });
-    m_bar_id_counter--;
+    add(time{ std::format("Done. Thread #{} processed {} file notifications\n", m_thread_number.load(), processed) });
+
+#if TERMINAL_BUILD
+    add(terminal_message{ " waiting..." });
+#endif
+    m_thread_number--;
 }
 
 bool core::backend::queue_system::skip_entry(file_entry& entry)

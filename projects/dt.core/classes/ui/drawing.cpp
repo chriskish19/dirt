@@ -1,3 +1,4 @@
+#include "drawing.hpp"
 /**********************************************************/
 //
 // File: drawing.cpp
@@ -17,7 +18,7 @@ void core::main::loading_bar::draw() {
 	const char8_t* current_frame_start = frames + (frame_index * bytes_per_frame);
 	std::cout << "\r" << BLUE;
 	std::cout.write(reinterpret_cast<const char*>(current_frame_start), bytes_per_frame);
-	std::cout << " waiting..." << DEFAULT_COLOR;
+	std::cout << m_message << DEFAULT_COLOR;
 	// Advance to next frame
 	frame_index = (frame_index + 1) % num_frames;
 }

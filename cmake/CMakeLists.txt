@@ -8,7 +8,7 @@ set(dt_core "dt-core")
 set(build_type "terminal")
 
 # set for testing the system
-set(system_test ON)
+set(system_test OFF)
 
 # create the main project
 project(${dt_core})

@@ -55,7 +55,7 @@ void core::frontend::gui_with_terminal::process_commands(std::shared_ptr<core::b
 	{
 		auto message_info = std::dynamic_pointer_cast<core::backend::message>(ci);
 		if (message_info != nullptr) {
-			std::cout << message_info->text << '\n';
+			std::cout << message_info->text;
 		}
 		else {
 			std::cout << core::pointer_is_null_pkg.message() << '\n';
@@ -69,7 +69,7 @@ void core::frontend::gui_with_terminal::process_commands(std::shared_ptr<core::b
 	{
 		auto time_info = std::dynamic_pointer_cast<core::backend::time>(ci);
 		if (time_info != nullptr) {
-			std::cout << time_info->text << '\n';
+			std::cout << "[" << time_info->time_tp << "]" << time_info->text;
 		}
 		else {
 			std::cout << core::pointer_is_null_pkg.message() << '\n';
@@ -343,6 +343,33 @@ void core::frontend::terminal::draw_progress()
 void core::frontend::terminal::process_commands(std::shared_ptr<core::backend::commands_info> ci)
 {
 	switch (ci->command()) {
+	case core::backend::commands::terminal_message:
+	{
+		auto t_message_info = std::dynamic_pointer_cast<core::backend::terminal_message>(ci);
+		if (t_message_info != nullptr) {
+			progress.set_message(t_message_info->text);
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.message() << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+		break;
+	}
+
+	case core::backend::commands::update_progress_bar:
+	{
+		auto progress_bar_info = std::dynamic_pointer_cast<core::backend::progress_bar>(ci);
+		if (progress_bar_info != nullptr) {
+			progress.set_message(std::format(" Processing {:.1f}%", progress_bar_info->progress));
+			progress.draw();
+		}
+		else {
+			std::cout << core::pointer_is_null_pkg.message() << '\n';
+			std::cout << api::get_location() << '\n';
+		}
+		break;
+	}
+
 	case core::backend::commands::error:
 	{
 		auto error_info = std::dynamic_pointer_cast<core::backend::error>(ci);
@@ -377,7 +404,7 @@ void core::frontend::terminal::process_commands(std::shared_ptr<core::backend::c
 	{
 		auto message_info = std::dynamic_pointer_cast<core::backend::message>(ci);
 		if (message_info != nullptr) {
-			std::cout << message_info->text << '\n';
+			std::cout << message_info->text;
 		}
 		else {
 			std::cout << core::pointer_is_null_pkg.message() << '\n';
@@ -391,7 +418,7 @@ void core::frontend::terminal::process_commands(std::shared_ptr<core::backend::c
 	{
 		auto time_info = std::dynamic_pointer_cast<core::backend::time>(ci);
 		if (time_info != nullptr) {
-			std::cout << time_info->text << '\n';
+			std::cout << "[" << time_info->time_tp << "]" << time_info->text;
 		}
 		else {
 			std::cout << core::pointer_is_null_pkg.message() << '\n';

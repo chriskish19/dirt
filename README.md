@@ -1,12 +1,18 @@
 ﻿# Directory Tool (dt)
 
-## Updates 02-07-2026: 
+## Updates:
+### 02-07-2026
 <p>
 I dont recommend using this program, its simply experimental at this point. V1.1 found on the releases page currently has many bugs that I dont have time to fix. 
 The main branch is full of experimental code which needs a better testing framework. 
-Im in school full-time for the next 1.5 years, I wish I had the time to finish this program.  
+Im in school full-time for the next 1.5 years, I wish I had the time to finish this program.
 </p>
 
+### 03-07-2026
+<p>
+I've had some time to work on the terminal version and it looks promising. I've tested it extensively using the linux source code files about 71775 files in total. So im releasing it 
+as v1.2. I will continue work on the gui version for the time being.
+</p>
 
 ## Info:
 <p> 
@@ -21,15 +27,14 @@ Use command line arguments or a text file to specify arguments and paths.
 
 args : -copy -watch -mirror
 {
-	src ./test
-	dst ./hello
+	src "C:/my files"
+	dst D:/backup
 }
 ```
 <p>
 Its a simple syntax parser that looks for right token and in the right place. If there is a syntax error the terminal will 
 output a syntax error. But only a general error it doesnt tell what token is missing or where. There is no limit to the amount of directories
 to be monitored/synced but each will use a 4MB buffer so keep that in mind. The file can be named anything but the extension type must support UTF text.
-Currently v1.0 doesnt support spaces in the directory name. But Ive added code to support spaces and will add it to the next release.
 </p>
 
 ## Arguments:
@@ -95,6 +100,6 @@ be valid as long as copy or watch is specified. Src, dst must always be specifie
 <p>In your terminal:</p>
 
 ```powershell
-PS C:\Users\chris>.\dirt.core -dirt_list_path ./dirt_list.txt
+PS C:\Users\chris>.\dt-core -dirt_list_path ./dirt_list.txt
 
 ```

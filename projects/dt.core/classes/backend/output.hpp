@@ -28,6 +28,7 @@ namespace core {
 			file_delete,
 			directory_delete,
 			new_backend,
+			terminal_message,
 		};
 
 		struct commands_info {
@@ -37,23 +38,30 @@ namespace core {
 			virtual commands command() const = 0;
 		};
 
+		struct terminal_message : public commands_info {
+			terminal_message(const std::string& message)
+				:text(message) {
+			}
+			std::string text;
+			std::shared_ptr<commands_info> clone() const override {
+				return std::make_shared<terminal_message>(*this);
+			}
+			commands command() const override {
+				return commands::terminal_message;
+			}
+		};
+
 		struct progress_bar : public commands_info {
-			enum class id {
-				one = 1,
-				two,
-				three,
-				four
-			};
-			progress_bar(float _progress,progress_bar::id bar)
-				:progress(_progress),bar_number(bar){}
+			progress_bar(float _progress,int thread_number)
+				:progress(_progress),m_thread(thread_number){}
 			float progress;
+			int m_thread;
 			std::shared_ptr<commands_info> clone() const override {
 				return std::make_shared<progress_bar>(*this);
 			}
 			commands command() const override {
 				return commands::update_progress_bar;
 			}
-			id bar_number;
 		};
 
 		struct message : public commands_info {

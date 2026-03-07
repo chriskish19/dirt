@@ -71,7 +71,11 @@ namespace core {
 			void process_queue(std::queue<file_entry> buffer_q);
 			bool skip_entry(file_entry& entry);
 			std::mutex m_terminal_mtx;
-			std::atomic<int> m_bar_id_counter = 0;
+			std::atomic<int> m_thread_number = 0;
+#if TERMINAL_BUILD
+			std::atomic<std::size_t> m_q_size = 0;
+			std::atomic<std::size_t> m_processed = 0;
+#endif
 		};
 
 

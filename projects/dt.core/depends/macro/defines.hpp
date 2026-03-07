@@ -39,7 +39,7 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 #define DISABLE_DELETE 0						// no deleting when set to 1
 #define TEST_TIME_DELAY 1000					// wait x milli-seconds before flooding with work
 #define TEST_CYCLE_DELETE_DELAY 20000			// wait x milli-seconds between creating files and deleting
-#define TEST_FILES_COUNT 1000					// number of files to create
+#define TEST_FILES_COUNT 100000					// number of files to create
 #define TEST_FILE_SIZE_IN_BYTES 1000			// 1kb per file size
 #define TEST_CYCLE_RUN 500000					// run the test for x milliseconds
 
@@ -49,7 +49,7 @@ constexpr const char* CLEAR_LINE = "\r\033[K";
 */
 #define BUFFER_SIZE 1024 * 1024 * 4				// 4 MB Buffer
 #define BUFFER_TIME 10							// 10 seconds
-#define MAX_THREADS 4							// 4 threads
+#define MAX_THREADS 4							// x threads
 #define MAX_QUEUE_SPLIT 1000					// 1000 files per queue
 #define GUI_SYNC_INTERVAL 1000					// in ms
 
